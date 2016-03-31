@@ -10,11 +10,29 @@ set(EXTENSION_CONTRIBUTORS "Matt McCormick (Kitware, Inc.), Stephen Aylward (Kit
 set(EXTENSION_DESCRIPTION "Ultrasound image formation, processing, and analysis. Interfaces built off the ITKUltrasound library.")
 set(EXTENSION_ICONURL "http://www.example.com/Slicer/Extensions/SlicerITKUltrasound.png")
 set(EXTENSION_SCREENSHOTURLS "http://www.example.com/Slicer/Extensions/SlicerITKUltrasound/Screenshots/1.png")
+set(EXTENSION_BUILD_SUBDIRECTORY SlicerITKUltrasound-build)
+
+set(SUPERBUILD_TOPLEVEL_PROJECT SlicerITKUltrasound)
 
 #-----------------------------------------------------------------------------
 # Extension dependencies
 find_package(Slicer REQUIRED)
 include(${Slicer_USE_FILE})
+mark_as_superbuild(Slicer_DIR)
+mark_as_superbuild(PYTHON_EXECUTABLE)
+mark_as_superbuild(PYTHON_INCLUDE_DIR)
+mark_as_superbuild(PYTHON_LIBRARY)
+
+find_package(Git REQUIRED)
+mark_as_superbuild(GIT_EXECUTABLE)
+
+#-----------------------------------------------------------------------------
+option(${EXTENSION_NAME}_SUPERBUILD "Build ${EXTENSION_NAME} and the projects it depends on." ON)
+mark_as_advanced(${EXTENSION_NAME}_SUPERBUILD)
+if(${EXTENSION_NAME}_SUPERBUILD)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/SuperBuild.cmake")
+  return()
+endif()
 
 #-----------------------------------------------------------------------------
 # Extension modules
@@ -22,4 +40,7 @@ add_subdirectory(ScanConvertPhasedArray3D)
 ## NEXT_MODULE
 
 #-----------------------------------------------------------------------------
+#-----------------------------------------------------------------------------
+set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${EXTENSION_NAME};ALL;/")
+set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${Ultrasound_DIR};Ultrasound;RuntimeLibraries;/")
 include(${Slicer_EXTENSION_CPACK})
