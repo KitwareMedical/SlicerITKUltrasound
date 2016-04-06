@@ -1,0 +1,13 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker info
+    - docker pull slicer/slicer-build:
+        timeout: 3000
+
+test:
+  override:
+    - ~/SlicerITKUltrasound/Docker/run.sh
