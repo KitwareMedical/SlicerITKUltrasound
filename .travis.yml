@@ -1,0 +1,12 @@
+sudo: required
+
+language: cpp
+
+services:
+  - docker
+
+before_install:
+  - docker pull slicer/slicer-build
+
+script:
+  - ./Docker/run.sh
