@@ -1,22 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Examples</category>
+  <category>Ultrasound</category>
   <title>ScanConvertPhasedArray3D</title>
-  <description><![CDATA[This is a CLI module that can be bundled in an extension]]></description>
+  <description><![CDATA[Scan convert beam-line data from a 3D phased-array ultrasound probe.]]></description>
   <version>0.0.1</version>
   <documentation-url>http://www.example.com/Slicer/Modules/ScanConvertPhasedArray3D</documentation-url>
-  <license>Slicer</license>
-  <contributor>FirstName LastName (Institution), FirstName LastName (Institution)</contributor>
-  <acknowledgements>This work was partially funded by NIH grant NXNNXXNNNNNN-NNXN</acknowledgements>
+  <license>Apache 2.0</license>
+  <contributor>Matthew McCormick (Kitware, Inc)</contributor>
+  <acknowledgements>This work was partially funded by NIH Prostate Cancer Assessment grant 1R41CA196565-01</acknowledgements>
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
     <double>
-      <name>sigma</name>
-      <longflag>sigma</longflag>
-      <flag>s</flag>
-      <label>Sigma</label>
-      <description><![CDATA[A double value (in units of mm) passed to the algorithm]]></description>
+      <name>azimuthAngularSeparation</name>
+      <longflag>azimuthAngularSeparation</longflag>
+      <flag>a</flag>
+      <label>AzimuthAngularSeparation</label>
+      <description><![CDATA[The number of radians between each azimuth unit]]></description>
+      <default>0.017453292519943295</default>
+    </double>
+    <double>
+      <name>elevationAngularSeparation</name>
+      <longflag>elevationAngularSeparation</longflag>
+      <flag>e</flag>
+      <label>ElevationAngularSeparation</label>
+      <description><![CDATA[The number of radians between each elevation unit]]></description>
+      <default>0.017453292519943295</default>
+    </double>
+    <double>
+      <name>radiusSampleSize</name>
+      <longflag>radiusSampleSize</longflag>
+      <flag>r</flag>
+      <label>RadiusSampleSize</label>
+      <description><![CDATA[The number of Cartesian units between each unit along the R]]></description>
+      <default>1.0</default>
+    </double>
+    <double>
+      <name>firstSampleDistance</name>
+      <longflag>firstSampleDistance</longflag>
+      <flag>f</flag>
+      <label>FirstSampleDistance</label>
+      <description><![CDATA[The distance to add to the radius]]></description>
       <default>1.0</default>
     </double>
     <image>

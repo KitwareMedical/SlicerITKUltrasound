@@ -37,7 +37,7 @@ int DoIt( int argc, char * argv[], T )
 
   typename FilterType::Pointer filter = FilterType::New();
   filter->SetInput( reader->GetOutput() );
-  filter->SetSigma( sigma );
+  //filter->SetSigma( sigma );
 
   typename WriterType::Pointer writer = WriterType::New();
   writer->SetFileName( outputVolume.c_str() );
