@@ -12,14 +12,21 @@ target_link_libraries(${CLP}Test ${CLP}Lib ${SlicerExecutionModel_EXTRA_EXECUTAB
 set_target_properties(${CLP}Test PROPERTIES LABELS ${CLP})
 
 #-----------------------------------------------------------------------------
-#set(testname ${CLP}Test)
-#ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
-  #--compare DATA{${BASELINE}/${CLP}Test.nhdr,${CLP}Test.raw}
-  #${TEMP}/${CLP}Test.nhdr
-  #ModuleEntryPoint
-  #--sigma 2.5 DATA{${INPUT}/CTHeadAxial.nhdr,CTHeadAxial.raw.gz} ${TEMP}/${CLP}Test.nhdr
-  #)
-#set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+set(testname ${CLP}Test)
+ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  --compare DATA{${BASELINE}/${CLP}TestOutput.mha}
+    ${TEMP}/${CLP}TestOutput.mha
+  ModuleEntryPoint
+    --azimuthAngularSeparation 0.0872665
+    --elevationAngularSeparation 0.0174533
+    --radiusSampleSize 0.2
+    --firstSampleDistance 8.0
+    --outputSize 128,128,128
+    --outputSpacing 0.2,0.2,0.2
+    DATA{${INPUT}/${CLP}TestInput.mha}
+    ${TEMP}/${CLP}TestOutput.mha
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
 #-----------------------------------------------------------------------------
 ExternalData_add_target(${CLP}Data)

@@ -1,6 +1,26 @@
-#include "itkImageFileWriter.h"
+/*=========================================================================
+ *
+ *  Copyright Insight Software Consortium
+ *
+ *  Licensed under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License.
+ *  You may obtain a copy of the License at
+ *
+ *         http://www.apache.org/licenses/LICENSE-2.0.txt
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS,
+ *  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ *  See the License for the specific language governing permissions and
+ *  limitations under the License.
+ *
+ *=========================================================================*/
 
-#include "itkSmoothingRecursiveGaussianImageFilter.h"
+#include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
+#include "itkPhasedArray3DSpecialCoordinatesImage.h"
+#include "itkResampleImageFilter.h"
+#include "itkCastImageFilter.h"
 
 #include "itkPluginUtilities.h"
 
@@ -14,35 +34,58 @@
 namespace
 {
 
-template <class T>
-int DoIt( int argc, char * argv[], T )
+template< typename TPixel >
+int DoIt( int argc, char * argv[] )
 {
   PARSE_ARGS;
 
-  typedef    T InputPixelType;
-  typedef    T OutputPixelType;
+  const unsigned int Dimension = 3;
 
-  typedef itk::Image<InputPixelType,  3> InputImageType;
-  typedef itk::Image<OutputPixelType, 3> OutputImageType;
+  typedef TPixel                                                 PixelType;
+  typedef itk::PhasedArray3DSpecialCoordinatesImage< PixelType > InputImageType;
+  typedef itk::Image< PixelType, Dimension >                     OutputImageType;
+  typedef double                                                 CoordRepType;
 
-  typedef itk::ImageFileReader<InputImageType>  ReaderType;
-  typedef itk::ImageFileWriter<OutputImageType> WriterType;
-
-  typedef itk::SmoothingRecursiveGaussianImageFilter<
-    InputImageType, OutputImageType>  FilterType;
-
+  typedef itk::ImageFileReader< InputImageType > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
+  reader->SetFileName( inputVolume );
+  reader->Update();
+  typename InputImageType::Pointer inputImage = reader->GetOutput();
+  inputImage->DisconnectPipeline();
+  inputImage->SetAzimuthAngularSeparation( azimuthAngularSeparation );
+  inputImage->SetElevationAngularSeparation( elevationAngularSeparation );
+  inputImage->SetRadiusSampleSize( radiusSampleSize );
+  inputImage->SetFirstSampleDistance( firstSampleDistance );
 
-  reader->SetFileName( inputVolume.c_str() );
+  typedef itk::ResampleImageFilter< InputImageType, OutputImageType > ResamplerType;
+  typename ResamplerType::Pointer resampler = ResamplerType::New();
+  resampler->SetInput( inputImage );
 
-  typename FilterType::Pointer filter = FilterType::New();
-  filter->SetInput( reader->GetOutput() );
-  filter->SetSigma( sigma );
+  typename OutputImageType::SizeType size;
+  size[0] = outputSize[0];
+  size[1] = outputSize[1];
+  size[2] = outputSize[2];
+  resampler->SetSize( size );
 
+  typename OutputImageType::SpacingType spacing;
+  spacing[0] = outputSpacing[0];
+  spacing[1] = outputSpacing[1];
+  spacing[2] = outputSpacing[2];
+  resampler->SetOutputSpacing( spacing );
+
+  typename OutputImageType::PointType origin;
+  for( unsigned int ii = 0; ii < Dimension - 1; ++ii )
+    {
+    origin[ii] = -1 * spacing[ii] * size[ii]  / 2;
+    }
+  origin[2] = 0.0;
+  resampler->SetOutputOrigin( origin );
+
+  typedef itk::ImageFileWriter< OutputImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
-  writer->SetFileName( outputVolume.c_str() );
-  writer->SetInput( filter->GetOutput() );
-  writer->SetUseCompression(1);
+  writer->SetFileName( outputVolume );
+  writer->SetInput( resampler->GetOutput() );
+  writer->SetUseCompression( true );
   writer->Update();
 
   return EXIT_SUCCESS;
@@ -54,54 +97,38 @@ int main( int argc, char * argv[] )
 {
   PARSE_ARGS;
 
-  itk::ImageIOBase::IOPixelType     pixelType;
-  itk::ImageIOBase::IOComponentType componentType;
+  itk::ImageIOBase::IOPixelType     inputPixelType;
+  itk::ImageIOBase::IOComponentType inputComponentType;
 
   try
     {
-    itk::GetImageType(inputVolume, pixelType, componentType);
+    itk::GetImageType(inputVolume, inputPixelType, inputComponentType);
 
-    // This filter handles all types on input, but only produces
-    // signed types
-    switch( componentType )
+    switch( inputComponentType )
       {
       case itk::ImageIOBase::UCHAR:
-        return DoIt( argc, argv, static_cast<unsigned char>(0) );
-        break;
-      case itk::ImageIOBase::CHAR:
-        return DoIt( argc, argv, static_cast<char>(0) );
+        return DoIt< unsigned char >( argc, argv );
         break;
       case itk::ImageIOBase::USHORT:
-        return DoIt( argc, argv, static_cast<unsigned short>(0) );
+        return DoIt< unsigned short >( argc, argv );
         break;
       case itk::ImageIOBase::SHORT:
-        return DoIt( argc, argv, static_cast<short>(0) );
-        break;
-      case itk::ImageIOBase::UINT:
-        return DoIt( argc, argv, static_cast<unsigned int>(0) );
-        break;
-      case itk::ImageIOBase::INT:
-        return DoIt( argc, argv, static_cast<int>(0) );
-        break;
-      case itk::ImageIOBase::ULONG:
-        return DoIt( argc, argv, static_cast<unsigned long>(0) );
-        break;
-      case itk::ImageIOBase::LONG:
-        return DoIt( argc, argv, static_cast<long>(0) );
+        return DoIt< short >( argc, argv );
         break;
       case itk::ImageIOBase::FLOAT:
-        return DoIt( argc, argv, static_cast<float>(0) );
+        return DoIt< float >( argc, argv );
         break;
       case itk::ImageIOBase::DOUBLE:
-        return DoIt( argc, argv, static_cast<double>(0) );
+        return DoIt< double >( argc, argv );
         break;
-      case itk::ImageIOBase::UNKNOWNCOMPONENTTYPE:
       default:
-        std::cout << "unknown component type" << std::endl;
+        std::cerr << "Unknown input image pixel component type: "
+          << itk::ImageIOBase::GetComponentTypeAsString( inputComponentType )
+          << std::endl;
+        return EXIT_FAILURE;
         break;
       }
     }
-
   catch( itk::ExceptionObject & excep )
     {
     std::cerr << argv[0] << ": exception caught !" << std::endl;

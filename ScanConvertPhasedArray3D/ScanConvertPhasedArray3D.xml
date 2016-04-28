@@ -1,24 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
-  <category>Examples</category>
+  <category>Ultrasound</category>
   <title>ScanConvertPhasedArray3D</title>
-  <description><![CDATA[This is a CLI module that can be bundled in an extension]]></description>
+  <description><![CDATA[Scan convert beam-line data from a 3D phased-array ultrasound probe.]]></description>
   <version>0.0.1</version>
   <documentation-url>http://www.example.com/Slicer/Modules/ScanConvertPhasedArray3D</documentation-url>
-  <license>Slicer</license>
-  <contributor>FirstName LastName (Institution), FirstName LastName (Institution)</contributor>
-  <acknowledgements>This work was partially funded by NIH grant NXNNXXNNNNNN-NNXN</acknowledgements>
+  <license>Apache 2.0</license>
+  <contributor>Matthew McCormick (Kitware, Inc)</contributor>
+  <acknowledgements>This work was partially funded by NIH Prostate Cancer Assessment grant 1R41CA196565-01</acknowledgements>
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
-    <double>
-      <name>sigma</name>
-      <longflag>sigma</longflag>
-      <flag>s</flag>
-      <label>Sigma</label>
-      <description><![CDATA[A double value (in units of mm) passed to the algorithm]]></description>
-      <default>1.0</default>
-    </double>
     <image>
       <name>inputVolume</name>
       <label>Input Volume</label>
@@ -26,6 +18,54 @@
       <index>0</index>
       <description><![CDATA[Input volume]]></description>
     </image>
+    <double>
+      <name>azimuthAngularSeparation</name>
+      <longflag>azimuthAngularSeparation</longflag>
+      <flag>a</flag>
+      <label>Azimuth Angular Separation</label>
+      <description><![CDATA[The number of radians between each azimuth unit]]></description>
+      <default>0.017453292519943295</default>
+    </double>
+    <double>
+      <name>elevationAngularSeparation</name>
+      <label>Elevation Angular Separation</label>
+      <longflag>elevationAngularSeparation</longflag>
+      <flag>e</flag>
+      <description><![CDATA[The number of radians between each elevation unit]]></description>
+      <default>0.017453292519943295</default>
+    </double>
+    <double>
+      <name>radiusSampleSize</name>
+      <label>Radius Sample Size</label>
+      <longflag>radiusSampleSize</longflag>
+      <flag>r</flag>
+      <description><![CDATA[The number of Cartesian units between each unit along the R]]></description>
+      <default>1.0</default>
+    </double>
+    <double>
+      <name>firstSampleDistance</name>
+      <label>First Sample Distance</label>
+      <longflag>firstSampleDistance</longflag>
+      <flag>f</flag>
+      <description><![CDATA[The distance to add to the radius]]></description>
+      <default>1.0</default>
+    </double>
+    <integer-vector>
+      <name>outputSize</name>
+      <label>Output Size</label>
+      <longflag>outputSize</longflag>
+      <flag>s</flag>
+      <description><![CDATA[Number of voxels in each direction of the output image.]]></description>
+      <default>128,128,128</default>
+    </integer-vector>
+    <double-vector>
+      <name>outputSpacing</name>
+      <label>Output Spacing</label>
+      <longflag>outputSpacing</longflag>
+      <flag>p</flag>
+      <description><![CDATA[Spacing between voxels in each direction of the output image.]]></description>
+      <default>0.2,0.2,0.2</default>
+    </double-vector>
     <image>
       <name>outputVolume</name>
       <label>Output Volume</label>
