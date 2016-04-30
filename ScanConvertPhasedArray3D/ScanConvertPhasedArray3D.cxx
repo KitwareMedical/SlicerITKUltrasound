@@ -23,6 +23,7 @@
 #include "itkCastImageFilter.h"
 
 #include "itkPluginUtilities.h"
+#include "itkPluginFilterWatcher.h"
 
 #include "ScanConvertPhasedArray3DCLP.h"
 
@@ -80,6 +81,7 @@ int DoIt( int argc, char * argv[] )
     }
   origin[2] = 0.0;
   resampler->SetOutputOrigin( origin );
+  itk::PluginFilterWatcher watchResampler(resampler, "Resample Image", CLPProcessInformation);
 
   typedef itk::ImageFileWriter< OutputImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
