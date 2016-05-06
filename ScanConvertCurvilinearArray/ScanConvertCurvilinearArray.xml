@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Ultrasound</category>
+  <title>ScanConvertPhasedArray3D</title>
+  <description><![CDATA[Scan convert beam-line data from a curvilinear-array ultrasound probe.]]></description>
+  <version>0.0.1</version>
+  <documentation-url>http://www.example.com/Slicer/Modules/ScanConvertCurvilinearArray</documentation-url>
+  <license>Apache 2.0</license>
+  <contributor>Matthew McCormick (Kitware, Inc)</contributor>
+  <acknowledgements>This work was partially funded by NIH Prostate Cancer Assessment grant 1R41CA196565-01</acknowledgements>
+  <parameters>
+    <label>IO</label>
+    <description><![CDATA[Input/output parameters]]></description>
+    <image>
+      <name>inputVolume</name>
+      <label>Input Volume</label>
+      <channel>input</channel>
+      <index>0</index>
+      <description><![CDATA[Input volume]]></description>
+    </image>
+    <double>
+      <name>lateralAngularSeparation</name>
+      <longflag>lateralAngularSeparation</longflag>
+      <flag>a</flag>
+      <label>Lateral Angular Separation</label>
+      <description><![CDATA[The number of radians between each lateral unit]]></description>
+      <default>0.017453292519943295</default>
+    </double>
+    <double>
+      <name>radiusSampleSize</name>
+      <label>Radius Sample Size</label>
+      <longflag>radiusSampleSize</longflag>
+      <flag>r</flag>
+      <description><![CDATA[The number of Cartesian units between each unit along the R]]></description>
+      <default>1.0</default>
+    </double>
+    <double>
+      <name>firstSampleDistance</name>
+      <label>First Sample Distance</label>
+      <longflag>firstSampleDistance</longflag>
+      <flag>f</flag>
+      <description><![CDATA[The distance to add to the radius]]></description>
+      <default>1.0</default>
+    </double>
+    <integer-vector>
+      <name>outputSize</name>
+      <label>Output Size</label>
+      <longflag>outputSize</longflag>
+      <flag>s</flag>
+      <description><![CDATA[Number of voxels in each direction of the output image.]]></description>
+      <default>128,128,128</default>
+    </integer-vector>
+    <double-vector>
+      <name>outputSpacing</name>
+      <label>Output Spacing</label>
+      <longflag>outputSpacing</longflag>
+      <flag>p</flag>
+      <description><![CDATA[Spacing between voxels in each direction of the output image.]]></description>
+      <default>0.2,0.2,0.2</default>
+    </double-vector>
+    <image>
+      <name>outputVolume</name>
+      <label>Output Volume</label>
+      <channel>output</channel>
+      <index>1</index>
+      <description><![CDATA[Output Volume]]></description>
+    </image>
+  </parameters>
+</executable>
