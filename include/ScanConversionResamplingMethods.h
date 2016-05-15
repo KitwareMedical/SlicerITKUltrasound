@@ -20,6 +20,9 @@
 #define ScanConversionResamplingMethods_h
 
 #include "itkResampleImageFilter.h"
+#include "itkNearestNeighborInterpolateImageFunction.h"
+#include "itkLinearInterpolateImageFunction.h"
+
 #include "itkPluginFilterWatcher.h"
 
 namespace
@@ -42,8 +45,9 @@ int ITKScanConversionResampling(const typename TInputImage::Pointer & inputImage
   ModuleProcessInformation * CLPProcessInformation
   )
 {
-  typedef TInputImage   InputImageType;
-  typedef TOutputImage  OutputImageType;
+  typedef TInputImage  InputImageType;
+  typedef TOutputImage OutputImageType;
+  typedef double       CoordRepType;
 
   typedef itk::ResampleImageFilter< InputImageType, OutputImageType > ResamplerType;
   typename ResamplerType::Pointer resampler = ResamplerType::New();
@@ -53,6 +57,26 @@ int ITKScanConversionResampling(const typename TInputImage::Pointer & inputImage
   resampler->SetOutputSpacing( spacing );
   resampler->SetOutputOrigin( origin );
   resampler->SetOutputDirection( direction );
+  switch( method )
+    {
+  case ITK_NEAREST_NEIGHBOR:
+      {
+      typedef itk::NearestNeighborInterpolateImageFunction< InputImageType, CoordRepType > InterpolatorType;
+      typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      resampler->SetInterpolator( interpolator );
+      break;
+      }
+  case ITK_LINEAR:
+      {
+      typedef itk::LinearInterpolateImageFunction< InputImageType, CoordRepType > InterpolatorType;
+      typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      resampler->SetInterpolator( interpolator );
+      break;
+      }
+  default:
+    std::cerr << "Unsupported resampling method in ITKScanConversionResampling" << std::endl;
+    return EXIT_FAILURE;
+    }
 
   itk::PluginFilterWatcher watchResampler(resampler, "Resample Image", CLPProcessInformation);
   resampler->Update();
@@ -69,12 +93,22 @@ int ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
   const typename TOutputImage::SpacingType & spacing,
   const typename TOutputImage::PointType & origin,
   const typename TOutputImage::DirectionType & direction,
-  ScanConversionResamplingMethod method,
+  const std::string & methodString,
   ModuleProcessInformation * CLPProcessInformation
   )
 {
   typedef TInputImage  InputImageType;
   typedef TOutputImage OutputImageType;
+
+  ScanConversionResamplingMethod method = ITK_LINEAR;
+  if( methodString == "ITKNearestNeighbor" )
+    {
+    method = ITK_NEAREST_NEIGHBOR;
+    }
+  else if( methodString == "ITKLinear" )
+    {
+    method = ITK_LINEAR;
+    }
 
   switch( method )
     {

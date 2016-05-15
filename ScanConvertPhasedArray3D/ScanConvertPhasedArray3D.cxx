@@ -87,7 +87,7 @@ int DoIt( int argc, char * argv[] )
     spacing,
     origin,
     direction,
-    ITK_LINEAR,
+    method,
     CLPProcessInformation
   );
 
