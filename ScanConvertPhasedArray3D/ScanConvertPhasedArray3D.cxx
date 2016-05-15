@@ -26,6 +26,7 @@
 #include "itkPluginFilterWatcher.h"
 
 #include "ScanConvertPhasedArray3DCLP.h"
+#include "ScanConversionResamplingMethods.h"
 
 // Use an anonymous namespace to keep class types and function names
 // from colliding when module is used as shared object module.  Every
@@ -45,12 +46,12 @@ int DoIt( int argc, char * argv[] )
   typedef TPixel                                                 PixelType;
   typedef itk::PhasedArray3DSpecialCoordinatesImage< PixelType > InputImageType;
   typedef itk::Image< PixelType, Dimension >                     OutputImageType;
-  typedef double                                                 CoordRepType;
 
   typedef itk::ImageFileReader< InputImageType > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( inputVolume );
   reader->Update();
+
   typename InputImageType::Pointer inputImage = reader->GetOutput();
   inputImage->DisconnectPipeline();
   inputImage->SetAzimuthAngularSeparation( azimuthAngularSeparation );
@@ -58,21 +59,18 @@ int DoIt( int argc, char * argv[] )
   inputImage->SetRadiusSampleSize( radiusSampleSize );
   inputImage->SetFirstSampleDistance( firstSampleDistance );
 
-  typedef itk::ResampleImageFilter< InputImageType, OutputImageType > ResamplerType;
-  typename ResamplerType::Pointer resampler = ResamplerType::New();
-  resampler->SetInput( inputImage );
-
   typename OutputImageType::SizeType size;
   size[0] = outputSize[0];
   size[1] = outputSize[1];
   size[2] = outputSize[2];
-  resampler->SetSize( size );
 
   typename OutputImageType::SpacingType spacing;
   spacing[0] = outputSpacing[0];
   spacing[1] = outputSpacing[1];
   spacing[2] = outputSpacing[2];
-  resampler->SetOutputSpacing( spacing );
+
+  typename OutputImageType::DirectionType direction;
+  direction.SetIdentity();
 
   typename OutputImageType::PointType origin;
   for( unsigned int ii = 0; ii < Dimension - 1; ++ii )
@@ -80,13 +78,23 @@ int DoIt( int argc, char * argv[] )
     origin[ii] = -1 * spacing[ii] * size[ii]  / 2;
     }
   origin[2] = 0.0;
-  resampler->SetOutputOrigin( origin );
-  itk::PluginFilterWatcher watchResampler(resampler, "Resample Image", CLPProcessInformation);
+
+  typename OutputImageType::Pointer outputImage = OutputImageType::New();
+
+  ScanConversionResampling< InputImageType, OutputImageType >( inputImage,
+    outputImage,
+    size,
+    spacing,
+    origin,
+    direction,
+    ITK_LINEAR,
+    CLPProcessInformation
+  );
 
   typedef itk::ImageFileWriter< OutputImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
   writer->SetFileName( outputVolume );
-  writer->SetInput( resampler->GetOutput() );
+  writer->SetInput( outputImage );
   writer->SetUseCompression( true );
   writer->Update();
 
