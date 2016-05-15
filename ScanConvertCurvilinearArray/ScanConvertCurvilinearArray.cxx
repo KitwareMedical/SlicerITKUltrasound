@@ -25,6 +25,7 @@
 #include "itkPluginUtilities.h"
 
 #include "ScanConvertCurvilinearArrayCLP.h"
+#include "ScanConversionResamplingMethods.h"
 
 // Use an anonymous namespace to keep class types and function names
 // from colliding when module is used as shared object module.  Every
@@ -49,38 +50,47 @@ int DoIt( int argc, char * argv[] )
   typename ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( inputVolume );
   reader->Update();
+
   typename InputImageType::Pointer inputImage = reader->GetOutput();
   inputImage->DisconnectPipeline();
   inputImage->SetLateralAngularSeparation( lateralAngularSeparation );
   inputImage->SetRadiusSampleSize( radiusSampleSize );
   inputImage->SetFirstSampleDistance( firstSampleDistance );
 
-  typedef itk::ResampleImageFilter< InputImageType, OutputImageType > ResamplerType;
-  typename ResamplerType::Pointer resampler = ResamplerType::New();
-  resampler->SetInput( inputImage );
-
   typename OutputImageType::SizeType size;
   size[0] = outputSize[0];
   size[1] = outputSize[1];
   size[2] = outputSize[2];
-  resampler->SetSize( size );
 
   typename OutputImageType::SpacingType spacing;
   spacing[0] = outputSpacing[0];
   spacing[1] = outputSpacing[1];
   spacing[2] = outputSpacing[2];
-  resampler->SetOutputSpacing( spacing );
 
   typename OutputImageType::PointType origin;
   origin[0] = outputSize[0] * outputSpacing[0] / -2.0;
   origin[1] = firstSampleDistance * std::cos( (inputImage->GetLargestPossibleRegion().GetSize()[1] - 1) / 2.0 * lateralAngularSeparation );
   origin[2] = inputImage->GetOrigin()[2];
-  resampler->SetOutputOrigin( origin );
+
+  typename OutputImageType::DirectionType direction;
+  direction.SetIdentity();
+
+  typename OutputImageType::Pointer outputImage;
+
+  ScanConversionResampling< InputImageType, OutputImageType >( inputImage,
+    outputImage,
+    size,
+    spacing,
+    origin,
+    direction,
+    ITK_LINEAR,
+    CLPProcessInformation
+  );
 
   typedef itk::ImageFileWriter< OutputImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
   writer->SetFileName( outputVolume );
-  writer->SetInput( resampler->GetOutput() );
+  writer->SetInput( outputImage );
   writer->SetUseCompression( true );
   writer->Update();
 

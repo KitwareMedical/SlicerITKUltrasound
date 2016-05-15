@@ -79,7 +79,7 @@ int DoIt( int argc, char * argv[] )
     }
   origin[2] = 0.0;
 
-  typename OutputImageType::Pointer outputImage = OutputImageType::New();
+  typename OutputImageType::Pointer outputImage;
 
   ScanConversionResampling< InputImageType, OutputImageType >( inputImage,
     outputImage,
