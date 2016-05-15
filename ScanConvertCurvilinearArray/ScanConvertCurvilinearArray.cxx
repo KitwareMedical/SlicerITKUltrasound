@@ -44,7 +44,6 @@ int DoIt( int argc, char * argv[] )
   typedef TPixel                                                               PixelType;
   typedef itk::CurvilinearArraySpecialCoordinatesImage< PixelType, Dimension > InputImageType;
   typedef itk::Image< PixelType, Dimension >                                   OutputImageType;
-  typedef double                                                               CoordRepType;
 
   typedef itk::ImageFileReader< InputImageType > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
