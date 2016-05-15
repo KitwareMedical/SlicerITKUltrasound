@@ -7,8 +7,8 @@ set(proj ITKUltrasound)
 set(${proj}_DEPENDENCIES )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
-# master 2016-05-05
-set(${proj}_GIT_TAG 05de167661abef2b16a1085ec33dc924c066e6f5)
+# master 2016-05-25
+set(${proj}_GIT_TAG 5d8bb437908cda9769f05583edec43d2b0d1831d)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${git_protocol}://github.com/KitwareMedical/ITKUltrasound.git
@@ -21,8 +21,9 @@ ExternalProject_Add(${proj}
     -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
     -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
     -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
-    # to find ITKConfig.cmake
     -DITK_DIR:PATH=${ITK_DIR}
+    -DITKUltrasound_USE_VTK:BOOL=ON
+    -DVTK_DIR:PATH=${VTK_DIR}
     -DPYTHON_EXECUTABLE:FILEPATH=${PYTHON_EXECUTABLE}
     -DPYTHON_INCLUDE_DIR:PATH=${PYTHON_INCLUDE_DIR}
     -DPYTHON_LIBRARY:FILEPATH=${PYTHON_LIBRARY}
