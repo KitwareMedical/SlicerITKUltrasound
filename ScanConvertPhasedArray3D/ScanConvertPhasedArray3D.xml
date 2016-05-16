@@ -66,6 +66,15 @@
       <description><![CDATA[Spacing between voxels in each direction of the output image.]]></description>
       <default>0.2,0.2,0.2</default>
     </double-vector>
+    <string-enumeration>
+      <name>method</name>
+      <flag>m</flag>
+      <longflag>method</longflag>
+      <description><![CDATA[Scan conversion resampling method.]]></description>
+      <default>ITKLinear</default>
+      <element>ITKNearestNeighbor</element>
+      <element>ITKLinear</element>
+    </string-enumeration>
     <image>
       <name>outputVolume</name>
       <label>Output Volume</label>
