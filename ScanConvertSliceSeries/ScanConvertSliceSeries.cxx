@@ -109,7 +109,9 @@ int DoIt( int argc, char * argv[] )
       }
 
     }
+
   const itk::IndexValueType sliceIndex = inputSize[2] - 1;
+  inputIndex[2] = sliceIndex;
 
   inputIndex[0] = 0;
   inputIndex[1] = 0;
@@ -148,19 +150,21 @@ int DoIt( int argc, char * argv[] )
 
 
   typename OutputImageType::SpacingType spacing;
-  spacing[0] = outputSpacing[0];
-  spacing[1] = outputSpacing[1];
-  spacing[2] = outputSpacing[2];
+  for( unsigned int ii = 0; ii < Dimension; ++ii )
+    {
+    spacing[ii] = outputSpacing[ii];
+    }
 
-  //typename OutputImageType::PointType origin;
-  //origin[0] = outputSize[0] * outputSpacing[0] / -2.0;
-  //origin[1] = firstSampleDistance * std::cos( (inputImage->GetLargestPossibleRegion().GetSize()[1] - 1) / 2.0 * lateralAngularSeparation );
-  //origin[2] = inputImage->GetOrigin()[2];
+  typename OutputImageType::SizeType size;
+  for( unsigned int ii = 0; ii < Dimension; ++ii )
+    {
+    size[ii] = ( upperBound[ii] - lowerBound[ii] ) / outputSpacing[ii] + 1;
+    }
 
-  //typename OutputImageType::DirectionType direction;
-  //direction.SetIdentity();
+  typename OutputImageType::DirectionType direction;
+  direction.SetIdentity();
 
-  //typename OutputImageType::Pointer outputImage;
+  typename OutputImageType::Pointer outputImage;
 
   //ScanConversionResampling< InputImageType, OutputImageType >( inputImage,
     //outputImage,
