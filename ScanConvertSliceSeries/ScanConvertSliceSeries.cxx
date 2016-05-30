@@ -56,12 +56,12 @@ int DoIt( int argc, char * argv[] )
   typename ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( inputVolume );
   reader->Update();
-  typename InputImageType::ConstPointer inputImage = reader->GetOutput();
+  typename InputImageType::Pointer inputImage = reader->GetOutput();
 
   // Find the bounding box of the input
-  typedef typename InputImageType::PointType InputPointType;
-  InputPointType lowerBound( itk::NumericTraits< typename InputPointType::CoordRepType >::max() );
-  InputPointType upperBound( itk::NumericTraits< typename InputPointType::CoordRepType >::NonpositiveMin() );
+  typedef typename OutputImageType::PointType OutputPointType;
+  OutputPointType lowerBound( itk::NumericTraits< typename OutputPointType::CoordRepType >::max() );
+  OutputPointType upperBound( itk::NumericTraits< typename OutputPointType::CoordRepType >::NonpositiveMin() );
 
   typename InputImageType::SizeType inputSize = inputImage->GetLargestPossibleRegion().GetSize();
   typename InputImageType::IndexType inputIndex;
@@ -166,22 +166,22 @@ int DoIt( int argc, char * argv[] )
 
   typename OutputImageType::Pointer outputImage;
 
-  //ScanConversionResampling< InputImageType, OutputImageType >( inputImage,
-    //outputImage,
-    //size,
-    //spacing,
-    //origin,
-    //direction,
-    //method,
-    //CLPProcessInformation
-  //);
+  ScanConversionResampling< InputImageType, OutputImageType >( inputImage,
+    outputImage,
+    size,
+    spacing,
+    lowerBound,
+    direction,
+    method,
+    CLPProcessInformation
+  );
 
-  //typedef itk::ImageFileWriter< OutputImageType > WriterType;
-  //typename WriterType::Pointer writer = WriterType::New();
-  //writer->SetFileName( outputVolume );
-  //writer->SetInput( outputImage );
-  //writer->SetUseCompression( true );
-  //writer->Update();
+  typedef itk::ImageFileWriter< OutputImageType > WriterType;
+  typename WriterType::Pointer writer = WriterType::New();
+  writer->SetFileName( outputVolume );
+  writer->SetInput( outputImage );
+  writer->SetUseCompression( true );
+  writer->Update();
 
   return EXIT_SUCCESS;
 }
