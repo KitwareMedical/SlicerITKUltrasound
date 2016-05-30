@@ -7,11 +7,11 @@ set(proj ITKUltrasound)
 set(${proj}_DEPENDENCIES )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
-# master 2016-05-29
-set(${proj}_GIT_TAG 8f848928f1f794cb46e515f8969902a5b65b30c3)
+# disable-wrapping 2016-05-30
+set(${proj}_GIT_TAG e08b714c52bef9fc45cf14558fd7cbfa4e9583df)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
-  GIT_REPOSITORY ${git_protocol}://github.com/KitwareMedical/ITKUltrasound.git
+  GIT_REPOSITORY ${git_protocol}://github.com/thewtex/ITKUltrasound.git
   GIT_TAG ${${proj}_GIT_TAG}
   SOURCE_DIR ${proj}
   BINARY_DIR ${proj}-build
