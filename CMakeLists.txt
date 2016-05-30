@@ -36,7 +36,9 @@ endif()
 
 #-----------------------------------------------------------------------------
 # Extension modules
-add_subdirectory(ScanConvertPhasedArray3D)
+# TODO: re-enable after Slicer's ITK gets this patch:
+# http://review.source.kitware.com/#/c/21119/
+#add_subdirectory(ScanConvertPhasedArray3D)
 add_subdirectory(ScanConvertCurvilinearArray)
 
 #-----------------------------------------------------------------------------
