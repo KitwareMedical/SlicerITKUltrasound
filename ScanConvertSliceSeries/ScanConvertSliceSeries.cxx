@@ -49,28 +49,108 @@ int DoIt( int argc, char * argv[] )
   typedef double                                                                                         ParametersValueType;
   typedef itk::Image< PixelType, SliceDimension >                                                        SliceImageType;
   typedef itk::Euler3DTransform< ParametersValueType >                                                   TransformType;
-  typedef itk::SliceSeriesSpecialCoordinatesImage< SliceImageType, TransformType, PixelType, Dimension > SpecialCoordinatesImageType;
+  typedef itk::SliceSeriesSpecialCoordinatesImage< SliceImageType, TransformType, PixelType, Dimension > InputImageType;
+  typedef itk::Image< PixelType, Dimension >                                                             OutputImageType;
 
-  typedef itk::UltrasoundImageFileReader< SpecialCoordinatesImageType > ReaderType;
+  typedef itk::UltrasoundImageFileReader< InputImageType > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( inputVolume );
   reader->Update();
+  typename InputImageType::ConstPointer inputImage = reader->GetOutput();
 
-  //typename InputImageType::Pointer inputImage = reader->GetOutput();
-  //inputImage->DisconnectPipeline();
-  //inputImage->SetLateralAngularSeparation( lateralAngularSeparation );
-  //inputImage->SetRadiusSampleSize( radiusSampleSize );
-  //inputImage->SetFirstSampleDistance( firstSampleDistance );
+  // Find the bounding box of the input
+  typedef typename InputImageType::PointType InputPointType;
+  InputPointType lowerBound( itk::NumericTraits< typename InputPointType::CoordRepType >::max() );
+  InputPointType upperBound( itk::NumericTraits< typename InputPointType::CoordRepType >::NonpositiveMin() );
 
-  //typename OutputImageType::SizeType size;
-  //size[0] = outputSize[0];
-  //size[1] = outputSize[1];
-  //size[2] = outputSize[2];
+  typename InputImageType::SizeType inputSize = inputImage->GetLargestPossibleRegion().GetSize();
+  typename InputImageType::IndexType inputIndex;
+  typename InputImageType::PointType point;
+  // Only sample with some of the slices so we get a sufficient sampling of
+  // the bounds
+  const itk::IndexValueType sliceStride = 4;
+  for( itk::IndexValueType sliceIndex = 0; sliceIndex < inputSize[2]; sliceIndex += sliceStride  )
+    {
+    inputIndex[0] = 0;
+    inputIndex[1] = 0;
+    inputIndex[2] = sliceIndex;
 
-  //typename OutputImageType::SpacingType spacing;
-  //spacing[0] = outputSpacing[0];
-  //spacing[1] = outputSpacing[1];
-  //spacing[2] = outputSpacing[2];
+    inputImage->TransformIndexToPhysicalPoint( inputIndex, point );
+    for( unsigned int ii = 0; ii < Dimension; ++ii )
+      {
+      lowerBound[ii] = std::min( lowerBound[ii], point[ii] );
+      upperBound[ii] = std::max( upperBound[ii], point[ii] );
+      }
+
+    inputIndex[0] = inputSize[0] - 1;
+    inputImage->TransformIndexToPhysicalPoint( inputIndex, point );
+    for( unsigned int ii = 0; ii < Dimension; ++ii )
+      {
+      lowerBound[ii] = std::min( lowerBound[ii], point[ii] );
+      upperBound[ii] = std::max( upperBound[ii], point[ii] );
+      }
+
+    inputIndex[0] = 0;
+    inputIndex[1] = inputSize[1] - 1;
+    inputImage->TransformIndexToPhysicalPoint( inputIndex, point );
+    for( unsigned int ii = 0; ii < Dimension; ++ii )
+      {
+      lowerBound[ii] = std::min( lowerBound[ii], point[ii] );
+      upperBound[ii] = std::max( upperBound[ii], point[ii] );
+      }
+
+    inputIndex[0] = inputSize[0] - 1;
+    inputIndex[1] = inputSize[1] - 1;
+    inputImage->TransformIndexToPhysicalPoint( inputIndex, point );
+    for( unsigned int ii = 0; ii < Dimension; ++ii )
+      {
+      lowerBound[ii] = std::min( lowerBound[ii], point[ii] );
+      upperBound[ii] = std::max( upperBound[ii], point[ii] );
+      }
+
+    }
+  const itk::IndexValueType sliceIndex = inputSize[2] - 1;
+
+  inputIndex[0] = 0;
+  inputIndex[1] = 0;
+  inputImage->TransformIndexToPhysicalPoint( inputIndex, point );
+  for( unsigned int ii = 0; ii < Dimension; ++ii )
+    {
+    lowerBound[ii] = std::min( lowerBound[ii], point[ii] );
+    upperBound[ii] = std::max( upperBound[ii], point[ii] );
+    }
+
+  inputIndex[0] = inputSize[0] - 1;
+  inputImage->TransformIndexToPhysicalPoint( inputIndex, point );
+  for( unsigned int ii = 0; ii < Dimension; ++ii )
+    {
+    lowerBound[ii] = std::min( lowerBound[ii], point[ii] );
+    upperBound[ii] = std::max( upperBound[ii], point[ii] );
+    }
+
+  inputIndex[0] = 0;
+  inputIndex[1] = inputSize[1] - 1;
+  inputImage->TransformIndexToPhysicalPoint( inputIndex, point );
+  for( unsigned int ii = 0; ii < Dimension; ++ii )
+    {
+    lowerBound[ii] = std::min( lowerBound[ii], point[ii] );
+    upperBound[ii] = std::max( upperBound[ii], point[ii] );
+    }
+
+  inputIndex[0] = inputSize[0] - 1;
+  inputIndex[1] = inputSize[1] - 1;
+  inputImage->TransformIndexToPhysicalPoint( inputIndex, point );
+  for( unsigned int ii = 0; ii < Dimension; ++ii )
+    {
+    lowerBound[ii] = std::min( lowerBound[ii], point[ii] );
+    upperBound[ii] = std::max( upperBound[ii], point[ii] );
+    }
+
+
+  typename OutputImageType::SpacingType spacing;
+  spacing[0] = outputSpacing[0];
+  spacing[1] = outputSpacing[1];
+  spacing[2] = outputSpacing[2];
 
   //typename OutputImageType::PointType origin;
   //origin[0] = outputSize[0] * outputSpacing[0] / -2.0;
