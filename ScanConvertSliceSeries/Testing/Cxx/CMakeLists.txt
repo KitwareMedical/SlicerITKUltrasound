@@ -13,7 +13,8 @@ set_target_properties(${CLP}Test PROPERTIES LABELS ${CLP})
 
 #-----------------------------------------------------------------------------
 set(testname ${CLP}Test)
-ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND ${SEM_LAUNCH_COMMAND} ${CLP}Test
+ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND
+  ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
   ModuleEntryPoint
     DATA{${INPUT}/bmode_p59.hdf5}
     ${TEMP}/${CLP}TestOutput.mha
