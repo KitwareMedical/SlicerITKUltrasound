@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <executable>
   <category>Ultrasound</category>
-  <title>ScanConvertPhasedArray3D</title>
-  <description><![CDATA[Scan convert beam-line data from a curvilinear-array ultrasound probe.]]></description>
+  <title>ScanConvertSliceSeries</title>
+  <description><![CDATA[Scan convert a 3D ultrasound volume collected as a series of adjacent 2D images.]]></description>
   <version>0.0.1</version>
-  <documentation-url>http://www.example.com/Slicer/Modules/ScanConvertCurvilinearArray</documentation-url>
+  <documentation-url>http://www.example.com/Slicer/Modules/ScanConvertSliceSeries</documentation-url>
   <license>Apache 2.0</license>
   <contributor>Matthew McCormick (Kitware, Inc)</contributor>
   <acknowledgements>This work was partially funded by NIH Prostate Cancer Assessment grant 1R41CA196565-01</acknowledgements>
@@ -18,30 +18,6 @@
       <index>0</index>
       <description><![CDATA[Input volume]]></description>
     </image>
-    <double>
-      <name>lateralAngularSeparation</name>
-      <longflag>lateralAngularSeparation</longflag>
-      <flag>a</flag>
-      <label>Lateral Angular Separation</label>
-      <description><![CDATA[The number of radians between each lateral unit]]></description>
-      <default>0.017453292519943295</default>
-    </double>
-    <double>
-      <name>radiusSampleSize</name>
-      <label>Radius Sample Size</label>
-      <longflag>radiusSampleSize</longflag>
-      <flag>r</flag>
-      <description><![CDATA[The number of Cartesian units between each unit along the R]]></description>
-      <default>1.0</default>
-    </double>
-    <double>
-      <name>firstSampleDistance</name>
-      <label>First Sample Distance</label>
-      <longflag>firstSampleDistance</longflag>
-      <flag>f</flag>
-      <description><![CDATA[The distance to add to the radius]]></description>
-      <default>1.0</default>
-    </double>
     <integer-vector>
       <name>outputSize</name>
       <label>Output Size</label>
