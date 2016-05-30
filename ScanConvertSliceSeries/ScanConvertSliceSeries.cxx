@@ -21,6 +21,8 @@
 #include "itkCurvilinearArraySpecialCoordinatesImage.h"
 #include "itkResampleImageFilter.h"
 #include "itkCastImageFilter.h"
+#include "itkUltrasoundImageFileReader.h"
+#include "itkHDF5UltrasoundImageIOFactory.h"
 
 #include "itkPluginUtilities.h"
 
@@ -40,7 +42,7 @@ int DoIt( int argc, char * argv[] )
 {
   PARSE_ARGS;
 
-  const unsigned int Dimension = 3;
+  //const unsigned int Dimension = 3;
 
   //typedef TPixel                                                               PixelType;
   //typedef itk::CurvilinearArraySpecialCoordinatesImage< PixelType, Dimension > InputImageType;
@@ -103,15 +105,17 @@ int main( int argc, char * argv[] )
 {
   PARSE_ARGS;
 
-  //itk::ImageIOBase::IOPixelType     inputPixelType;
-  //itk::ImageIOBase::IOComponentType inputComponentType;
+  itk::ImageIOBase::IOPixelType     inputPixelType;
+  itk::ImageIOBase::IOComponentType inputComponentType;
 
-  //try
-    //{
-    //itk::GetImageType(inputVolume, inputPixelType, inputComponentType);
+  try
+    {
+    itk::HDF5UltrasoundImageIOFactory::RegisterOneFactory();
 
-    //switch( inputComponentType )
-      //{
+    itk::GetImageType(inputVolume, inputPixelType, inputComponentType);
+
+    switch( inputComponentType )
+      {
       //case itk::ImageIOBase::UCHAR:
         //return DoIt< unsigned char >( argc, argv );
         //break;
@@ -121,25 +125,25 @@ int main( int argc, char * argv[] )
       //case itk::ImageIOBase::SHORT:
         //return DoIt< short >( argc, argv );
         //break;
-      //case itk::ImageIOBase::FLOAT:
-        //return DoIt< float >( argc, argv );
-        //break;
+      case itk::ImageIOBase::FLOAT:
+        return DoIt< float >( argc, argv );
+        break;
       //case itk::ImageIOBase::DOUBLE:
         //return DoIt< double >( argc, argv );
         //break;
-      //default:
-        //std::cerr << "Unknown input image pixel component type: "
-          //<< itk::ImageIOBase::GetComponentTypeAsString( inputComponentType )
-          //<< std::endl;
-        //return EXIT_FAILURE;
-        //break;
-      //}
-    //}
-  //catch( itk::ExceptionObject & excep )
-    //{
-    //std::cerr << argv[0] << ": exception caught !" << std::endl;
-    //std::cerr << excep << std::endl;
-    //return EXIT_FAILURE;
-    //}
+      default:
+        std::cerr << "Unknown input image pixel component type: "
+          << itk::ImageIOBase::GetComponentTypeAsString( inputComponentType )
+          << std::endl;
+        return EXIT_FAILURE;
+        break;
+      }
+    }
+  catch( itk::ExceptionObject & excep )
+    {
+    std::cerr << argv[0] << ": exception caught !" << std::endl;
+    std::cerr << excep << std::endl;
+    return EXIT_FAILURE;
+    }
   return EXIT_SUCCESS;
 }
