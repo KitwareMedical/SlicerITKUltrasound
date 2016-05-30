@@ -8,7 +8,7 @@ set(${proj}_DEPENDENCIES )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
 # master 2016-05-25
-set(${proj}_GIT_TAG 5d8bb437908cda9769f05583edec43d2b0d1831d)
+set(${proj}_GIT_TAG 972c7be4bdfacb0a41972ef86b99de368da2e1b5)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${git_protocol}://github.com/KitwareMedical/ITKUltrasound.git

@@ -22,6 +22,7 @@
 #include "itkResampleImageFilter.h"
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkLinearInterpolateImageFunction.h"
+#include "itkWindowedSincInterpolateImageFunction.h"
 
 #include "itkPluginFilterWatcher.h"
 
@@ -30,7 +31,8 @@ namespace
 
 enum ScanConversionResamplingMethod {
   ITK_NEAREST_NEIGHBOR = 0,
-  ITK_LINEAR
+  ITK_LINEAR,
+  ITK_WINDOWED_SINC
 };
 
 
@@ -73,6 +75,15 @@ int ITKScanConversionResampling(const typename TInputImage::Pointer & inputImage
       resampler->SetInterpolator( interpolator );
       break;
       }
+  case ITK_WINDOWED_SINC:
+      {
+      static const unsigned int Radius = 3;
+      typedef itk::Function::LanczosWindowFunction< Radius, CoordRepType, CoordRepType > WindowFunctionType;
+      typedef itk::WindowedSincInterpolateImageFunction< InputImageType, Radius, WindowFunctionType > InterpolatorType;
+      typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      resampler->SetInterpolator( interpolator );
+      break;
+      }
   default:
     std::cerr << "Unsupported resampling method in ITKScanConversionResampling" << std::endl;
     return EXIT_FAILURE;
@@ -109,11 +120,16 @@ int ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
     {
     method = ITK_LINEAR;
     }
+  else if( methodString == "ITKWindowedSinc" )
+    {
+    method = ITK_WINDOWED_SINC;
+    }
 
   switch( method )
     {
   case ITK_NEAREST_NEIGHBOR:
   case ITK_LINEAR:
+  case ITK_WINDOWED_SINC:
     return ITKScanConversionResampling< InputImageType, OutputImageType >( inputImage,
       outputImage,
       size,
