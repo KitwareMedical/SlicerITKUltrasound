@@ -16,9 +16,9 @@
  *
  *=========================================================================*/
 
-#include "itkImageFileReader.h"
 #include "itkImageFileWriter.h"
-#include "itkCurvilinearArraySpecialCoordinatesImage.h"
+#include "itkSliceSeriesSpecialCoordinatesImage.h"
+#include "itkEuler3DTransform.h"
 #include "itkResampleImageFilter.h"
 #include "itkCastImageFilter.h"
 #include "itkUltrasoundImageFileReader.h"
@@ -42,16 +42,19 @@ int DoIt( int argc, char * argv[] )
 {
   PARSE_ARGS;
 
-  //const unsigned int Dimension = 3;
+  const unsigned int Dimension = 3;
+  const unsigned int SliceDimension = Dimension - 1;
 
-  //typedef TPixel                                                               PixelType;
-  //typedef itk::CurvilinearArraySpecialCoordinatesImage< PixelType, Dimension > InputImageType;
-  //typedef itk::Image< PixelType, Dimension >                                   OutputImageType;
+  typedef TPixel                                                                                         PixelType;
+  typedef double                                                                                         ParametersValueType;
+  typedef itk::Image< PixelType, SliceDimension >                                                        SliceImageType;
+  typedef itk::Euler3DTransform< ParametersValueType >                                                   TransformType;
+  typedef itk::SliceSeriesSpecialCoordinatesImage< SliceImageType, TransformType, PixelType, Dimension > SpecialCoordinatesImageType;
 
-  //typedef itk::ImageFileReader< InputImageType > ReaderType;
-  //typename ReaderType::Pointer reader = ReaderType::New();
-  //reader->SetFileName( inputVolume );
-  //reader->Update();
+  typedef itk::UltrasoundImageFileReader< SpecialCoordinatesImageType > ReaderType;
+  typename ReaderType::Pointer reader = ReaderType::New();
+  reader->SetFileName( inputVolume );
+  reader->Update();
 
   //typename InputImageType::Pointer inputImage = reader->GetOutput();
   //inputImage->DisconnectPipeline();
@@ -110,6 +113,7 @@ int main( int argc, char * argv[] )
 
   try
     {
+    // TODO: use the CMake configured factory registration
     itk::HDF5UltrasoundImageIOFactory::RegisterOneFactory();
 
     itk::GetImageType(inputVolume, inputPixelType, inputComponentType);
