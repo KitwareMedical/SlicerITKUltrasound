@@ -15,7 +15,10 @@ set_target_properties(${CLP}Test PROPERTIES LABELS ${CLP})
 set(testname ${CLP}Test)
 ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND
   ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  --compare DATA{${BASELINE}/${CLP}TestOutput.mha}
+    ${TEMP}/${CLP}TestOutput.mha
   ModuleEntryPoint
+    --outputSpacing 1.0,1.0,1.0
     DATA{${INPUT}/bmode_p59.hdf5}
     ${TEMP}/${CLP}TestOutput.mha
   )
