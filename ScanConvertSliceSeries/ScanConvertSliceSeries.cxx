@@ -189,6 +189,7 @@ int DoIt( int argc, char * argv[] )
   writer->SetFileName( outputVolume );
   writer->SetInput( outputImage );
   writer->SetUseCompression( true );
+  itk::PluginFilterWatcher watchWriter(writer, "Write Output", CLPProcessInformation);
   writer->Update();
 
   return EXIT_SUCCESS;
