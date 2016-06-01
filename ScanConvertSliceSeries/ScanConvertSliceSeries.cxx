@@ -23,6 +23,7 @@
 #include "itkCastImageFilter.h"
 #include "itkUltrasoundImageFileReader.h"
 #include "itkHDF5UltrasoundImageIOFactory.h"
+#include "itkReplaceNonFiniteImageFilter.h"
 
 #include "itkPluginUtilities.h"
 
@@ -55,8 +56,15 @@ int DoIt( int argc, char * argv[] )
   typedef itk::UltrasoundImageFileReader< InputImageType > ReaderType;
   typename ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( inputVolume );
-  reader->Update();
-  typename InputImageType::Pointer inputImage = reader->GetOutput();
+
+  typedef itk::ReplaceNonFiniteImageFilter< InputImageType > ReplaceNonFiniteFilterType;
+  typename ReplaceNonFiniteFilterType::Pointer replaceNonFiniteFilter = ReplaceNonFiniteFilterType::New();
+  replaceNonFiniteFilter->SetInput( reader->GetOutput() );
+  replaceNonFiniteFilter->InPlaceOn();
+  itk::PluginFilterWatcher watchReplaceNonFinite(replaceNonFiniteFilter, "Replace NonFinite", CLPProcessInformation);
+  replaceNonFiniteFilter->UpdateLargestPossibleRegion();
+
+  typename InputImageType::Pointer inputImage = replaceNonFiniteFilter->GetOutput();
 
   // Find the bounding box of the input
   typedef typename OutputImageType::PointType OutputPointType;
