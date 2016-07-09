@@ -7,8 +7,8 @@ set(proj ITKUltrasound)
 set(${proj}_DEPENDENCIES )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
-# disable-wrapping 2016-06-01
-set(${proj}_GIT_TAG 3468f98076b617ea2d1704a78db4a0f6e6b8cedf)
+# disable-wrapping 2016-08-09
+set(${proj}_GIT_TAG 0cb92288333a9779da57511f779d0bde5ca35275)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${git_protocol}://github.com/thewtex/ITKUltrasound.git
