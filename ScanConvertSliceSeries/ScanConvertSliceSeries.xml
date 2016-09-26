@@ -43,6 +43,7 @@
       <element>ITKNearestNeighbor</element>
       <element>ITKLinear</element>
       <element>ITKWindowedSinc</element>
+      <element>VTKProbeFilter</element>
     </string-enumeration>
     <image>
       <name>outputVolume</name>

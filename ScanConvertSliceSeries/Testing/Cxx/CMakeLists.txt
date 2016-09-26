@@ -24,5 +24,18 @@ ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
+set(testname ${CLP}VTKProbeFilterTest)
+ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND
+  ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  --compare DATA{${BASELINE}/${CLP}VTKProbeFilterTestOutput.mha}
+    ${TEMP}/${CLP}VTKProbeFilterTestOutput.mha
+  ModuleEntryPoint
+    --method VTKProbeFilter
+    --outputSpacing 1.0,1.0,1.0
+    DATA{${INPUT}/bmode_p59.hdf5}
+    ${TEMP}/${CLP}VTKProbeFilterTestOutput.mha
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+
 #-----------------------------------------------------------------------------
 ExternalData_add_target(${CLP}Data)
