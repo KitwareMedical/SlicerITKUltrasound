@@ -16,6 +16,7 @@ include(${SlicerExecutionModel_USE_FILE})
 set(${PROJECT_NAME}_ITK_COMPONENTS
   ITKIOImageBase
   ITKSmoothing
+  ITKVtkGlue
   Ultrasound
   )
 find_package(ITK 4.9 COMPONENTS ${${PROJECT_NAME}_ITK_COMPONENTS} REQUIRED)

@@ -77,7 +77,7 @@ int DoIt( int argc, char * argv[] )
   // Only sample with some of the slices so we get a sufficient sampling of
   // the bounds
   const itk::IndexValueType sliceStride = 4;
-  for( itk::IndexValueType sliceIndex = 0; sliceIndex < inputSize[2]; sliceIndex += sliceStride  )
+  for( itk::IndexValueType sliceIndex = 0; sliceIndex < static_cast< itk::IndexValueType >( inputSize[2] ); sliceIndex += sliceStride  )
     {
     inputIndex[0] = 0;
     inputIndex[1] = 0;

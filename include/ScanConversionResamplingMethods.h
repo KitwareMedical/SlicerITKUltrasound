@@ -23,6 +23,14 @@
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkWindowedSincInterpolateImageFunction.h"
+#include "itkSpecialCoordinatesImageToVTKStructuredGridFilter.h"
+#include "itkVTKImageToImageFilter.h"
+#include "itkImageAlgorithm.h"
+
+#include "vtkProbeFilter.h"
+#include "vtkImageData.h"
+#include "vtkNew.h"
+#include "vtkStructuredGrid.h"
 
 #include "itkPluginFilterWatcher.h"
 
@@ -32,12 +40,14 @@ namespace
 enum ScanConversionResamplingMethod {
   ITK_NEAREST_NEIGHBOR = 0,
   ITK_LINEAR,
-  ITK_WINDOWED_SINC
+  ITK_WINDOWED_SINC,
+  VTK_PROBE_FILTER
 };
 
 
 template< typename TInputImage, typename TOutputImage >
-int ITKScanConversionResampling(const typename TInputImage::Pointer & inputImage,
+int
+ITKScanConversionResampling(const typename TInputImage::Pointer & inputImage,
   typename TOutputImage::Pointer & outputImage,
   const typename TOutputImage::SizeType & size,
   const typename TOutputImage::SpacingType & spacing,
@@ -98,7 +108,59 @@ int ITKScanConversionResampling(const typename TInputImage::Pointer & inputImage
 
 
 template< typename TInputImage, typename TOutputImage >
-int ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
+int
+VTKProbeFilterResampling(const typename TInputImage::Pointer & inputImage,
+  typename TOutputImage::Pointer & outputImage,
+  const typename TOutputImage::SizeType & size,
+  const typename TOutputImage::SpacingType & spacing,
+  const typename TOutputImage::PointType & origin,
+  ModuleProcessInformation * CLPProcessInformation
+  )
+{
+  typedef TInputImage  InputImageType;
+  typedef TOutputImage OutputImageType;
+
+  typedef itk::SpecialCoordinatesImageToVTKStructuredGridFilter< InputImageType > ConversionFilterType;
+  typename ConversionFilterType::Pointer conversionFilter = ConversionFilterType::New();
+  conversionFilter->SetInput( inputImage );
+  itk::PluginFilterWatcher watchConversion(conversionFilter, "Convert to vtkStructuredGrid", CLPProcessInformation);
+  conversionFilter->Update();
+  vtkStructuredGrid * inputStructuredGrid = conversionFilter->GetOutput();
+
+  vtkNew< vtkImageData > grid;
+  grid->SetDimensions( size[0], size[1], size[2] );
+  grid->SetSpacing( spacing[0], spacing[1], spacing[2] );
+  grid->SetOrigin( origin[0], origin[1], origin[2] );
+  grid->ComputeBounds();
+
+  vtkNew< vtkProbeFilter > probeFilter;
+  probeFilter->SetSourceData( inputStructuredGrid );
+  probeFilter->SetInputData( grid.GetPointer() );
+  probeFilter->Update();
+
+  typedef itk::VTKImageToImageFilter< OutputImageType > VTKToITKFilterType;
+  typename VTKToITKFilterType::Pointer vtkToITKFilter = VTKToITKFilterType::New();
+  vtkToITKFilter->SetInput( probeFilter->GetImageDataOutput() );
+  vtkToITKFilter->Update();
+
+  typename OutputImageType::Pointer output = OutputImageType::New();
+  output->SetRegions( vtkToITKFilter->GetOutput()->GetLargestPossibleRegion() );
+  output->Allocate();
+  itk::ImageAlgorithm::Copy< OutputImageType, OutputImageType >(
+    vtkToITKFilter->GetOutput(),
+    output.GetPointer(),
+    output->GetLargestPossibleRegion(),
+    output->GetLargestPossibleRegion()
+    );
+  outputImage = output;
+
+  return EXIT_SUCCESS;
+}
+
+
+template< typename TInputImage, typename TOutputImage >
+int
+ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
   typename TOutputImage::Pointer & outputImage,
   const typename TOutputImage::SizeType & size,
   const typename TOutputImage::SpacingType & spacing,
@@ -124,6 +186,10 @@ int ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
     {
     method = ITK_WINDOWED_SINC;
     }
+  else if( methodString == "VTKProbeFilter" )
+    {
+    method = VTK_PROBE_FILTER;
+    }
 
   switch( method )
     {
@@ -137,6 +203,15 @@ int ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
       origin,
       direction,
       method,
+      CLPProcessInformation
+    );
+    break;
+  case VTK_PROBE_FILTER:
+    return VTKProbeFilterResampling< InputImageType, OutputImageType >( inputImage,
+      outputImage,
+      size,
+      spacing,
+      origin,
       CLPProcessInformation
     );
     break;
