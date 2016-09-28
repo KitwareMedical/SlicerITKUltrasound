@@ -31,6 +31,12 @@
 #include "vtkImageData.h"
 #include "vtkNew.h"
 #include "vtkStructuredGrid.h"
+#include "vtkPointInterpolator.h"
+#include "vtkGaussianKernel.h"
+#include "vtkLinearKernel.h"
+#include "vtkShepardKernel.h"
+#include "vtkInterpolationKernel.h"
+#include "vtkVoronoiKernel.h"
 
 #include "itkPluginFilterWatcher.h"
 
@@ -41,7 +47,11 @@ enum ScanConversionResamplingMethod {
   ITK_NEAREST_NEIGHBOR = 0,
   ITK_LINEAR,
   ITK_WINDOWED_SINC,
-  VTK_PROBE_FILTER
+  VTK_PROBE_FILTER,
+  VTK_GAUSSIAN_KERNEL,
+  VTK_LINEAR_KERNEL,
+  VTK_SHEPARD_KERNEL,
+  VTK_VORONOI_KERNEL
 };
 
 
@@ -154,6 +164,134 @@ VTKProbeFilterResampling(const typename TInputImage::Pointer & inputImage,
     );
   outputImage = output;
 
+
+  return EXIT_SUCCESS;
+}
+
+
+template< typename TInputImage, typename TOutputImage >
+int
+VTKPointInterpolatorResampling(const typename TInputImage::Pointer & inputImage,
+  typename TOutputImage::Pointer & outputImage,
+  const typename TOutputImage::SizeType & size,
+  const typename TOutputImage::SpacingType & spacing,
+  const typename TOutputImage::PointType & origin,
+  ScanConversionResamplingMethod method,
+  ModuleProcessInformation * CLPProcessInformation
+  )
+{
+  typedef TInputImage  InputImageType;
+  typedef TOutputImage OutputImageType;
+
+  typedef itk::SpecialCoordinatesImageToVTKStructuredGridFilter< InputImageType > ConversionFilterType;
+  typename ConversionFilterType::Pointer conversionFilter = ConversionFilterType::New();
+  conversionFilter->SetInput( inputImage );
+  itk::PluginFilterWatcher watchConversion(conversionFilter, "Convert to vtkStructuredGrid", CLPProcessInformation);
+  conversionFilter->Update();
+  vtkStructuredGrid * inputStructuredGrid = conversionFilter->GetOutput();
+  inputStructuredGrid->ComputeBounds();
+
+  vtkNew< vtkImageData > grid;
+  grid->SetDimensions( size[0], size[1], size[2] );
+  grid->SetSpacing( spacing[0], spacing[1], spacing[2] );
+  grid->SetOrigin( origin[0], origin[1], origin[2] );
+  grid->ComputeBounds();
+  vtkNew< vtkFloatArray > scalars;
+  scalars->SetName( "Scalars" );
+  scalars->Allocate( size[0] * size[1] * size[2] );
+  grid->GetPointData()->SetScalars(scalars.GetPointer());
+
+
+  vtkNew< vtkPointInterpolator > pointInterpolator;
+  pointInterpolator->SetSourceData( inputStructuredGrid );
+  pointInterpolator->SetInputData( grid.GetPointer() );
+  pointInterpolator->SetPassPointArrays( false );
+  pointInterpolator->SetNullPointsStrategyToNullValue();
+  pointInterpolator->SetNullValue( 0.0 );
+
+  vtkInterpolationKernel * interpolationKernel = ITK_NULLPTR;
+
+  double maxSpacing = 0.0;
+  for( unsigned int ii = 0; ii < InputImageType::ImageDimension; ++ii )
+    {
+    maxSpacing = std::max( maxSpacing, spacing[ii] );
+    }
+  const double radius = 1.1 * maxSpacing;
+
+  switch( method )
+    {
+  case VTK_GAUSSIAN_KERNEL:
+      {
+      vtkGaussianKernel * gaussianKernel = vtkGaussianKernel::New();
+      gaussianKernel->SetKernelFootprintToRadius();
+      gaussianKernel->SetRadius( radius );
+      interpolationKernel = gaussianKernel;
+      break;
+      }
+  case VTK_LINEAR_KERNEL:
+      {
+      vtkLinearKernel * linearKernel = vtkLinearKernel::New();
+      linearKernel->SetKernelFootprintToRadius();
+      linearKernel->SetRadius( radius );
+      interpolationKernel = linearKernel;
+      break;
+      }
+  case VTK_SHEPARD_KERNEL:
+      {
+      vtkShepardKernel * shepardKernel = vtkShepardKernel::New();
+      shepardKernel->SetKernelFootprintToRadius();
+      shepardKernel->SetRadius( radius );
+      interpolationKernel = shepardKernel;
+      break;
+      }
+  case VTK_VORONOI_KERNEL:
+      {
+      vtkVoronoiKernel * voronoiKernel = vtkVoronoiKernel::New();
+      interpolationKernel = voronoiKernel;
+      break;
+      }
+  default:
+    std::cerr << "Unexpected interpolation kernel: " << method << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // TODO: Use float internall and cast to OutputImageTypee for the
+  // VTKPointFiltering method
+  typedef itk::VTKImageToImageFilter< OutputImageType > VTKToITKFilterType;
+  typename VTKToITKFilterType::Pointer vtkToITKFilter = VTKToITKFilterType::New();
+
+
+  switch( method )
+    {
+  case VTK_GAUSSIAN_KERNEL:
+  case VTK_LINEAR_KERNEL:
+  case VTK_SHEPARD_KERNEL:
+  case VTK_VORONOI_KERNEL:
+      {
+      pointInterpolator->SetKernel( interpolationKernel );
+      pointInterpolator->Update();
+      vtkToITKFilter->SetInput( pointInterpolator->GetImageDataOutput() );
+      break;
+      }
+  default:
+    std::cerr << "Unexpected interpolation kernel: " << method << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  vtkToITKFilter->Update();
+  interpolationKernel->Delete();
+
+  typename OutputImageType::Pointer output = OutputImageType::New();
+  output->SetRegions( vtkToITKFilter->GetOutput()->GetLargestPossibleRegion() );
+  output->CopyInformation( vtkToITKFilter->GetOutput() );
+  output->Allocate();
+  itk::ImageAlgorithm::Copy< OutputImageType, OutputImageType >(
+    vtkToITKFilter->GetOutput(),
+    output.GetPointer(),
+    output->GetLargestPossibleRegion(),
+    output->GetLargestPossibleRegion()
+    );
+  outputImage = output;
   return EXIT_SUCCESS;
 }
 
@@ -190,6 +328,22 @@ ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
     {
     method = VTK_PROBE_FILTER;
     }
+  else if( methodString == "VTKGaussianKernel" )
+    {
+    method = VTK_GAUSSIAN_KERNEL;
+    }
+  else if( methodString == "VTKLinearKernel" )
+    {
+    method = VTK_LINEAR_KERNEL;
+    }
+  else if( methodString == "VTKShepardKernel" )
+    {
+    method = VTK_SHEPARD_KERNEL;
+    }
+  else if( methodString == "VTKVoronoiKernel" )
+    {
+    method = VTK_VORONOI_KERNEL;
+    }
 
   switch( method )
     {
@@ -212,6 +366,19 @@ ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
       size,
       spacing,
       origin,
+      CLPProcessInformation
+    );
+    break;
+  case VTK_GAUSSIAN_KERNEL:
+  case VTK_LINEAR_KERNEL:
+  case VTK_SHEPARD_KERNEL:
+  case VTK_VORONOI_KERNEL:
+    return VTKPointInterpolatorResampling< InputImageType, OutputImageType >( inputImage,
+      outputImage,
+      size,
+      spacing,
+      origin,
+      method,
       CLPProcessInformation
     );
     break;

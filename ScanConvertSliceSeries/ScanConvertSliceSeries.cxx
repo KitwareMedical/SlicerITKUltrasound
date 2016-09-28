@@ -24,11 +24,13 @@
 #include "itkUltrasoundImageFileReader.h"
 #include "itkHDF5UltrasoundImageIOFactory.h"
 #include "itkReplaceNonFiniteImageFilter.h"
+#include "itkFloatingPointExceptions.h"
 
 #include "itkPluginUtilities.h"
 
 #include "ScanConvertSliceSeriesCLP.h"
 #include "ScanConversionResamplingMethods.h"
+
 
 // Use an anonymous namespace to keep class types and function names
 // from colliding when module is used as shared object module.  Every
@@ -203,6 +205,8 @@ int main( int argc, char * argv[] )
 
   itk::ImageIOBase::IOPixelType     inputPixelType;
   itk::ImageIOBase::IOComponentType inputComponentType;
+  itk::FloatingPointExceptions::Enable();
+  itk::FloatingPointExceptions::SetExceptionAction( itk::FloatingPointExceptions::ABORT );
 
   try
     {
