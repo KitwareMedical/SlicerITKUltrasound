@@ -37,5 +37,57 @@ ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND
   )
 set_property(TEST ${testname} PROPERTY LABELS ${CLP})
 
+set(testname ${CLP}VTKGaussianKernelTest)
+ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND
+  ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  --compare DATA{${BASELINE}/${CLP}VTKGaussianKernelTestOutput.mha}
+    ${TEMP}/${CLP}VTKGaussianKernelTestOutput.mha
+  ModuleEntryPoint
+    --method VTKGaussianKernel
+    --outputSpacing 1.0,1.0,1.0
+    DATA{${INPUT}/bmode_p59.hdf5}
+    ${TEMP}/${CLP}VTKGaussianKernelTestOutput.mha
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+
+set(testname ${CLP}VTKLinearKernelTest)
+ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND
+  ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  --compare DATA{${BASELINE}/${CLP}VTKLinearKernelTestOutput.mha}
+    ${TEMP}/${CLP}VTKLinearKernelTestOutput.mha
+  ModuleEntryPoint
+    --method VTKLinearKernel
+    --outputSpacing 1.0,1.0,1.0
+    DATA{${INPUT}/bmode_p59.hdf5}
+    ${TEMP}/${CLP}VTKLinearKernelTestOutput.mha
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+
+set(testname ${CLP}VTKShepardKernelTest)
+ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND
+  ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  --compare DATA{${BASELINE}/${CLP}VTKShepardKernelTestOutput.mha}
+    ${TEMP}/${CLP}VTKShepardKernelTestOutput.mha
+  ModuleEntryPoint
+    --method VTKShepardKernel
+    --outputSpacing 1.0,1.0,1.0
+    DATA{${INPUT}/bmode_p59.hdf5}
+    ${TEMP}/${CLP}VTKShepardKernelTestOutput.mha
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+
+set(testname ${CLP}VTKVoronoiKernelTest)
+ExternalData_add_test(${CLP}Data NAME ${testname} COMMAND
+  ${SEM_LAUNCH_COMMAND} $<TARGET_FILE:${CLP}Test>
+  --compare DATA{${BASELINE}/${CLP}VTKVoronoiKernelTestOutput.mha}
+    ${TEMP}/${CLP}VTKVoronoiKernelTestOutput.mha
+  ModuleEntryPoint
+    --method VTKVoronoiKernel
+    --outputSpacing 1.0,1.0,1.0
+    DATA{${INPUT}/bmode_p59.hdf5}
+    ${TEMP}/${CLP}VTKVoronoiKernelTestOutput.mha
+  )
+set_property(TEST ${testname} PROPERTY LABELS ${CLP})
+
 #-----------------------------------------------------------------------------
 ExternalData_add_target(${CLP}Data)

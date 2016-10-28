@@ -68,6 +68,10 @@
       <element>ITKLinear</element>
       <element>ITKWindowedSinc</element>
       <element>VTKProbeFilter</element>
+      <element>VTKGaussianKernel</element>
+      <element>VTKLinearKernel</element>
+      <element>VTKShepardKernel</element>
+      <element>VTKVoronoiKernel</element>
     </string-enumeration>
     <image>
       <name>outputVolume</name>
