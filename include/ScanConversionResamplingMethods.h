@@ -216,7 +216,7 @@ VTKPointInterpolatorResampling(const typename TInputImage::Pointer & inputImage,
     {
     maxSpacing = std::max( maxSpacing, spacing[ii] );
     }
-  const double radius = 1.1 * maxSpacing;
+  const double radius = 2.1 * maxSpacing;
 
   switch( method )
     {
@@ -255,9 +255,8 @@ VTKPointInterpolatorResampling(const typename TInputImage::Pointer & inputImage,
     return EXIT_FAILURE;
     }
 
-  // TODO: Use float internall and cast to OutputImageTypee for the
-  // VTKPointFiltering method
-  typedef itk::VTKImageToImageFilter< OutputImageType > VTKToITKFilterType;
+  typedef itk::Image< float, 3 > VTKInterpolatorOutputImageType;
+  typedef itk::VTKImageToImageFilter< VTKInterpolatorOutputImageType > VTKToITKFilterType;
   typename VTKToITKFilterType::Pointer vtkToITKFilter = VTKToITKFilterType::New();
 
 
@@ -281,12 +280,17 @@ VTKPointInterpolatorResampling(const typename TInputImage::Pointer & inputImage,
   vtkToITKFilter->Update();
   interpolationKernel->Delete();
 
+  typedef itk::CastImageFilter< VTKInterpolatorOutputImageType, OutputImageType > CasterType;
+  typename CasterType::Pointer caster = CasterType::New();
+  caster->SetInput( vtkToITKFilter->GetOutput() );
+  caster->Update();
+
   typename OutputImageType::Pointer output = OutputImageType::New();
-  output->SetRegions( vtkToITKFilter->GetOutput()->GetLargestPossibleRegion() );
-  output->CopyInformation( vtkToITKFilter->GetOutput() );
+  output->SetRegions( caster->GetOutput()->GetLargestPossibleRegion() );
+  output->CopyInformation( caster->GetOutput() );
   output->Allocate();
   itk::ImageAlgorithm::Copy< OutputImageType, OutputImageType >(
-    vtkToITKFilter->GetOutput(),
+    caster->GetOutput(),
     output.GetPointer(),
     output->GetLargestPossibleRegion(),
     output->GetLargestPossibleRegion()
