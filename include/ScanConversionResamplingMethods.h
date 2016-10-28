@@ -23,6 +23,7 @@
 #include "itkNearestNeighborInterpolateImageFunction.h"
 #include "itkLinearInterpolateImageFunction.h"
 #include "itkWindowedSincInterpolateImageFunction.h"
+#include "itkGaussianInterpolateImageFunction.h"
 #include "itkSpecialCoordinatesImageToVTKStructuredGridFilter.h"
 #include "itkVTKImageToImageFilter.h"
 #include "itkImageAlgorithm.h"
@@ -46,6 +47,7 @@ namespace
 enum ScanConversionResamplingMethod {
   ITK_NEAREST_NEIGHBOR = 0,
   ITK_LINEAR,
+  ITK_GAUSSIAN,
   ITK_WINDOWED_SINC,
   VTK_PROBE_FILTER,
   VTK_GAUSSIAN_KERNEL,
@@ -92,6 +94,25 @@ ITKScanConversionResampling(const typename TInputImage::Pointer & inputImage,
       {
       typedef itk::LinearInterpolateImageFunction< InputImageType, CoordRepType > InterpolatorType;
       typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      resampler->SetInterpolator( interpolator );
+      break;
+      }
+  case ITK_GAUSSIAN:
+      {
+      itk::SpacePrecisionType maxSpacing = 0.0;
+      for( unsigned int ii = 0; ii < InputImageType::ImageDimension; ++ii )
+        {
+        maxSpacing = std::max( maxSpacing, spacing[ii] );
+        }
+      typedef itk::GaussianInterpolateImageFunction< InputImageType, CoordRepType > InterpolatorType;
+      typename InterpolatorType::Pointer interpolator = InterpolatorType::New();
+      typename InterpolatorType::ArrayType sigma;
+      for( unsigned int ii = 0; ii < OutputImageType::ImageDimension; ++ii )
+        {
+        sigma[ii] = 1.0 * spacing[ii];
+        }
+      interpolator->SetSigma( sigma );
+      interpolator->SetAlpha( 3.0 * maxSpacing );
       resampler->SetInterpolator( interpolator );
       break;
       }
@@ -324,6 +345,10 @@ ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
     {
     method = ITK_LINEAR;
     }
+  else if( methodString == "ITKGaussian" )
+    {
+    method = ITK_GAUSSIAN;
+    }
   else if( methodString == "ITKWindowedSinc" )
     {
     method = ITK_WINDOWED_SINC;
@@ -353,6 +378,7 @@ ScanConversionResampling(const typename TInputImage::Pointer & inputImage,
     {
   case ITK_NEAREST_NEIGHBOR:
   case ITK_LINEAR:
+  case ITK_GAUSSIAN:
   case ITK_WINDOWED_SINC:
     return ITKScanConversionResampling< InputImageType, OutputImageType >( inputImage,
       outputImage,

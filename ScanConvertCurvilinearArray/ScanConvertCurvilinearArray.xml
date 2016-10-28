@@ -66,6 +66,7 @@
       <default>ITKLinear</default>
       <element>ITKNearestNeighbor</element>
       <element>ITKLinear</element>
+      <element>ITKGaussian</element>
       <element>ITKWindowedSinc</element>
       <element>VTKProbeFilter</element>
       <element>VTKGaussianKernel</element>
