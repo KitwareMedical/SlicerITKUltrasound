@@ -216,7 +216,7 @@ VTKPointInterpolatorResampling(const typename TInputImage::Pointer & inputImage,
     {
     maxSpacing = std::max( maxSpacing, spacing[ii] );
     }
-  const double radius = 1.1 * maxSpacing;
+  const double radius = 2.1 * maxSpacing;
 
   switch( method )
     {
