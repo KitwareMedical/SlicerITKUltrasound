@@ -11,13 +11,13 @@
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
-    <image>
+    <file>
       <name>inputVolume</name>
       <label>Input Volume</label>
       <channel>input</channel>
       <index>0</index>
       <description><![CDATA[Input volume]]></description>
-    </image>
+    </file>
     <integer-vector>
       <name>outputSize</name>
       <label>Output Size</label>
