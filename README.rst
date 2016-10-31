@@ -22,6 +22,7 @@ the `Slicer_DIR` configuration variable as the
 
 Run the tests for the extension by executing `ctest` in
 *<SlicerITKUltrasound-Superbuild>/SlicerITKUltrasound-build*.
+With Visual Studio on Windows, run `ctest -C Release` or `ctest -C Debug`.
 
 To use the modules from Slicer's user interface: add the generated modules to
 Slicer's module search path by opening Slicer, then *Edit -> Application
