@@ -1,22 +1,17 @@
-.. SlicerITKUltrasound documentation master file, created by
-   sphinx-quickstart on Wed Nov 30 18:01:12 2016.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+===================
+SlicerITKUltrasound
+===================
 
-Welcome to SlicerITKUltrasound's documentation!
-===============================================
+.. image:: https://travis-ci.org/KitwareMedical/SlicerITKUltrasound.svg?branch=master
+    :target: https://travis-ci.org/KitwareMedical/SlicerITKUltrasound
+
+.. image:: https://img.shields.io/github/stars/KitwareMedical/SlicerITKUltrasound.svg?style=social&label=Star
+    :target: https://github.com/KitwareMedical/SlicerITKUltrasound
+
+A `3D Slicer <http://slicer.org/>`_ extension for ultrasound image formation, processing, and analysis. Interfaces built off the
+`ITKUltrasound <https://github.com/KitwareMedical/ITKUltrasound/>`_ library.
 
 Contents:
 
 .. toctree::
    :maxdepth: 2
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
-
