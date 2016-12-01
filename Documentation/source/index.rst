@@ -5,6 +5,9 @@ SlicerITKUltrasound
 .. image:: https://travis-ci.org/KitwareMedical/SlicerITKUltrasound.svg?branch=master
     :target: https://travis-ci.org/KitwareMedical/SlicerITKUltrasound
 
+.. image:: https://circleci.com/gh/KitwareMedical/SlicerITKUltrasound.svg?style=svg
+    :target: https://circleci.com/gh/KitwareMedical/SlicerITKUltrasound
+
 .. image:: https://img.shields.io/github/stars/KitwareMedical/SlicerITKUltrasound.svg?style=social&label=Star
     :target: https://github.com/KitwareMedical/SlicerITKUltrasound
 
