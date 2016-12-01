@@ -1,6 +1,8 @@
 Development
 ===========
 
+.. index:: Develop, Build
+
 To develop SlicerITKUltrasound, first `build 3D Slicer
 <https://www.slicer.org/slicerWiki/index.php/Documentation/Nightly/Developers/Build_Instructions>`_.
 Version *r25484* (trunk from 2016-10-28) or later is required.
