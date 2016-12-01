@@ -1,0 +1,20 @@
+machine:
+  python:
+    version: 3.5.2
+
+dependencies:
+  pre:
+    - pip install --upgrade pip
+    - pip install sphinx-foundation-theme
+    - git clone -b gh-pages git@github.com:KitwareMedical/SlicerITKUltrasoundDoc Documentation/build/html
+    - cd Documentation/build/html && git config user.name CircleCI && git config user.email "matt.mccormick@kitware.com"
+
+test:
+  override:
+    - cd Documentation && make html && cd build/html && git add * && git commit -m "Build on $(date) of $(cd ..; git rev-parse --short HEAD)"
+
+deployment:
+  documentation:
+    branch: master
+    commands:
+      - cd Documentation/build/html && git push origin gh-pages
