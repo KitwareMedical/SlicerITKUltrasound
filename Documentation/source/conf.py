@@ -118,7 +118,8 @@ html_theme = 'foundation'
 # further.  For a list of options available for each theme, see the
 # documentation.
 html_theme_options = { 'rightsidebar': False,
-    'topbar_page': False }
+    'topbar_page': False,
+    'stylesheet': 'SlicerITKUltrasound.css' }
 
 # Add any paths that contain custom themes here, relative to this directory.
 html_theme_path = sphinx_foundation_theme.get_html_theme_path()
