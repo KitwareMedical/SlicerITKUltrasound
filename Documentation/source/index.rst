@@ -15,4 +15,10 @@ A `3D Slicer <http://slicer.org/>`_ extension for ultrasound image formation, pr
 Contents:
 
 .. toctree::
-   :maxdepth: 2
+  :maxdepth: 2
+
+  Installation
+  Modules/index
+  Development
+  References
+  Acknowledgments
