@@ -5,7 +5,7 @@ ScanConvertPhasedArray3D
 Scan convert beam-line data from a 3D phased-array ultrasound probe.
 
 :Authors: Matthew McCormick (Kitware, Inc)
-:Version: 0.0.1
+:Version: 0.1.0
 :License: Apache 2.0
 
 
@@ -34,7 +34,7 @@ Input/output parameters
 **Output Spacing**
    Spacing between voxels in each direction of the output image.
 
-**None**
+**Resampling Method**
    Scan conversion resampling method.
 
 **Output Volume**

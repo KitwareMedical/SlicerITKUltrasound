@@ -6,7 +6,7 @@ Scan convert a 3D ultrasound volume collected as a series of adjacent 2D
 images.
 
 :Authors: Matthew McCormick (Kitware, Inc)
-:Version: 0.0.1
+:Version: 0.1.0
 :License: Apache 2.0
 
 
@@ -23,7 +23,7 @@ Input/output parameters
 **Output Spacing**
    Spacing between voxels in each direction of the output image.
 
-**None**
+**Resampling Method**
    Scan conversion resampling method.
 
 **Output Volume**
