@@ -1,2 +1,3 @@
-Phased Array 3D
-===============
+.. index:: Phased array
+
+.. include:: ScanConvertPhasedArray3D.rst
