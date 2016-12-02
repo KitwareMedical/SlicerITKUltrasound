@@ -36,6 +36,7 @@
     </double-vector>
     <string-enumeration>
       <name>method</name>
+      <label>Resampling Method</label>
       <flag>m</flag>
       <longflag>method</longflag>
       <description><![CDATA[Scan conversion resampling method.]]></description>
