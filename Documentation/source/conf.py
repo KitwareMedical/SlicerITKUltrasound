@@ -31,7 +31,7 @@ import sphinx_foundation_theme
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    # 'sphinx.ext.mathjax',
+    'sphinx.ext.mathjax',
     'sphinx.ext.todo',
 ]
 
@@ -161,7 +161,7 @@ html_static_path = ['_static']
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
 html_sidebars = {'**': ['searchbox.html'],
-    'Modules/ScanConversion': ['localtoc.html',
+    'Modules/ScanConversion/index': ['localtoc.html',
         'searchbox.html'],
     'index': []
     }
