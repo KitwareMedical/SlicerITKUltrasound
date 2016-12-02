@@ -117,7 +117,7 @@ html_theme = 'foundation'
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
 # documentation.
-html_theme_options = { 'rightsidebar': False,
+html_theme_options = { 'rightsidebar': True,
     'topbar_page': False,
     'stylesheet': 'SlicerITKUltrasound.css' }
 
