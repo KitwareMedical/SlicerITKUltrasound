@@ -3,7 +3,7 @@
   <category>Ultrasound</category>
   <title>ScanConvertPhasedArray3D</title>
   <description><![CDATA[Scan convert beam-line data from a 3D phased-array ultrasound probe.]]></description>
-  <version>0.0.1</version>
+  <version>0.1.0</version>
   <documentation-url>http://www.example.com/Slicer/Modules/ScanConvertPhasedArray3D</documentation-url>
   <license>Apache 2.0</license>
   <contributor>Matthew McCormick (Kitware, Inc)</contributor>
