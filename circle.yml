@@ -13,7 +13,7 @@ dependencies:
 
 test:
   override:
-    - cd Documentation && make html && cd build/html && git add * && git commit -m "Build on $(date) of $(cd ..; git rev-parse --short HEAD)" || true
+    - cd Documentation && make html && cd build/html && if [ -n "$(git ls-files -m)" ]; then git add * && git commit -m "Build on $(date) of $(cd ..; git rev-parse --short HEAD)"; fi
 
 deployment:
   documentation:
