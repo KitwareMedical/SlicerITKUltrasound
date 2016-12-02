@@ -3,7 +3,7 @@
   <category>Ultrasound</category>
   <title>ScanConvertCurvilinearArray</title>
   <description><![CDATA[Scan convert beam-line data from a curvilinear-array ultrasound probe.]]></description>
-  <version>0.0.1</version>
+  <version>0.1.0</version>
   <documentation-url>http://www.example.com/Slicer/Modules/ScanConvertCurvilinearArray</documentation-url>
   <license>Apache 2.0</license>
   <contributor>Matthew McCormick (Kitware, Inc)</contributor>
@@ -60,6 +60,7 @@
     </double-vector>
     <string-enumeration>
       <name>method</name>
+      <label>Resampling Method</label>
       <flag>m</flag>
       <longflag>method</longflag>
       <description><![CDATA[Scan conversion resampling method.]]></description>

@@ -51,8 +51,14 @@ help:
 clean:
 	rm -rf $(BUILDDIR)/*
 
+.PHONY: moduledoc
+moduledoc: ../ScanConvertCurvilinearArray/ScanConvertCurvilinearArray.xml ../ScanConvertPhasedArray3D/ScanConvertPhasedArray3D.xml
+	./ctk-cli-to-rst.py ../ScanConvertCurvilinearArray/ScanConvertCurvilinearArray.xml ./source/Modules/ScanConversion/ScanConvertCurvilinearArray.rst
+	./ctk-cli-to-rst.py ../ScanConvertPhasedArray3D/ScanConvertPhasedArray3D.xml ./source/Modules/ScanConversion/ScanConvertPhasedArray3D.rst
+	./ctk-cli-to-rst.py ../ScanConvertSliceSeries/ScanConvertSliceSeries.xml ./source/Modules/ScanConversion/ScanConvertSliceSeries.rst
+
 .PHONY: html
-html:
+html: moduledoc
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
