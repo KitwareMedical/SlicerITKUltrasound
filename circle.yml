@@ -6,6 +6,7 @@ dependencies:
   pre:
     - pip install --upgrade pip
     - pip install sphinx-foundation-theme
+    - pip install ctk-cli
     - git clone -b gh-pages git@github.com:KitwareMedical/SlicerITKUltrasoundDoc Documentation/build/html
     - cd Documentation/build/html && git config user.name CircleCI && git config user.email "matt.mccormick@kitware.com"
 
