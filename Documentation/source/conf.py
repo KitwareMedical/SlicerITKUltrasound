@@ -161,7 +161,7 @@ html_static_path = ['_static']
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
 html_sidebars = {'**': ['searchbox.html'],
-    'Modules/ScanConversion': ['localtoc.html',
+    'Modules/ScanConversion/index': ['localtoc.html',
         'searchbox.html'],
     'index': []
     }
