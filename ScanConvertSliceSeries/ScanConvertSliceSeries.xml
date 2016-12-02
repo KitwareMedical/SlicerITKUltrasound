@@ -4,7 +4,7 @@
   <title>ScanConvertSliceSeries</title>
   <description><![CDATA[Scan convert a 3D ultrasound volume collected as a series of adjacent 2D images.]]></description>
   <version>0.1.0</version>
-  <documentation-url>http://www.example.com/Slicer/Modules/ScanConvertSliceSeries</documentation-url>
+  <documentation-url>https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/Modules/ScanConversion/SliceSeries.html</documentation-url>
   <license>Apache 2.0</license>
   <contributor>Matthew McCormick (Kitware, Inc)</contributor>
   <acknowledgements>This work was partially funded by NIH Prostate Cancer Assessment grant 1R41CA196565-01</acknowledgements>
