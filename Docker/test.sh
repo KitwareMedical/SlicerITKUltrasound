@@ -15,6 +15,5 @@ cd /usr/src/SlicerITKUltrasound-build
 cmake \
   -DSlicer_DIR:PATH=/usr/src/Slicer-build/Slicer-build \
   -DBUILDNAME:STRING=Extension-SlicerITKUltrasound \
-  -DGIT_EXECUTABLE:FILEPATH=/usr/bin/git \
     /usr/src/SlicerITKUltrasound/
 ctest -VV -D Experimental
