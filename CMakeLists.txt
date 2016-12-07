@@ -14,6 +14,9 @@ set(EXTENSION_BUILD_SUBDIRECTORY SlicerITKUltrasound-build)
 
 set(SUPERBUILD_TOPLEVEL_PROJECT SlicerITKUltrasound)
 
+find_package(Git REQUIRED)
+find_package(Subversion REQUIRED)
+
 #-----------------------------------------------------------------------------
 # Extension dependencies
 find_package(Slicer REQUIRED)
@@ -22,9 +25,6 @@ mark_as_superbuild(Slicer_DIR)
 mark_as_superbuild(PYTHON_EXECUTABLE)
 mark_as_superbuild(PYTHON_INCLUDE_DIR)
 mark_as_superbuild(PYTHON_LIBRARY)
-
-find_package(Git REQUIRED)
-mark_as_superbuild(GIT_EXECUTABLE)
 
 #-----------------------------------------------------------------------------
 option(${EXTENSION_NAME}_SUPERBUILD "Build ${EXTENSION_NAME} and the projects it depends on." ON)
