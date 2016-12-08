@@ -15,6 +15,7 @@ set(EXTENSION_SCREENSHOTURLS
   "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/f1f347fc6b9a1a56200ed1bbc2ff7f4e3d0836ef/Documentation/source/Modules/ScanConversion/ScanConvertSliceSeries.png"
   )
 set(EXTENSION_BUILD_SUBDIRECTORY SlicerITKUltrasound-build)
+set(EXTENSION_STATUS Beta)
 
 set(SUPERBUILD_TOPLEVEL_PROJECT SlicerITKUltrasound)
 
