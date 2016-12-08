@@ -43,5 +43,5 @@ add_subdirectory(ScanConvertSliceSeries)
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${CMAKE_BINARY_DIR};${EXTENSION_NAME};ALL;/")
-set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${Ultrasound_DIR};Ultrasound;RuntimeLibraries;/")
+set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${ITKUltrasound_DIR};Ultrasound;RuntimeLibraries;/")
 include(${Slicer_EXTENSION_CPACK})
