@@ -7,6 +7,8 @@ set(proj ITKUltrasound)
 set(${proj}_DEPENDENCIES )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
+set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
+
 # disable-wrapping 2016-10-24
 set(${proj}_GIT_TAG 8642d8dd8101e3a855b0265c4849da66da26cd6c)
 ExternalProject_Add(${proj}
@@ -14,7 +16,7 @@ ExternalProject_Add(${proj}
   GIT_REPOSITORY ${git_protocol}://github.com/thewtex/ITKUltrasound.git
   GIT_TAG ${${proj}_GIT_TAG}
   SOURCE_DIR ${proj}
-  BINARY_DIR ${proj}-build
+  BINARY_DIR ${${proj}_BINARY_DIR}
   INSTALL_COMMAND ""
   CMAKE_CACHE_ARGS
     -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
@@ -32,3 +34,8 @@ ExternalProject_Add(${proj}
     -DITK_INSTALL_LIBRARY_DIR:STRING=${Slicer_INSTALL_LIB_DIR}
   DEPENDS ${${proj}_DEPENDENCIES}
 )
+
+set(${proj}_DIR ${${proj}_BINARY_DIR})
+mark_as_superbuild(VARS ${proj}_DIR:PATH)
+
+ExternalProject_Message(${proj} "${proj}_DIR:${${proj}_DIR}")
