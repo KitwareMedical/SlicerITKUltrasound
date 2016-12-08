@@ -4,12 +4,16 @@ project(SlicerITKUltrasound)
 
 #-----------------------------------------------------------------------------
 # Extension meta-information
-set(EXTENSION_HOMEPAGE "http://slicer.org/slicerWiki/index.php/Documentation/Nightly/Extensions/SlicerITKUltrasound")
+set(EXTENSION_HOMEPAGE "https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/")
 set(EXTENSION_CATEGORY "Filtering")
-set(EXTENSION_CONTRIBUTORS "Matt McCormick (Kitware, Inc.), Stephen Aylward (Kitware, Inc.), Hyun Jae Kang (Kitware, Inc.)")
+set(EXTENSION_CONTRIBUTORS "Matt McCormick (Kitware, Inc.), Mark Palmeri (Duke University), Stephen Aylward (Kitware, Inc.), Jean-Christophe Fillion-Robin (Kitware, Inc.)")
 set(EXTENSION_DESCRIPTION "Ultrasound image formation, processing, and analysis. Interfaces built off the ITKUltrasound library.")
-set(EXTENSION_ICONURL "http://www.example.com/Slicer/Extensions/SlicerITKUltrasound.png")
-set(EXTENSION_SCREENSHOTURLS "http://www.example.com/Slicer/Extensions/SlicerITKUltrasound/Screenshots/1.png")
+set(EXTENSION_ICONURL "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/master/SlicerITKUltrasound.png")
+set(EXTENSION_SCREENSHOTURLS
+  "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/f1f347fc6b9a1a56200ed1bbc2ff7f4e3d0836ef/Documentation/source/Modules/ScanConversion/ScanConvertCurvilinearArray.png"
+  "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/f1f347fc6b9a1a56200ed1bbc2ff7f4e3d0836ef/Documentation/source/Modules/ScanConversion/ScanConvertPhasedArray3D.png"
+  "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/f1f347fc6b9a1a56200ed1bbc2ff7f4e3d0836ef/Documentation/source/Modules/ScanConversion/ScanConvertSliceSeries.png"
+  )
 set(EXTENSION_BUILD_SUBDIRECTORY SlicerITKUltrasound-build)
 
 set(SUPERBUILD_TOPLEVEL_PROJECT SlicerITKUltrasound)
