@@ -5,7 +5,7 @@
 .. figure:: ScanConvertCurvilinearArray.png
   :alt: Curvilinear array scan conversion screenshot
 
-  Screenshot of the ScanConvertCurvilinearArray module output. If the there
+  Screenshot of the ScanConvertCurvilinearArray module output. If there
   are multiple frames in the volume's third dimension, each frame is scan
   converted.
 
