@@ -13,6 +13,11 @@ References
   Image Computing Platform for the Quantitative Imaging Network. Magnetic
   Resonance Imaging 2012; July PMID: 22770690.
 
+.. [Lasso2014] Lasso A., Heffter T., Rankin A., Pinter C., Ungi T., Fichtinger
+  G. 2014. PLUS: open-source toolkit for ultrasound-guided intervention systems.
+  IEEE transactions on bio-medical engineering 61:2527–2537.
+  http://dx.doi.org/10.1109/TBME.2014.2322864
+
 .. [McCormick2010] McCormick, M. An Open Source, Fast Ultrasound B-Mode
   Implementation for Commodity Hardware. Insight Journal. 2010 January-June. URL:
   http://hdl.handle.net/10380/3159
