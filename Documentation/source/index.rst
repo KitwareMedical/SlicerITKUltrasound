@@ -37,8 +37,8 @@ See Also
 --------
 
 - `3D Slicer`_: The medical imaging software platform for this project.
-- ITKUltrasound_: This module for the ITK_ library
-  contains the core classes used for this extension.
+- ITKUltrasound_: This module from the ITK_ library
+  contains the core classes used by this extension.
 - PLUS_: The Public Library of Ultrasound is another library with a Slicer
   extension useful for diagnostic ultrasound. PLUS focuses on data
   acquisition, pre-processing, and calibration for navigated image-guided
