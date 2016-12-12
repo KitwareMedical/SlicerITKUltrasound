@@ -4,6 +4,6 @@ Modules
 3D Slicer Modules:
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
 
    ScanConversion/index
