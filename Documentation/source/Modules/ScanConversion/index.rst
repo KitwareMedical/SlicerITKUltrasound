@@ -31,6 +31,13 @@ scan conversion modules. These algorithms vary in performance and accuracy
 characteristics. They should be selected based on performance requirements and
 behavior for the probe's geometry and image contents.
 
+.. figure:: ResamplingMethodsInSlicerGUI.png
+  :alt: Resampling methods in the Slicer GUI
+
+  All resampling methods are available across in the three probe geometry scan
+  conversion modules. Select the desired resampling method with the button in
+  the above section.
+
 The ITK methods use the `itk::ResampleImageFilter
 <https://itk.org/Doxygen/html/classitk_1_1ResampleImageFilter.html>`_ while
 the VTK methods use the `vtkProbeFilter
