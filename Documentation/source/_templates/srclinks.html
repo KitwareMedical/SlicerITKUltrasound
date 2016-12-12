@@ -1,0 +1,9 @@
+{%- if show_source and has_source and sourcename %}
+   {%- if edit_srclink_url %}
+   <p>
+   <a href="{{ edit_srclink_url }}"
+            rel="nofollow"
+            target="_blank"><i class="fi-social-github"></i>{{ _(' Edit on GitHub') }}</a>
+   </p>
+   {%- endif %}
+{%- endif %}
