@@ -1,5 +1,3 @@
-# -*- coding: utf-8 -*-
-#
 # SlicerITKUltrasound documentation build configuration file, created by
 # sphinx-quickstart on Wed Nov 30 18:01:12 2016.
 #
@@ -33,6 +31,7 @@ import sphinx_foundation_theme
 extensions = [
     'sphinx.ext.mathjax',
     'sphinx.ext.todo',
+    'sphinxcontrib.srclinks',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -158,10 +157,14 @@ html_static_path = ['_static']
 # typographically correct entities.
 #html_use_smartypants = True
 
+srclink_project = 'https://github.com/KitwareMedical/SlicerITKUltrasound'
+srclink_src_path = 'Documentation/source/'
+srclink_branch = 'master'
 # Custom sidebar templates, maps document names to template names.
 #html_sidebars = {}
-html_sidebars = {'**': ['searchbox.html'],
-    'Modules/ScanConversion/index': ['localtoc.html',
+html_sidebars = {'**': ['srclinks.html', 'searchbox.html'],
+    'Modules/ScanConversion/index': ['srclinks.html',
+        'localtoc.html',
         'searchbox.html'],
     'index': []
     }

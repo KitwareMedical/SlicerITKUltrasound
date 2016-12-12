@@ -1,3 +1,4 @@
 sphinx-foundation-theme
 ctk_cli
 rstcloth
+sphinxcontrib-srclinks
