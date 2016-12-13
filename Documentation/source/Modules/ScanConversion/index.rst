@@ -34,7 +34,7 @@ behavior for the probe's geometry and image contents.
 .. figure:: ResamplingMethodsInSlicerGUI.png
   :alt: Resampling methods in the Slicer GUI
 
-  All resampling methods are available across in the three probe geometry scan
+  All resampling methods are available in the three probe geometry scan
   conversion modules. Select the desired resampling method with the button in
   the above section.
 
