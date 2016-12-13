@@ -12,7 +12,7 @@ SlicerITKUltrasound
     :target: https://github.com/KitwareMedical/SlicerITKUltrasound
 
 A `3D Slicer`_ [Fedorov2012]_ extension for ultrasound image formation,
-processing, and analysis. Interfaces built off the ITKUltrasound_ library
+processing, and analysis. Interfaces are built off the ITKUltrasound_ library
 [McCormick2014]_.  The modules available in this extension are useful for both
 2D and 3D image generation for traditional B-mode imaging [McCormick2010]_,
 but also next-generation ultrasound image modalities like ultrasound
