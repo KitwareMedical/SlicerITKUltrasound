@@ -1,5 +1,5 @@
 ---
-title: 'SlicerITKUltrasound: A 3D Slicer extension for ultrasound image formation, processing, and analysis'
+title: 'SlicerITKUltrasound: A 3D Slicer extension for scan conversion of B-mode and next-generation ultrasound imaging modalities'
 tags:
   - ultrasound
   - medical imaging
@@ -27,13 +27,11 @@ bibliography: paper.bib
 
 # Summary
 
-A 3D Slicer [@Fedorov2012] extension for ultrasound image formation,
-processing, and analysis. Interfaces are built off the ITKUltrasound library
-[@McCormick2014]. The modules available in this extension are useful for both
-2D and 3D image generation for traditional B-mode imaging [@McCormick2010],
-but also next-generation ultrasound image modalities like ultrasound
-spectroscopy [@Aylward2016], acoustic radiation force imaging (ARFI)
-[@Palmeri2016], acoustic radiation force shear wave imaging (ARFI-SWEI)
-[@Rosenzweig2014], and others.
+A 3D Slicer [@Fedorov2012] extension for ultrasound scan conversion during 2D
+and 3D image generation for traditional B-mode imaging [@McCormick2010], but
+also next-generation ultrasound image modalities like ultrasound spectroscopy
+[@Aylward2016], acoustic radiation force imaging (ARFI) [@Palmeri2016],
+acoustic radiation force shear wave imaging (ARFI-SWEI) [@Rosenzweig2014], and
+others.  Interfaces are built off the ITKUltrasound library [@McCormick2014].
 
 # References
