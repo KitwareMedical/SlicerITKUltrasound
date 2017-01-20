@@ -10,4 +10,5 @@
   that are not necessarily uniform.
 
   This output can be reproduced by running the ``ScanConvertSliceSeriesTest``
-  test in the project repository.
+  test in the project repository. Example input data can be found `here
+  <http://slicer.kitware.com/midas3/folder/3704>`_.
