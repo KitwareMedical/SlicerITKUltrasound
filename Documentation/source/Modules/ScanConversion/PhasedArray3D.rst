@@ -8,4 +8,5 @@
   Screenshot of the ScanConvertPhasedArray3D module output.
 
   This output can be reproduced by running the ``ScanConvertPhasedArray3DTest``
-  test in the project repository.
+  test in the project repository. Example input data can be found `here
+  <http://slicer.kitware.com/midas3/folder/3614>`_.
