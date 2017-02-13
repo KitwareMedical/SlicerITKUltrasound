@@ -11,6 +11,9 @@ SlicerITKUltrasound
 .. image:: https://img.shields.io/github/stars/KitwareMedical/SlicerITKUltrasound.svg?style=social&label=Star
     :target: https://github.com/KitwareMedical/SlicerITKUltrasound
 
+.. image:: https://zenodo.org/badge/55185312.svg
+    :target: https://zenodo.org/badge/latestdoi/55185312
+
 A `3D Slicer`_ [Fedorov2012]_ extension for ultrasound image scan conversion
 of B-mode and next-generation ultrasound imaging modalities.  Interfaces are
 built off the ITKUltrasound_ library [McCormick2014]_.  The modules available
