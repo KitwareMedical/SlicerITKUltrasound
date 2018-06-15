@@ -44,7 +44,7 @@ endif()
 add_subdirectory(ScanConvertPhasedArray3D)
 add_subdirectory(ScanConvertCurvilinearArray)
 add_subdirectory(ScanConvertSliceSeries)
-add_subdirectory(TimeSeriesDisplacement)
+add_subdirectory(GenerateBModeFromRF)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------
