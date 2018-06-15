@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.9)
+cmake_minimum_required(VERSION 3.7.0)
 
 project(SlicerITKUltrasound)
 
@@ -44,6 +44,7 @@ endif()
 add_subdirectory(ScanConvertPhasedArray3D)
 add_subdirectory(ScanConvertCurvilinearArray)
 add_subdirectory(ScanConvertSliceSeries)
+add_subdirectory(TimeSeriesDisplacement)
 
 #-----------------------------------------------------------------------------
 #-----------------------------------------------------------------------------

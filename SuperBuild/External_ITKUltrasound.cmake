@@ -23,6 +23,7 @@ ExternalProject_Add(${proj}
     -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
     -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
     -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
+    -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
     -DITK_DIR:PATH=${ITK_DIR}
     -DITKUltrasound_USE_VTK:BOOL=ON
     -DVTK_DIR:PATH=${VTK_DIR}
