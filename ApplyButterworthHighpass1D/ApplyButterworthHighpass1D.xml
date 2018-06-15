@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Ultrasound</category>
+  <title>ApplyButterworthHighpass1D</title>
+  <description><![CDATA[Apply a Butterworth lowpass filter along the first direction of the image.]]></description>
+  <version>0.1.0</version>
+  <documentation-url>https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/Modules/ApplyButterworthHighpass1D/ApplyButterworthHighpass1D.html</documentation-url>
+  <license>Apache 2.0</license>
+  <contributor>Matthew McCormick (Kitware, Inc)</contributor>
+  <acknowledgements></acknowledgements>
+  <parameters>
+    <label>IO</label>
+    <description><![CDATA[Input/output parameters]]></description>
+    <image>
+      <name>inputVolume</name>
+      <label>Input Volume</label>
+      <channel>input</channel>
+      <index>0</index>
+      <description><![CDATA[Input volume]]></description>
+    </image>
+    <image>
+      <name>outputVolume</name>
+      <label>Output Volume</label>
+      <channel>output</channel>
+      <index>1</index>
+      <description><![CDATA[Output Volume]]></description>
+    </image>
+    <label>Direction</label>
+    <integer>
+      <name>direction</name>
+      <label>Direction</label>
+      <longflag>direction</longflag>
+      <flag>d</flag>
+      <description><![CDATA[The voxel direction along with to apply the filter.]]></description>
+      <default>0</default>
+    </integer>
+    <label>Butterworth</label>
+    <double>
+      <name>cutoff</name>
+      <longflag>cutoff</longflag>
+      <flag>c</flag>
+      <label>Cutoff Frequency</label>
+      <description><![CDATA[Cutoff frequency in the range (0.0, 1.0).]]></description>
+      <default>0.15</default>
+    </double>
+    <integer>
+      <name>order</name>
+      <label>Order</label>
+      <longflag>order</longflag>
+      <flag>o</flag>
+      <description><![CDATA[The filter order.]]></description>
+      <default>5</default>
+    </integer>
+  </parameters>
+</executable>
