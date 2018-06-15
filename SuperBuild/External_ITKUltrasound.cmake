@@ -9,8 +9,8 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
-# disable-wrapping 2016-10-24
-set(${proj}_GIT_TAG 8642d8dd8101e3a855b0265c4849da66da26cd6c)
+# disable-wrapping 2018-06-15
+set(${proj}_GIT_TAG ec34fd1d22aef70b28c34605638b0df95ea8e03c)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${git_protocol}://github.com/thewtex/ITKUltrasound.git
