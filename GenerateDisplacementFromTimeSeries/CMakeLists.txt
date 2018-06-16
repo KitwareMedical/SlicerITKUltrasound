@@ -1,6 +1,6 @@
 
 #-----------------------------------------------------------------------------
-set(MODULE_NAME GenerateBModeFromRF)
+set(MODULE_NAME GenerateDisplacementFromTimeSeries)
 
 #-----------------------------------------------------------------------------
 
