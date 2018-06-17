@@ -21,13 +21,25 @@
 #include "itkExtractImageFilter.h"
 #include "itkVector.h"
 #include "itkChangeInformationImageFilter.h"
+#include "itkResampleImageFilter.h"
+#include "itkZeroFluxNeumannBoundaryCondition.h"
+#include "itkWindowedSincInterpolateImageFunction.h"
+#include "itkTileImageFilter.h"
 
 #include "itkBlockMatchingImageRegistrationMethod.h"
 #include "itkBlockMatchingNormalizedCrossCorrelationNeighborhoodIteratorMetricImageFilter.h"
 #include "itkBlockMatchingSearchRegionImageInitializer.h"
 #include "itkBlockMatchingBayesianRegularizationDisplacementCalculator.h"
+#include "itkBlockMatchingMultiResolutionMinMaxBlockRadiusCalculator.h"
+#include "itkBlockMatchingMultiResolutionMinMaxSearchRegionImageSource.h"
+#include "itkBlockMatchingParabolicInterpolationDisplacementCalculator.h"
+#include "itkBlockMatchingStrainWindowDisplacementCalculator.h"
+#include "itkBlockMatchingBlockAffineTransformMetricImageFilter.h"
+#include "itkBlockMatchingStrainWindowBlockAffineTransformCommand.h"
+
+#include "itkStrainImageFilter.h"
+
 #include "itkSplitComponentsImageFilter.h"
-#include "itkTileImageFilter.h"
 
 #include "itkPluginUtilities.h"
 
@@ -51,7 +63,7 @@ int DoIt( int argc, char * argv[] )
   typedef itk::Image< InputPixelType, Dimension > InputImageType;
   typedef typename InputImageType::SizeType       RadiusType;
 
-  typedef double                                   MetricPixelType;
+  typedef float                                    MetricPixelType;
   typedef itk::Image< MetricPixelType, Dimension > MetricImageType;
 
   typedef itk::Vector< MetricPixelType, Dimension > VectorType;
@@ -72,17 +84,68 @@ int DoIt( int argc, char * argv[] )
   const typename SeriesImageType::RegionType seriesRegion = seriesImage->GetLargestPossibleRegion();
   const typename SeriesImageType::SizeType seriesSize( seriesRegion.GetSize() );
 
+  typedef itk::ResampleImageFilter< InputImageType, InputImageType, CoordRepType > ResamplerType;
+  typename ResamplerType::Pointer fixedResampler = ResamplerType::New();
+  typename ResamplerType::Pointer movingResampler = ResamplerType::New();
+  const static unsigned int ResampleRadius = 4;
+  typedef itk::Function::WelchWindowFunction< ResampleRadius > ResampleWindowType;
+  typedef itk::ZeroFluxNeumannBoundaryCondition< InputImageType > BoundaryConditionType;
+  typedef itk::WindowedSincInterpolateImageFunction< InputImageType,
+                                                    ResampleRadius, ResampleWindowType, BoundaryConditionType,
+                                                    CoordRepType> ResamplerInterpolatorType;
+  typename ResamplerInterpolatorType::Pointer fixedResamplerInterpolator = ResamplerInterpolatorType::New();
+  typename ResamplerInterpolatorType::Pointer movingResamplerInterpolator = ResamplerInterpolatorType::New();
+  fixedResampler->SetInterpolator( fixedResamplerInterpolator );
+  movingResampler->SetInterpolator( movingResamplerInterpolator );
+
+  /** The block radius calculator. */
+  typedef itk::BlockMatching::MultiResolutionMinMaxBlockRadiusCalculator< InputImageType >
+    BlockRadiusCalculatorType;
+  typename BlockRadiusCalculatorType::Pointer blockRadiusCalculator = BlockRadiusCalculatorType::New();
+
+  /** The search region image source. */
+  typedef itk::BlockMatching::MultiResolutionMinMaxSearchRegionImageSource< InputImageType,
+          InputImageType, DisplacementImageType > SearchRegionImageSourceType;
+  typename SearchRegionImageSourceType::Pointer searchRegionImageSource = SearchRegionImageSourceType::New();
+
   // Make the search region image.
   typedef itk::BlockMatching::SearchRegionImageInitializer< InputImageType, InputImageType > SearchRegionInitializerType;
   typename SearchRegionInitializerType::Pointer searchRegions = SearchRegionInitializerType::New();
 
+  /** The registration method. */
   typedef itk::BlockMatching::ImageRegistrationMethod< InputImageType, InputImageType, MetricImageType, DisplacementImageType, CoordRepType > RegistrationMethodType;
   typename RegistrationMethodType::Pointer registrationMethod = RegistrationMethodType::New();
+
+  typedef itk::BlockMatching::ParabolicInterpolationDisplacementCalculator<
+    MetricImageType,
+    DisplacementImageType > ParabolicInterpolatorType;
+  typename ParabolicInterpolatorType::Pointer parabolicInterpolator = ParabolicInterpolatorType::New();
+
+  /** Filter out peak hopping. */
+  typedef itk::BlockMatching::StrainWindowDisplacementCalculator< MetricImageType, DisplacementImageType, MetricPixelType > StrainWindowDisplacementCalculatorType;
+  typename StrainWindowDisplacementCalculatorType::Pointer strainWindower = StrainWindowDisplacementCalculatorType::New();
+  strainWindower->SetMaximumIterations( 2 );
+  strainWindower->SetDisplacementCalculator( parabolicInterpolator );
+  typedef itk::StrainImageFilter< DisplacementImageType, MetricPixelType, MetricPixelType > StrainWindowStrainFilterType;
+  typename StrainWindowStrainFilterType::Pointer strainWindowStrainFilter = StrainWindowStrainFilterType::New();
+  strainWindower->SetStrainImageFilter( strainWindowStrainFilter );
 
   //// Our similarity metric.
   typedef itk::BlockMatching::NormalizedCrossCorrelationNeighborhoodIteratorMetricImageFilter< InputImageType, InputImageType, MetricImageType > MetricImageFilterType;
   typename MetricImageFilterType::Pointer metricImageFilter = MetricImageFilterType::New();
   registrationMethod->SetMetricImageFilter( metricImageFilter );
+
+  /** Scale the fixed block by the strain at higher levels. */
+  typedef itk::BlockMatching::BlockAffineTransformMetricImageFilter< InputImageType,
+          InputImageType, MetricImageType, MetricPixelType > BlockTransformMetricImageFilterType;
+  typename BlockTransformMetricImageFilterType::Pointer blockTransformMetricImageFilter = BlockTransformMetricImageFilterType::New();
+  blockTransformMetricImageFilter->SetMetricImageFilter( metricImageFilter );
+  typedef itk::BlockMatching::StrainWindowBlockAffineTransformCommand< StrainWindowDisplacementCalculatorType,
+          BlockTransformMetricImageFilterType, StrainWindowStrainFilterType > BlockTransformCommandType;
+  typename BlockTransformCommandType::Pointer blockTransformCommand = BlockTransformCommandType::New();
+  blockTransformCommand->SetBlockAffineTransformMetricImageFilter( blockTransformMetricImageFilter );
+  strainWindower->AddObserver( itk::EndEvent(), blockTransformCommand );
+
 
   // Perform regularization.
   typedef itk::BlockMatching::BayesianRegularizationDisplacementCalculator<
@@ -153,8 +216,7 @@ int DoIt( int argc, char * argv[] )
     searchRadius[1] = 6;
     searchRegions->SetFixedBlockRadius( blockRadius );
     searchRegions->SetSearchRegionRadius( searchRadius );
-    // For speed...
-    searchRegions->SetOverlap( 3.0 );
+    searchRegions->SetOverlap( 0.8 );
 
     // The image registration method.
     registrationMethod->SetFixedImage( fixedImage );
@@ -167,8 +229,8 @@ int DoIt( int argc, char * argv[] )
     strainSigma[0] = 0.08;
     strainSigma[1] = 0.04;
     regularizer->SetStrainSigma( strainSigma );
-    regularizer->SetMaximumIterations( 3 );
-    registrationMethod->SetMetricImageToDisplacementCalculator( regularizer );
+    regularizer->SetMaximumIterations( 0 );
+    //registrationMethod->SetMetricImageToDisplacementCalculator( regularizer );
     registrationMethod->Update();
 
     typename DisplacementImageType::Pointer displacement = registrationMethod->GetOutput();
@@ -198,9 +260,12 @@ int DoIt( int argc, char * argv[] )
   changeInformationFilter->SetInput( displacementTiler->GetOutput() );
   // Todo: Update Origin based on startIndex
   changeInformationFilter->SetOutputOrigin( seriesImage->GetOrigin() );
+  changeInformationFilter->ChangeOriginOn();
   // Todo: update based on frameSkip?
   changeInformationFilter->SetOutputSpacing( seriesImage->GetSpacing() );
+  changeInformationFilter->ChangeSpacingOn();
   changeInformationFilter->SetOutputDirection( seriesImage->GetDirection() );
+  changeInformationFilter->ChangeDirectionOn();
 
 
   typedef itk::ImageFileWriter< DisplacementSeriesImageType > WriterType;
@@ -209,19 +274,32 @@ int DoIt( int argc, char * argv[] )
   displacementWriter->SetInput( changeInformationFilter->GetOutput() );
   displacementWriter->Update();
 
+  typedef itk::ChangeInformationImageFilter< DisplacementSeriesComponentImageType > ComponentChangeInformationFilterType;
+  typename ComponentChangeInformationFilterType::Pointer componentChangeInformationFilter = ComponentChangeInformationFilterType::New();
+  // Todo: Update Origin based on startIndex
+  componentChangeInformationFilter->SetOutputOrigin( seriesImage->GetOrigin() );
+  componentChangeInformationFilter->ChangeOriginOn();
+  // Todo: update based on frameSkip?
+  componentChangeInformationFilter->SetOutputSpacing( seriesImage->GetSpacing() );
+  componentChangeInformationFilter->ChangeSpacingOn();
+  componentChangeInformationFilter->SetOutputDirection( seriesImage->GetDirection() );
+  componentChangeInformationFilter->ChangeDirectionOn();
+
   typedef itk::ImageFileWriter< DisplacementSeriesComponentImageType > ComponentWriterType;
   ComponentWriterType::Pointer displacementComponentWriter = ComponentWriterType::New();
   if( !displacementSeriesComponent0.empty() )
     {
     // write out displacementSeriesComponent0
-    displacementComponentWriter->SetInput( displacementComponent0Tiler->GetOutput() );
+    componentChangeInformationFilter->SetInput( displacementComponent0Tiler->GetOutput() );
+    displacementComponentWriter->SetInput( componentChangeInformationFilter->GetOutput() );
     displacementComponentWriter->SetFileName( displacementSeriesComponent0 );
     displacementComponentWriter->Update();
     }
   if( !displacementSeriesComponent1.empty() )
     {
     // write out displacementSeriesComponent1
-    displacementComponentWriter->SetInput( displacementComponent1Tiler->GetOutput() );
+    componentChangeInformationFilter->SetInput( displacementComponent1Tiler->GetOutput() );
+    displacementComponentWriter->SetInput( componentChangeInformationFilter->GetOutput() );
     displacementComponentWriter->SetFileName( displacementSeriesComponent1 );
     displacementComponentWriter->Update();
     }

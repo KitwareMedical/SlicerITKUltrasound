@@ -16,6 +16,7 @@ include(${SlicerExecutionModel_USE_FILE})
 set(${PROJECT_NAME}_ITK_COMPONENTS
   ITKIOImageBase
   Ultrasound
+  Strain
   )
 if(NOT DEFINED Slicer_DIR)
   list(APPEND ${PROJECT_NAME}_ITK_COMPONENTS ITKImageIO)
