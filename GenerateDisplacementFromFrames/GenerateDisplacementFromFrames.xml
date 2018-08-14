@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Ultrasound</category>
+  <title>GenerateDisplacementFromFrames</title>
+  <description><![CDATA[Estimate displacement from two 2D ultrasound data frames stored within a 3D volume.]]></description>
+  <version>0.1.0</version>
+  <documentation-url>https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/Modules/FramesDisplacement/FramesDisplacement.html</documentation-url>
+  <license>Apache 2.0</license>
+  <contributor>Matthew McCormick (Kitware, Inc)</contributor>
+  <acknowledgements></acknowledgements>
+  <parameters>
+    <label>IO</label>
+    <description><![CDATA[Input/output parameters]]></description>
+    <image>
+      <name>inputSeries</name>
+      <label>Input Series</label>
+      <channel>input</channel>
+      <index>0</index>
+      <description><![CDATA[Input series -- third dimension should be time]]></description>
+    </image>
+    <image>
+      <name>displacement</name>
+      <label>Displacement Series</label>
+      <channel>output</channel>
+      <index>1</index>
+      <description><![CDATA[Output Volume -- displacement volume]]></description>
+    </image>
+    <image>
+      <name>displacementComponent0</name>
+      <label>Displacement Component 0</label>
+      <channel>output</channel>
+      <longflag>component0</longflag>
+      <flag>c</flag>
+      <description><![CDATA[Output Volume -- displacement component 0 volume]]></description>
+    </image>
+    <image>
+      <name>displacementComponent1</name>
+      <label>Displacement Component 1</label>
+      <channel>output</channel>
+      <longflag>component1</longflag>
+      <flag>d</flag>
+      <description><![CDATA[Output Volume -- displacement component 1 volume]]></description>
+    </image>
+  </parameters>
+  <parameters>
+    <label>Time</label>
+    <description><![CDATA[Select time range and time delay]]></description>
+    <integer>
+      <name>startFrameIndex</name>
+      <label>Start Frame Index</label>
+      <longflag>startFrameIndex</longflag>
+      <flag>s</flag>
+      <channel>input</channel>
+      <default>0</default>
+      <description><![CDATA[Start frame index]]></description>
+    </integer>
+    <integer>
+      <name>endFrameIndex</name>
+      <label>End Frame Index</label>
+      <longflag>endFrameIndex</longflag>
+      <flag>e</flag>
+      <channel>input</channel>
+      <default>-1</default>
+      <description><![CDATA[End frame index]]></description>
+    </integer>
+  </parameters>
+</executable>
