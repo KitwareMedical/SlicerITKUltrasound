@@ -17,6 +17,7 @@
  *=========================================================================*/
 
 #include "itkImageFileReader.h"
+#include "itkImageFileWriter.h"
 #include "itkExtractImageFilter.h"
 
 #include "itkSplitComponentsImageFilter.h"
@@ -66,6 +67,30 @@ int DoIt( int argc, char * argv[] )
   const typename SeriesImageType::RegionType seriesRegion = seriesImage->GetLargestPossibleRegion();
   const typename SeriesImageType::SizeType seriesSize( seriesRegion.GetSize() );
 
+  typedef itk::ExtractImageFilter< SeriesImageType, InputImageType > ExtractorType;
+
+  typename ExtractorType::Pointer fixedExtractor = ExtractorType::New();
+  fixedExtractor->SetInput( seriesImage );
+  fixedExtractor->SetDirectionCollapseToSubmatrix();
+  typename SeriesImageType::RegionType fixedExtractionRegion( seriesRegion );
+  fixedExtractionRegion.SetSize( 2, 0 );
+  const itk::IndexValueType seriesStartFrame = seriesRegion.GetIndex( 2 );
+  if( startFrameIndex < seriesStartFrame ||  startFrameIndex > seriesStartFrame + seriesRegion.GetSize( 2 ) - 1 )
+    {
+    std::cerr << "startFrameIndex is outside the series." << std::endl;
+    return EXIT_FAILURE;
+    }
+  fixedExtractionRegion.SetIndex( 2, startFrameIndex );
+  fixedExtractor->SetExtractionRegion( fixedExtractionRegion );
+
+  typedef itk::ImageFileWriter< InputImageType > WriterType;
+  typename WriterType::Pointer writer = WriterType::New();
+  writer->SetFileName( displacement );
+  writer->SetInput( fixedExtractor->GetOutput() );
+
+  writer->Update();
+
+
   return EXIT_SUCCESS;
 }
 
@@ -84,21 +109,21 @@ int main( int argc, char * argv[] )
 
     switch( inputComponentType )
       {
-      case itk::ImageIOBase::UCHAR:
-        return DoIt< unsigned char >( argc, argv );
-        break;
-      case itk::ImageIOBase::USHORT:
-        return DoIt< unsigned short >( argc, argv );
-        break;
-      case itk::ImageIOBase::SHORT:
-        return DoIt< short >( argc, argv );
-        break;
+      //case itk::ImageIOBase::UCHAR:
+        //return DoIt< unsigned char >( argc, argv );
+        //break;
+      //case itk::ImageIOBase::USHORT:
+        //return DoIt< unsigned short >( argc, argv );
+        //break;
+      //case itk::ImageIOBase::SHORT:
+        //return DoIt< short >( argc, argv );
+        //break;
       case itk::ImageIOBase::FLOAT:
         return DoIt< float >( argc, argv );
         break;
-      case itk::ImageIOBase::DOUBLE:
-        return DoIt< double >( argc, argv );
-        break;
+      //case itk::ImageIOBase::DOUBLE:
+        //return DoIt< double >( argc, argv );
+        //break;
       default:
         std::cerr << "Unknown input image pixel component type: "
           << itk::ImageIOBase::GetComponentTypeAsString( inputComponentType )
