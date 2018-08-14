@@ -83,10 +83,23 @@ int DoIt( int argc, char * argv[] )
   fixedExtractionRegion.SetIndex( 2, startFrameIndex );
   fixedExtractor->SetExtractionRegion( fixedExtractionRegion );
 
+  typename ExtractorType::Pointer movingExtractor = ExtractorType::New();
+  movingExtractor->SetInput( seriesImage );
+  movingExtractor->SetDirectionCollapseToSubmatrix();
+  typename SeriesImageType::RegionType movingExtractionRegion( seriesRegion );
+  movingExtractionRegion.SetSize( 2, 0 );
+  if( endFrameIndex < seriesStartFrame ||  endFrameIndex > seriesStartFrame + seriesRegion.GetSize( 2 ) - 1 )
+    {
+    std::cerr << "endFrameIndex is outside the series." << std::endl;
+    return EXIT_FAILURE;
+    }
+  movingExtractionRegion.SetIndex( 2, endFrameIndex );
+  movingExtractor->SetExtractionRegion( movingExtractionRegion );
+
   typedef itk::ImageFileWriter< InputImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
   writer->SetFileName( displacement );
-  writer->SetInput( fixedExtractor->GetOutput() );
+  writer->SetInput( movingExtractor->GetOutput() );
 
   writer->Update();
 
