@@ -96,10 +96,18 @@ int DoIt( int argc, char * argv[] )
   movingExtractionRegion.SetIndex( 2, endFrameIndex );
   movingExtractor->SetExtractionRegion( movingExtractionRegion );
 
-  typedef itk::ImageFileWriter< InputImageType > WriterType;
+  typedef itk::BlockMatching::DisplacementPipeline< InputPixelType, InputPixelType, MetricPixelType, double, Dimension >
+    DisplacementPipelineType;
+  typename DisplacementPipelineType::Pointer displacementPipeline = DisplacementPipelineType::New();
+  displacementPipeline->SetFixedImage( fixedExtractor->GetOutput() );
+  displacementPipeline->SetMovingImage( movingExtractor->GetOutput() );
+
+  typedef typename DisplacementPipelineType::DisplacementImageType DisplacementImageType;
+
+  typedef itk::ImageFileWriter< DisplacementImageType > WriterType;
   typename WriterType::Pointer writer = WriterType::New();
   writer->SetFileName( displacement );
-  writer->SetInput( movingExtractor->GetOutput() );
+  writer->SetInput( displacementPipeline->GetOutput() );
 
   writer->Update();
 
