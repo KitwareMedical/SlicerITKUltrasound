@@ -50,7 +50,6 @@ int DoIt( int argc, char * argv[] )
   typedef itk::Image< MetricPixelType, Dimension > MetricImageType;
 
   typedef itk::Vector< MetricPixelType, Dimension > VectorType;
-  typedef itk::Image< VectorType, Dimension >       DisplacementImageType;
 
   typedef double CoordRepType;
 
