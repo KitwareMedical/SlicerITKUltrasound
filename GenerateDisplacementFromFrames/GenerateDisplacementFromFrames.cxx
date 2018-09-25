@@ -26,6 +26,9 @@
 
 #include "itkPluginUtilities.h"
 
+// For debugging
+#include "itkBlockMatchingMultiResolutionSearchRegionWriterCommand.h"
+
 #include "GenerateDisplacementFromFramesCLP.h"
 
 // Use an anonymous namespace to keep class types and function names
@@ -42,21 +45,21 @@ int DoIt( int argc, char * argv[] )
   PARSE_ARGS;
 
   const unsigned int Dimension = 2;
-  typedef TPixel InputPixelType;
-  typedef itk::Image< InputPixelType, Dimension > InputImageType;
-  typedef typename InputImageType::SizeType       RadiusType;
+  using InputPixelType = TPixel;
+  using InputImageType = itk::Image< InputPixelType, Dimension >;
+  using RadiusType = typename InputImageType::SizeType;
 
-  typedef float                                    MetricPixelType;
-  typedef itk::Image< MetricPixelType, Dimension > MetricImageType;
+  using MetricPixelType = float;
+  using MetricImageType = itk::Image< MetricPixelType, Dimension >;
 
   typedef itk::Vector< MetricPixelType, Dimension > VectorType;
 
-  typedef double CoordRepType;
+  using CoordRepType = double;
 
   const unsigned int SeriesDimension = 3;
-  typedef itk::Image< InputPixelType, SeriesDimension > SeriesImageType;
+  using SeriesImageType = itk::Image< InputPixelType, SeriesDimension >;
 
-  typedef itk::ImageFileReader< SeriesImageType > ReaderType;
+  using ReaderType = itk::ImageFileReader< SeriesImageType >;
   typename ReaderType::Pointer seriesReader = ReaderType::New();
   seriesReader->SetFileName( inputSeries );
   seriesReader->Update();
@@ -95,15 +98,24 @@ int DoIt( int argc, char * argv[] )
   movingExtractionRegion.SetIndex( 2, endFrameIndex );
   movingExtractor->SetExtractionRegion( movingExtractionRegion );
 
-  typedef itk::BlockMatching::DisplacementPipeline< InputPixelType, InputPixelType, MetricPixelType, double, Dimension >
-    DisplacementPipelineType;
+  using DisplacementPipelineType = itk::BlockMatching::DisplacementPipeline< InputPixelType, InputPixelType, MetricPixelType, double, Dimension >;
+    ;
   typename DisplacementPipelineType::Pointer displacementPipeline = DisplacementPipelineType::New();
   displacementPipeline->SetFixedImage( fixedExtractor->GetOutput() );
   displacementPipeline->SetMovingImage( movingExtractor->GetOutput() );
 
-  typedef typename DisplacementPipelineType::DisplacementImageType DisplacementImageType;
+  // To debug / inspect the search regions
+  /** Write out the search region images at every level. */
+  using SearchRegionWriterCommandType = itk::BlockMatching::MultiResolutionSearchRegionWriterCommand< typename DisplacementPipelineType::RegistrationMethodType >;
+  typename SearchRegionWriterCommandType::Pointer searchRegionWriterCommand = SearchRegionWriterCommandType::New();
+  searchRegionWriterCommand->SetOutputFilePrefix( "/tmp/SearchRegionWriter" );
+  typename DisplacementPipelineType::RegistrationMethodType * multiResolutionRegistrationMethod = displacementPipeline->GetMultiResolutionRegistrationMethod();
+  searchRegionWriterCommand->SetMultiResolutionMethod( multiResolutionRegistrationMethod );
+  //multiResolutionRegistrationMethod->AddObserver( itk::IterationEvent(), searchRegionWriterCommand );
 
-  typedef itk::ImageFileWriter< DisplacementImageType > WriterType;
+  using DisplacementImageType = typename DisplacementPipelineType::DisplacementImageType;
+
+  using WriterType = itk::ImageFileWriter< DisplacementImageType >;
   typename WriterType::Pointer writer = WriterType::New();
   writer->SetFileName( displacement );
   writer->SetInput( displacementPipeline->GetOutput() );
