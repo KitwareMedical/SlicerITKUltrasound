@@ -63,5 +63,14 @@
       <default>-1</default>
       <description><![CDATA[End frame index]]></description>
     </integer>
+    <integer>
+      <name>regularizationMaximumIterations</name>
+      <label>Regularization maximum iterations</label>
+      <longflag>regularizationMaximumIterations</longflag>
+      <flag>r</flag>
+      <channel>input</channel>
+      <default>1</default>
+      <description><![CDATA[Regularization maximum number of iterations]]></description>
+    </integer>
   </parameters>
 </executable>
