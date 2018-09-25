@@ -125,6 +125,24 @@ int DoIt( int argc, char * argv[] )
   writer->Update();
 
 
+  using DisplacementComponentFilterType = itk::SplitComponentsImageFilter< DisplacementImageType, MetricImageType >;
+  typename DisplacementComponentFilterType::Pointer displacementComponentFilter = DisplacementComponentFilterType::New();
+  displacementComponentFilter->SetInput( displacementPipeline->GetOutput() );
+  using ComponentWriterType = itk::ImageFileWriter< MetricImageType >;
+  typename ComponentWriterType::Pointer componentWriter = ComponentWriterType::New();
+  if( !displacementComponent0.empty() )
+    {
+    componentWriter->SetFileName( displacementComponent0 );
+    componentWriter->SetInput( displacementComponentFilter->GetOutput( 0 ) );
+    componentWriter->Update();
+    }
+  if( !displacementComponent1.empty() )
+    {
+    componentWriter->SetFileName( displacementComponent1 );
+    componentWriter->SetInput( displacementComponentFilter->GetOutput( 1 ) );
+    componentWriter->Update();
+    }
+
   return EXIT_SUCCESS;
 }
 
