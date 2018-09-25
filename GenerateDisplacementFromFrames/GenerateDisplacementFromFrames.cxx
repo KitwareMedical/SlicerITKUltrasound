@@ -104,6 +104,8 @@ int DoIt( int argc, char * argv[] )
   displacementPipeline->SetFixedImage( fixedExtractor->GetOutput() );
   displacementPipeline->SetMovingImage( movingExtractor->GetOutput() );
 
+  displacementPipeline->SetRegularizationMaximumNumberOfIterations( regularizationMaximumIterations );
+
   // To debug / inspect the search regions
   /** Write out the search region images at every level. */
   using SearchRegionWriterCommandType = itk::BlockMatching::MultiResolutionSearchRegionWriterCommand< typename DisplacementPipelineType::RegistrationMethodType >;
