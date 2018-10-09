@@ -46,6 +46,16 @@ SEMMacroBuildCLI(
   INCLUDE_DIRECTORIES ${MODULE_INCLUDE_DIRECTORIES}
   ADDITIONAL_SRCS ${MODULE_SRCS}
   )
+if(CMAKE_VERSION VERSION_GREATER_EQUAL 3.13.0)
+  # Optional IPO. Do not use IPO if it's not supported by compiler.
+  include(CheckIPOSupported)
+  check_ipo_supported(RESULT result OUTPUT output)
+  if(result)
+    set_property(TARGET ${MODULE_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+  else()
+    message(WARNING "IPO is not supported: ${output}")
+  endif()
+endif()
 
 #-----------------------------------------------------------------------------
 if(BUILD_TESTING)
