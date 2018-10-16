@@ -107,6 +107,12 @@ int DoIt( int argc, char * argv[] )
 
   displacementPipeline->SetRegularizationMaximumNumberOfIterations( regularizationMaximumIterations );
 
+  using BlockRadiusType = typename DisplacementPipelineType::BlockRadiusType;
+  BlockRadiusType topBlockRadiusWithType;
+  topBlockRadiusWithType[0] = topBlockRadius[0];
+  topBlockRadiusWithType[1] = topBlockRadius[1];
+  displacementPipeline->SetTopBlockRadius( topBlockRadiusWithType );
+
   // To debug / inspect the search regions
   /** Write out the search region images at every level. */
   using SearchRegionWriterCommandType = itk::BlockMatching::MultiResolutionSearchRegionWriterCommand< typename DisplacementPipelineType::RegistrationMethodType >;
