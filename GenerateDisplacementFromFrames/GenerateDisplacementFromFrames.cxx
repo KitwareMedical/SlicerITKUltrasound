@@ -28,6 +28,7 @@
 
 // For debugging
 #include "itkBlockMatchingMultiResolutionSearchRegionWriterCommand.h"
+#include "itkBlockMatchingMultiResolutionIterationObserver.h"
 
 #include "GenerateDisplacementFromFramesCLP.h"
 
@@ -113,7 +114,17 @@ int DoIt( int argc, char * argv[] )
   searchRegionWriterCommand->SetOutputFilePrefix( "/tmp/SearchRegionWriter" );
   typename DisplacementPipelineType::RegistrationMethodType * multiResolutionRegistrationMethod = displacementPipeline->GetMultiResolutionRegistrationMethod();
   searchRegionWriterCommand->SetMultiResolutionMethod( multiResolutionRegistrationMethod );
-  //multiResolutionRegistrationMethod->AddObserver( itk::IterationEvent(), searchRegionWriterCommand );
+  multiResolutionRegistrationMethod->AddObserver( itk::IterationEvent(), searchRegionWriterCommand );
+
+  // To debug / inspect displacements at multiple resolutions
+  typedef itk::BlockMatching::MultiResolutionIterationObserver< typename DisplacementPipelineType::RegistrationMethodType > MultiResolutionObserverType;
+  typename MultiResolutionObserverType::Pointer multiResolutionObserver = MultiResolutionObserverType::New();
+  multiResolutionObserver->SetMultiResolutionMethod( multiResolutionRegistrationMethod );
+  multiResolutionObserver->SetOutputFilePrefix( "/tmp/MultiResolutionObserver" );
+  multiResolutionRegistrationMethod->AddObserver( itk::IterationEvent(), multiResolutionObserver );
+
+  // Enable text progress bar
+  displacementPipeline->SetLevelRegistrationMethodTextProgressBar( true );
 
   using DisplacementImageType = typename DisplacementPipelineType::DisplacementImageType;
 
