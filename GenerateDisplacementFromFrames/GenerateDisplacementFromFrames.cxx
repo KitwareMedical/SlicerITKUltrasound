@@ -113,6 +113,11 @@ int DoIt( int argc, char * argv[] )
   topBlockRadiusWithType[1] = topBlockRadius[1];
   displacementPipeline->SetTopBlockRadius( topBlockRadiusWithType );
 
+  BlockRadiusType bottomBlockRadiusWithType;
+  bottomBlockRadiusWithType[0] = bottomBlockRadius[0];
+  bottomBlockRadiusWithType[1] = bottomBlockRadius[1];
+  displacementPipeline->SetBottomBlockRadius( bottomBlockRadiusWithType );
+
   // To debug / inspect the search regions
   /** Write out the search region images at every level. */
   using SearchRegionWriterCommandType = itk::BlockMatching::MultiResolutionSearchRegionWriterCommand< typename DisplacementPipelineType::RegistrationMethodType >;
