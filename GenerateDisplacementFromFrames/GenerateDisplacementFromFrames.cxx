@@ -120,19 +120,22 @@ int DoIt( int argc, char * argv[] )
 
   // To debug / inspect the search regions
   /** Write out the search region images at every level. */
-  using SearchRegionWriterCommandType = itk::BlockMatching::MultiResolutionSearchRegionWriterCommand< typename DisplacementPipelineType::RegistrationMethodType >;
-  typename SearchRegionWriterCommandType::Pointer searchRegionWriterCommand = SearchRegionWriterCommandType::New();
-  searchRegionWriterCommand->SetOutputFilePrefix( "/tmp/SearchRegionWriter" );
-  typename DisplacementPipelineType::RegistrationMethodType * multiResolutionRegistrationMethod = displacementPipeline->GetMultiResolutionRegistrationMethod();
-  searchRegionWriterCommand->SetMultiResolutionMethod( multiResolutionRegistrationMethod );
-  multiResolutionRegistrationMethod->AddObserver( itk::IterationEvent(), searchRegionWriterCommand );
+  if( !multiResolutionPrefix.empty() )
+    {
+    using SearchRegionWriterCommandType = itk::BlockMatching::MultiResolutionSearchRegionWriterCommand< typename DisplacementPipelineType::RegistrationMethodType >;
+    typename SearchRegionWriterCommandType::Pointer searchRegionWriterCommand = SearchRegionWriterCommandType::New();
+    searchRegionWriterCommand->SetOutputFilePrefix( multiResolutionPrefix );
+    typename DisplacementPipelineType::RegistrationMethodType * multiResolutionRegistrationMethod = displacementPipeline->GetMultiResolutionRegistrationMethod();
+    searchRegionWriterCommand->SetMultiResolutionMethod( multiResolutionRegistrationMethod );
+    multiResolutionRegistrationMethod->AddObserver( itk::IterationEvent(), searchRegionWriterCommand );
 
-  // To debug / inspect displacements at multiple resolutions
-  typedef itk::BlockMatching::MultiResolutionIterationObserver< typename DisplacementPipelineType::RegistrationMethodType > MultiResolutionObserverType;
-  typename MultiResolutionObserverType::Pointer multiResolutionObserver = MultiResolutionObserverType::New();
-  multiResolutionObserver->SetMultiResolutionMethod( multiResolutionRegistrationMethod );
-  multiResolutionObserver->SetOutputFilePrefix( "/tmp/MultiResolutionObserver" );
-  multiResolutionRegistrationMethod->AddObserver( itk::IterationEvent(), multiResolutionObserver );
+    // To debug / inspect displacements at multiple resolutions
+    using MultiResolutionObserverType = itk::BlockMatching::MultiResolutionIterationObserver< typename DisplacementPipelineType::RegistrationMethodType >;
+    typename MultiResolutionObserverType::Pointer multiResolutionObserver = MultiResolutionObserverType::New();
+    multiResolutionObserver->SetMultiResolutionMethod( multiResolutionRegistrationMethod );
+    multiResolutionObserver->SetOutputFilePrefix( multiResolutionPrefix );
+    multiResolutionRegistrationMethod->AddObserver( itk::IterationEvent(), multiResolutionObserver );
+    }
 
   // Enable text progress bar
   displacementPipeline->SetLevelRegistrationMethodTextProgressBar( true );

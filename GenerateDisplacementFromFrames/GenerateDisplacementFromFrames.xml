@@ -46,6 +46,14 @@
       <description><![CDATA[Output Volume -- displacement component 1 volume]]></description>
     </image>
 
+    <string>
+      <name>multiResolutionPrefix</name>
+      <label>MultiResolution prefix</label>
+      <longflag>multiResolutionPrefix</longflag>
+      <default><![CDATA[]]></default>
+      <description><![CDATA[Output file prefix for multi-resolution intermediate outputs.]]></description>
+    </string>
+
   </parameters>
   <parameters>
     <label>Time</label>
