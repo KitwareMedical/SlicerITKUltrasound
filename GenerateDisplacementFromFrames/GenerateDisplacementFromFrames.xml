@@ -11,6 +11,7 @@
   <parameters>
     <label>IO</label>
     <description><![CDATA[Input/output parameters]]></description>
+
     <image>
       <name>inputSeries</name>
       <label>Input Series</label>
@@ -18,6 +19,7 @@
       <index>0</index>
       <description><![CDATA[Input series -- third dimension should be time]]></description>
     </image>
+
     <image>
       <name>displacement</name>
       <label>Displacement Series</label>
@@ -25,6 +27,7 @@
       <index>1</index>
       <description><![CDATA[Output Volume -- displacement volume]]></description>
     </image>
+
     <image>
       <name>displacementComponent0</name>
       <label>Displacement Component 0</label>
@@ -33,6 +36,7 @@
       <flag>c</flag>
       <description><![CDATA[Output Volume -- displacement component 0 volume]]></description>
     </image>
+
     <image>
       <name>displacementComponent1</name>
       <label>Displacement Component 1</label>
@@ -41,28 +45,43 @@
       <flag>d</flag>
       <description><![CDATA[Output Volume -- displacement component 1 volume]]></description>
     </image>
+
+    <string>
+      <name>multiResolutionPrefix</name>
+      <label>MultiResolution prefix</label>
+      <longflag>multiResolutionPrefix</longflag>
+      <default><![CDATA[]]></default>
+      <description><![CDATA[Output file prefix for multi-resolution intermediate outputs.]]></description>
+    </string>
+
   </parameters>
   <parameters>
     <label>Time</label>
     <description><![CDATA[Select time range and time delay]]></description>
+
     <integer>
       <name>startFrameIndex</name>
       <label>Start Frame Index</label>
       <longflag>startFrameIndex</longflag>
       <flag>s</flag>
-      <channel>input</channel>
       <default>0</default>
       <description><![CDATA[Start frame index]]></description>
     </integer>
+
     <integer>
       <name>endFrameIndex</name>
       <label>End Frame Index</label>
       <longflag>endFrameIndex</longflag>
       <flag>e</flag>
-      <channel>input</channel>
       <default>-1</default>
       <description><![CDATA[End frame index]]></description>
     </integer>
+
+  </parameters>
+  <parameters>
+    <label>Time</label>
+    <description><![CDATA[Select time range and time delay]]></description>
+
     <integer>
       <name>regularizationMaximumIterations</name>
       <label>Regularization maximum iterations</label>
@@ -72,5 +91,21 @@
       <default>1</default>
       <description><![CDATA[Regularization maximum number of iterations]]></description>
     </integer>
+
+    <integer-vector>
+      <name>topBlockRadius</name>
+      <label>Top block radius</label>
+      <longflag>topBlockRadius</longflag>
+      <description>Block radius at the top level of the multi-resolution pyramid.</description>
+      <default>15,10</default>
+    </integer-vector>
+
+    <integer-vector>
+      <name>bottomBlockRadius</name>
+      <label>Bottom block radius</label>
+      <longflag>bottomBlockRadius</longflag>
+      <description>Block radius at the bottom level of the multi-resolution pyramid.</description>
+      <default>12,7</default>
+    </integer-vector>
   </parameters>
 </executable>
