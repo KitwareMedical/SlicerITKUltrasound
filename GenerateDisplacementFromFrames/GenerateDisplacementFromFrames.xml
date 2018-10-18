@@ -132,5 +132,13 @@
       <default>0.075</default>
     </float>
 
+    <float>
+      <name>blockOverlap</name>
+      <label>Block overlap</label>
+      <longflag>blockOverlap</longflag>
+      <description><![CDATA[Block overlap. 1.0 is no overlap. 0.5 is 50% overlap.]]></description>
+      <default>0.75</default>
+    </float>
+
   </parameters>
 </executable>
