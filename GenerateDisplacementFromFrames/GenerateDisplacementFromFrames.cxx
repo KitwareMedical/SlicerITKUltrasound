@@ -118,6 +118,17 @@ int DoIt( int argc, char * argv[] )
   bottomBlockRadiusWithType[1] = bottomBlockRadius[1];
   displacementPipeline->SetBottomBlockRadius( bottomBlockRadiusWithType );
 
+  using SearchRegionFactorType = typename DisplacementPipelineType::SearchRegionFactorType;
+  SearchRegionFactorType searchRegionTopFactorWithType;
+  searchRegionTopFactorWithType[0] = searchRegionTopFactor[0];
+  searchRegionTopFactorWithType[1] = searchRegionTopFactor[1];
+  displacementPipeline->SetSearchRegionTopFactor( searchRegionTopFactorWithType );
+
+  SearchRegionFactorType searchRegionBottomFactorWithType;
+  searchRegionBottomFactorWithType[0] = searchRegionBottomFactor[0];
+  searchRegionBottomFactorWithType[1] = searchRegionBottomFactor[1];
+  displacementPipeline->SetSearchRegionBottomFactor( searchRegionBottomFactorWithType );
+
   // To debug / inspect the search regions
   /** Write out the search region images at every level. */
   if( !multiResolutionPrefix.empty() )
