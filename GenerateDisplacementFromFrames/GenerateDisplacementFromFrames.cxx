@@ -129,6 +129,8 @@ int DoIt( int argc, char * argv[] )
   searchRegionBottomFactorWithType[1] = searchRegionBottomFactor[1];
   displacementPipeline->SetSearchRegionBottomFactor( searchRegionBottomFactorWithType );
 
+  displacementPipeline->SetMaximumAbsStrainAllowed( maximumAbsStrainAllowed );
+
   // To debug / inspect the search regions
   /** Write out the search region images at every level. */
   if( !multiResolutionPrefix.empty() )

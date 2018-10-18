@@ -124,5 +124,13 @@
       <default>1.1,1.1</default>
     </float-vector>
 
+    <float>
+      <name>maximumAbsStrainAllowed</name>
+      <label>Maximum absolute strain allowed</label>
+      <longflag>maximumAbsStrainAllowed</longflag>
+      <description><![CDATA[Any point with a strain component above the given value in the higher levels will have its displacement interpolated by surrounding areas.]]></description>
+      <default>0.075</default>
+    </float>
+
   </parameters>
 </executable>
