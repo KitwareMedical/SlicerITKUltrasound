@@ -79,7 +79,7 @@
 
   </parameters>
   <parameters>
-    <label>Time</label>
+    <label>Motion Tracking</label>
     <description><![CDATA[Select time range and time delay]]></description>
 
     <integer>
@@ -96,7 +96,7 @@
       <name>topBlockRadius</name>
       <label>Top block radius</label>
       <longflag>topBlockRadius</longflag>
-      <description>Block radius at the top level of the multi-resolution pyramid.</description>
+      <description><![CDATA[Block radius at the top level of the multi-resolution pyramid.]]></description>
       <default>15,10</default>
     </integer-vector>
 
@@ -104,8 +104,41 @@
       <name>bottomBlockRadius</name>
       <label>Bottom block radius</label>
       <longflag>bottomBlockRadius</longflag>
-      <description>Block radius at the bottom level of the multi-resolution pyramid.</description>
+      <description><![CDATA[Block radius at the bottom level of the multi-resolution pyramid.]]></description>
       <default>12,7</default>
     </integer-vector>
+
+    <float-vector>
+      <name>searchRegionTopFactor</name>
+      <label>Top search region factor</label>
+      <longflag>searchRegionTopFactor</longflag>
+      <description><![CDATA[Search region radius at the top level is the following factor times the block radius.]]></description>
+      <default>2.2,1.4</default>
+    </float-vector>
+
+    <float-vector>
+      <name>searchRegionBottomFactor</name>
+      <label>Bottom search region factor</label>
+      <longflag>searchRegionBottomFactor</longflag>
+      <description><![CDATA[Search region radius at the bottom level is the following factor times the block radius.]]></description>
+      <default>1.1,1.1</default>
+    </float-vector>
+
+    <float>
+      <name>maximumAbsStrainAllowed</name>
+      <label>Maximum absolute strain allowed</label>
+      <longflag>maximumAbsStrainAllowed</longflag>
+      <description><![CDATA[Any point with a strain component above the given value in the higher levels will have its displacement interpolated by surrounding areas.]]></description>
+      <default>0.075</default>
+    </float>
+
+    <float>
+      <name>blockOverlap</name>
+      <label>Block overlap</label>
+      <longflag>blockOverlap</longflag>
+      <description><![CDATA[Block overlap. 1.0 is no overlap. 0.5 is 50% overlap.]]></description>
+      <default>0.75</default>
+    </float>
+
   </parameters>
 </executable>
