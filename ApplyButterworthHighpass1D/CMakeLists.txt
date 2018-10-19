@@ -1,3 +1,4 @@
+cmake_minimum_required(VERSION 3.10.2)
 
 #-----------------------------------------------------------------------------
 set(MODULE_NAME ApplyButterworthHighpass1D)
@@ -17,8 +18,13 @@ set(${PROJECT_NAME}_ITK_COMPONENTS
   ITKIOImageBase
   Ultrasound
   )
+if(NOT DEFINED Slicer_DIR)
+  list(APPEND ${PROJECT_NAME}_ITK_COMPONENTS ITKImageIO)
+endif()
 find_package(ITK 4.9 COMPONENTS ${${PROJECT_NAME}_ITK_COMPONENTS} REQUIRED)
-set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1) # See Libs/ITKFactoryRegistration/CMakeLists.txt
+if(DEFINED Slicer_DIR)
+  set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1) # See Libs/ITKFactoryRegistration/CMakeLists.txt
+endif()
 include(${ITK_USE_FILE})
 
 #-----------------------------------------------------------------------------

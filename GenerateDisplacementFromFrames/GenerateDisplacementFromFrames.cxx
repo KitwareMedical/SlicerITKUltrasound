@@ -129,6 +129,12 @@ int DoIt( int argc, char * argv[] )
   searchRegionBottomFactorWithType[1] = searchRegionBottomFactor[1];
   displacementPipeline->SetSearchRegionBottomFactor( searchRegionBottomFactorWithType );
 
+  using UpsamplingRatioType = typename DisplacementPipelineType::UpsamplingRatioType;
+  UpsamplingRatioType upsamplingRatioWithType;
+  upsamplingRatioWithType[0] = upsamplingRatio[0];
+  upsamplingRatioWithType[1] = upsamplingRatio[1];
+  displacementPipeline->SetSearchRegionTopFactor( upsamplingRatioWithType );
+
   displacementPipeline->SetMaximumAbsStrainAllowed( maximumAbsStrainAllowed );
 
   displacementPipeline->SetBlockOverlap( blockOverlap );

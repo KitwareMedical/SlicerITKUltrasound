@@ -140,5 +140,13 @@
       <default>0.75</default>
     </float>
 
+    <float-vector>
+      <name>upsamplingRatio</name>
+      <label>Upsampling ratio</label>
+      <longflag>upsamplingRatio</longflag>
+      <description><![CDATA[Upsampling ratio applied to the input images.]]></description>
+      <default>2.0,2.0</default>
+    </float-vector>
+
   </parameters>
 </executable>
