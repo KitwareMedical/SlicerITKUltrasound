@@ -21,6 +21,7 @@
 
 #include "itkStrainImageFilter.h"
 #include "itkSplitComponentsImageFilter.h"
+#include "itkLinearLeastSquaresGradientImageFilter.h"
 
 #include "itkPluginUtilities.h"
 
@@ -50,11 +51,20 @@ int DoIt( int argc, char * argv[] )
   typename ReaderType::Pointer reader = ReaderType::New();
   reader->SetFileName( inputImage );
 
-  using StrainFilterType = itk::StrainImageFilter< InputImageType, PixelType, PixelType >;
+  using StrainComponentType = float;
+  using StrainFilterType = itk::StrainImageFilter< InputImageType, StrainComponentType, StrainComponentType >;
   using TensorImageType = typename StrainFilterType::OutputImageType;
+  using ComponentImageType = typename StrainFilterType::OperatorImageType;
 
   typename StrainFilterType::Pointer strainFilter = StrainFilterType::New();
   strainFilter->SetInput( reader->GetOutput() );
+
+  // todo: more gradient filter options
+  using LinearLeastSquaresGradientFilterType = itk::LinearLeastSquaresGradientImageFilter< ComponentImageType, StrainComponentType, StrainComponentType >;
+  typename LinearLeastSquaresGradientFilterType::Pointer linearLeastSquaresGradientFilter = LinearLeastSquaresGradientFilterType::New();
+  linearLeastSquaresGradientFilter->SetRadius( 4 );
+  strainFilter->SetGradientFilter( linearLeastSquaresGradientFilter );
+
 
   // Todo: enable specification
   //// Get the input strain form
@@ -87,10 +97,10 @@ int DoIt( int argc, char * argv[] )
   writer->SetUseCompression( true );
   writer->Update();
 
-  using StrainComponentFilterType = itk::SplitComponentsImageFilter< TensorImageType, typename StrainFilterType::OperatorImageType >;
+  using StrainComponentFilterType = itk::SplitComponentsImageFilter< TensorImageType, ComponentImageType >;
   typename StrainComponentFilterType::Pointer strainComponentFilter = StrainComponentFilterType::New();
   strainComponentFilter->SetInput( strainFilter->GetOutput() );
-  using ComponentWriterType = itk::ImageFileWriter< typename StrainFilterType::OperatorImageType >;
+  using ComponentWriterType = itk::ImageFileWriter< ComponentImageType >;
   typename ComponentWriterType::Pointer componentWriter = ComponentWriterType::New();
   if( !strainComponent0.empty() )
     {
