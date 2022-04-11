@@ -13,7 +13,7 @@ set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 set(${proj}_GIT_TAG adf8fa601a8d886c841d0ae43e72b77f59f022c8)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
-  GIT_REPOSITORY ${git_protocol}://github.com/InsightSoftwareConsortium/ITKHigherOrderAccurateGradient.git
+  GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/InsightSoftwareConsortium/ITKHigherOrderAccurateGradient.git
   GIT_TAG ${${proj}_GIT_TAG}
   SOURCE_DIR ${proj}
   BINARY_DIR ${${proj}_BINARY_DIR}
