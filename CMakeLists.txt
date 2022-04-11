@@ -20,7 +20,6 @@ set(EXTENSION_STATUS Beta)
 set(SUPERBUILD_TOPLEVEL_PROJECT SlicerITKUltrasound)
 
 find_package(Git REQUIRED)
-find_package(Subversion REQUIRED)
 
 #-----------------------------------------------------------------------------
 # Extension dependencies
