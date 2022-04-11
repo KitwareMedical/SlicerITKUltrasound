@@ -13,7 +13,7 @@ set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 set(${proj}_GIT_TAG 9349567031960e08a3ff20119c2a776e8368598c)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
-  GIT_REPOSITORY ${git_protocol}://github.com/InsightSoftwareConsortium/ITKSplitComponents.git
+  GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/InsightSoftwareConsortium/ITKSplitComponents.git
   GIT_TAG ${${proj}_GIT_TAG}
   SOURCE_DIR ${proj}
   BINARY_DIR ${${proj}_BINARY_DIR}

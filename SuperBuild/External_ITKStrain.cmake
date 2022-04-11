@@ -13,7 +13,7 @@ set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 set(${proj}_GIT_TAG 7374068d6f3e0c6a5f7d0d932bbd51d8d665394f)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
-  GIT_REPOSITORY ${git_protocol}://github.com/KitwareMedical/ITKStrain.git
+  GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/KitwareMedical/ITKStrain.git
   GIT_TAG ${${proj}_GIT_TAG}
   SOURCE_DIR ${proj}
   BINARY_DIR ${${proj}_BINARY_DIR}
