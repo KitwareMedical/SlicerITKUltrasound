@@ -9,8 +9,7 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
-# disable-wrapping 2018-06-15
-set(${proj}_GIT_TAG 9349567031960e08a3ff20119c2a776e8368598c)
+set(${proj}_GIT_TAG 3dfd5775ec5702428d6319091e58990e9fe1e42d)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/InsightSoftwareConsortium/ITKSplitComponents.git

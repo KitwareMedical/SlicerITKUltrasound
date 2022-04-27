@@ -9,8 +9,7 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
-# disable-wrapping 2018-06-15
-set(${proj}_GIT_TAG adf8fa601a8d886c841d0ae43e72b77f59f022c8)
+set(${proj}_GIT_TAG b57ee45519e88b88bd46d5b8390b029f290311d9)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/InsightSoftwareConsortium/ITKHigherOrderAccurateGradient.git

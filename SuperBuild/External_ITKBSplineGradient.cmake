@@ -9,8 +9,7 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
-# disable-wrapping 2018-06-15
-set(${proj}_GIT_TAG 0081829a2bc67c46a12b2315a55866892423646e)
+set(${proj}_GIT_TAG ba1417c320c75ba0987e8a6cb12d9bb8a3f47365)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/InsightSoftwareConsortium/ITKBSplineGradient.git
