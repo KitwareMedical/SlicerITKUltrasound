@@ -16,17 +16,21 @@ ExternalProject_Add(${proj}
   GIT_TAG ${${proj}_GIT_TAG}
   SOURCE_DIR ${proj}
   BINARY_DIR ${${proj}_BINARY_DIR}
-  INSTALL_COMMAND ""
   CMAKE_CACHE_ARGS
+    # Compiler settings
     -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
     -DCMAKE_CXX_FLAGS:STRING=${ep_common_cxx_flags}
     -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
     -DCMAKE_C_FLAGS:STRING=${ep_common_c_flags}
     -DCMAKE_CXX_STANDARD:STRING=${CMAKE_CXX_STANDARD}
+    # Dependencies
     -DITK_DIR:PATH=${ITK_DIR}
+    # Options
     -DBUILD_TESTING:BOOL=OFF
+    # Install directories
     -DITK_INSTALL_RUNTIME_DIR:STRING=${Slicer_INSTALL_LIB_DIR}
     -DITK_INSTALL_LIBRARY_DIR:STRING=${Slicer_INSTALL_LIB_DIR}
+  INSTALL_COMMAND ""
   DEPENDS ${${proj}_DEPENDENCIES}
 )
 
