@@ -48,14 +48,9 @@ int DoIt( int argc, char * argv[] )
   const unsigned int Dimension = 2;
   using InputPixelType = TPixel;
   using InputImageType = itk::Image< InputPixelType, Dimension >;
-  using RadiusType = typename InputImageType::SizeType;
 
   using MetricPixelType = float;
   using MetricImageType = itk::Image< MetricPixelType, Dimension >;
-
-  typedef itk::Vector< MetricPixelType, Dimension > VectorType;
-
-  using CoordRepType = double;
 
   const unsigned int SeriesDimension = 3;
   using SeriesImageType = itk::Image< InputPixelType, SeriesDimension >;
