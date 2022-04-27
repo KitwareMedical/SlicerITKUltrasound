@@ -9,8 +9,7 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
-# disable-wrapping 2018-06-15
-set(${proj}_GIT_TAG 7374068d6f3e0c6a5f7d0d932bbd51d8d665394f)
+set(${proj}_GIT_TAG 4fd046c85556c3514b436652002539573ce25125)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/KitwareMedical/ITKStrain.git
