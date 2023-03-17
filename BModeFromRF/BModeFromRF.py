@@ -1,16 +1,16 @@
 import logging
 import os
 
+import numpy as np
 import vtk
+import time
+
 
 import slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
+from ITKUltrasoundCommon import ITKUltrasoundCommonLogic
 
-
-#
-# BModeFromRF
-#
 
 class BModeFromRF(ScriptedLoadableModule):
     """Uses ScriptedLoadableModule base class, available at:
@@ -19,21 +19,18 @@ class BModeFromRF(ScriptedLoadableModule):
 
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
-        self.parent.title = "BModeFromRF"  # TODO: make this more human readable by adding spaces
-        self.parent.categories = ["Examples"]  # TODO: set categories (folders where the module shows up in the module selector)
-        self.parent.dependencies = []  # TODO: add here list of module names that this module requires
-        self.parent.contributors = ["John Doe (AnyWare Corp.)"]  # TODO: replace with "Firstname Lastname (Organization)"
-        # TODO: update with short description of the module and a link to online module documentation
+        self.parent.title = "B-Mode from RF"
+        self.parent.categories = ["Ultrasound"]
+        self.parent.dependencies = ["ITKUltrasoundCommon"]
+        self.parent.contributors = ["Dženan Zukić (Kitware Inc.)"]
         self.parent.helpText = """
-This is an example of scripted loadable module bundled in an extension.
-See more information in <a href="https://github.com/organization/projectname#BModeFromRF">module documentation</a>.
+Computes ultrasound B-mode image from Radio-Frequency (RF) image. 
+<a href="https://github.com/KitwareMedical/ITKUltrasound/blob/v0.6.0/include/itkBModeImageFilter.h#L37-L41">Filter documentation</a>.
 """
-        # TODO: replace with organization, grant and thanks
         self.parent.acknowledgementText = """
-This file was originally developed by Jean-Christophe Fillion-Robin, Kitware Inc., Andras Lasso, PerkLab,
-and Steve Pieper, Isomics, Inc. and was partially funded by NIH grant 3P41RR013218-12S1.
+This file was originally developed by Dženan Zukić, Kitware Inc., 
+and was partially funded by NIH grant 5R44CA239830.
 """
-
         # Additional initialization step after application startup is complete
         slicer.app.connect("startupCompleted()", registerSampleData)
 
@@ -285,11 +282,12 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                                    self.ui.imageThresholdSliderWidget.value, not self.ui.invertOutputCheckBox.checked, showResult=False)
 
 
+
 #
 # BModeFromRFLogic
 #
 
-class BModeFromRFLogic(ScriptedLoadableModuleLogic):
+class BModeFromRFLogic(ITKUltrasoundCommonLogic):
     """This class should implement all the actual
     computation done by your module.  The interface
     should be such that other python code can import
@@ -303,7 +301,7 @@ class BModeFromRFLogic(ScriptedLoadableModuleLogic):
         """
         Called when the logic class is instantiated. Can be used for initializing member variables.
         """
-        ScriptedLoadableModuleLogic.__init__(self)
+        ITKUltrasoundCommonLogic.__init__(self)
 
     def setDefaultParameters(self, parameterNode):
         """
@@ -313,6 +311,7 @@ class BModeFromRFLogic(ScriptedLoadableModuleLogic):
             parameterNode.SetParameter("Threshold", "100.0")
         if not parameterNode.GetParameter("Invert"):
             parameterNode.SetParameter("Invert", "false")
+
 
     def process(self, inputVolume, outputVolume, imageThreshold, invert=False, showResult=True):
         """
@@ -324,27 +323,24 @@ class BModeFromRFLogic(ScriptedLoadableModuleLogic):
         :param invert: if True then values above the threshold will be set to 0, otherwise values below are set to 0
         :param showResult: show output volume in slice viewers
         """
-
         if not inputVolume or not outputVolume:
             raise ValueError("Input or output volume is invalid")
 
-        import time
-        startTime = time.time()
+        logging.info('Instantiating the filter')
+        itk = self.itk
+        itkImage = self.getITKImageFromVolumeNode(inputVolume)
+        floatImage = itkImage.astype(itk.F)
+        bmode_filter = itk.BModeImageFilter.New(floatImage, Direction=0)
+
         logging.info('Processing started')
-
-        # Compute the thresholded output volume using the "Threshold Scalar Volume" CLI module
-        cliParams = {
-            'InputVolume': inputVolume.GetID(),
-            'OutputVolume': outputVolume.GetID(),
-            'ThresholdValue': imageThreshold,
-            'ThresholdType': 'Above' if invert else 'Below'
-        }
-        cliNode = slicer.cli.run(slicer.modules.thresholdscalarvolume, None, cliParams, wait_for_completion=True, update_display=showResult)
-        # We don't need the CLI module node anymore, remove it to not clutter the scene with it
-        slicer.mrmlScene.RemoveNode(cliNode)
-
+        startTime = time.time()
+        bmode_filter.Update()
+        result = bmode_filter.GetOutput()
         stopTime = time.time()
         logging.info(f'Processing completed in {stopTime-startTime:.2f} seconds')
+
+        self.setITKImageToVolumeNode(result, outputVolume)
+        logging.info('GUI updated with results')
 
 
 #
