@@ -48,6 +48,7 @@ add_subdirectory(ScanConvertPhasedArray3D)
 add_subdirectory(ScanConvertCurvilinearArray)
 add_subdirectory(ScanConvertSliceSeries)
 add_subdirectory(BModeFromRF)
+add_subdirectory(ITKUltrasoundCommon)
 
 #-----------------------------------------------------------------------------
 set(EXTENSION_CPACK_INSTALL_CMAKE_PROJECTS)
