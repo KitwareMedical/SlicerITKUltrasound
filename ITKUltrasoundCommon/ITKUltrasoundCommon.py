@@ -162,7 +162,6 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
 
     def getITKImageFromVolumeNode(self, volumeNode):
         itkImage = self.itk.image_from_vtk_image(volumeNode.GetImageData())
-        Dimension = len(itkImage.shape)
 
         ijkToRAS = vtk.vtkMatrix4x4()
         volumeNode.GetIJKToRASMatrix(ijkToRAS)
@@ -171,7 +170,7 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         origin, spacing, directionTuple = self.get_itk_metadata_from_ras_affine(rasAffine)
         itkImage.SetOrigin(origin)
         itkImage.SetSpacing(spacing)
-        directionMatrix = np.asarray(directionTuple).reshape((Dimension, Dimension))
+        directionMatrix = np.asarray(directionTuple).reshape((itkImage.ndim, itkImage.ndim))
         itkImage.SetDirection(self.itk.matrix_from_array(directionMatrix))
 
         return itkImage
@@ -212,8 +211,8 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         unitSpacing = [1.0] * itkImage.ndim
         vtkImage = self.itk.vtk_image_from_image(itkImage)
         vtkImage.SetSpacing(unitSpacing)  # otherwise slice display is bugged
-        outputVolumeNode.SetIJKToRASMatrix(ijkToRAS)
         outputVolumeNode.SetAndObserveImageData(vtkImage)
+        outputVolumeNode.SetIJKToRASMatrix(ijkToRAS)
 
 
 def preloadITK():
