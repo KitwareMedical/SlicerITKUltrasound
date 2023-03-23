@@ -213,6 +213,7 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         vtkImage.SetSpacing(unitSpacing)  # otherwise slice display is bugged
         outputVolumeNode.SetAndObserveImageData(vtkImage)
         outputVolumeNode.SetIJKToRASMatrix(ijkToRAS)
+        slicer.util.setSliceViewerLayers(background=outputVolumeNode)
 
 
 def preloadITK():
