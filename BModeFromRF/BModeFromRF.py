@@ -138,9 +138,8 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # (in the selected parameter node).
         self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
         self.ui.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
-        self.ui.imageThresholdSliderWidget.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
-        self.ui.invertOutputCheckBox.connect("toggled(bool)", self.updateParameterNodeFromGUI)
-        self.ui.invertedOutputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
+        self.ui.imageThresholdSliderWidget.connect("currentIndexChanged(int)", self.updateParameterNodeFromGUI)
+
 
         # Buttons
         self.ui.applyButton.connect('clicked(bool)', self.onApplyButton)
@@ -234,9 +233,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Update node selectors and sliders
         self.ui.inputSelector.setCurrentNode(self._parameterNode.GetNodeReference("InputVolume"))
         self.ui.outputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume"))
-        self.ui.invertedOutputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolumeInverse"))
-        self.ui.imageThresholdSliderWidget.value = float(self._parameterNode.GetParameter("Threshold"))
-        self.ui.invertOutputCheckBox.checked = (self._parameterNode.GetParameter("Invert") == "true")
+        self.ui.imageThresholdSliderWidget.currentIndex = int(self._parameterNode.GetParameter("Threshold"))
 
         # Update buttons states and tooltips
         if self._parameterNode.GetNodeReference("InputVolume") and self._parameterNode.GetNodeReference("OutputVolume"):
@@ -262,10 +259,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
         self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
-        self._parameterNode.SetParameter("Threshold", str(self.ui.imageThresholdSliderWidget.value))
-        self._parameterNode.SetParameter("Invert", "true" if self.ui.invertOutputCheckBox.checked else "false")
-        self._parameterNode.SetNodeReferenceID("OutputVolumeInverse", self.ui.invertedOutputSelector.currentNodeID)
-
+        self._parameterNode.SetParameter("Threshold", str(self.ui.imageThresholdSliderWidget.currentIndex))
         self._parameterNode.EndModify(wasModified)
 
     def onApplyButton(self):
@@ -276,13 +270,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
             # Compute output
             self.logic.process(self.ui.inputSelector.currentNode(), self.ui.outputSelector.currentNode(),
-                               self.ui.imageThresholdSliderWidget.value, self.ui.invertOutputCheckBox.checked)
-
-            # Compute inverted output (if needed)
-            if self.ui.invertedOutputSelector.currentNode():
-                # If additional output volume is selected then result with inverted threshold is written there
-                self.logic.process(self.ui.inputSelector.currentNode(), self.ui.invertedOutputSelector.currentNode(),
-                                   self.ui.imageThresholdSliderWidget.value, not self.ui.invertOutputCheckBox.checked, showResult=False)
+                               self.ui.imageThresholdSliderWidget.currentIndex)
 
 
 
@@ -311,12 +299,12 @@ class BModeFromRFLogic(ITKUltrasoundCommonLogic):
         Initialize parameter node with default settings.
         """
         if not parameterNode.GetParameter("Threshold"):
-            parameterNode.SetParameter("Threshold", "100.0")
+            parameterNode.SetParameter("Threshold", "0")
         if not parameterNode.GetParameter("Invert"):
             parameterNode.SetParameter("Invert", "false")
 
 
-    def process(self, inputVolume, outputVolume, imageThreshold, invert=False, showResult=True):
+    def process(self, inputVolume, outputVolume, axisOfPropagation=0):
         """
         Run the processing algorithm.
         Can be used without GUI widget.
@@ -333,7 +321,7 @@ class BModeFromRFLogic(ITKUltrasoundCommonLogic):
         itk = self.itk
         itkImage = self.getITKImageFromVolumeNode(inputVolume)
         floatImage = itkImage.astype(itk.F)
-        bmode_filter = itk.BModeImageFilter.New(floatImage, Direction=0)
+        bmode_filter = itk.BModeImageFilter.New(floatImage, Direction=axisOfPropagation)
 
         logging.info('Processing started')
         startTime = time.time()

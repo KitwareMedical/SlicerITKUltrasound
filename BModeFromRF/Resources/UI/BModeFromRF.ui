@@ -20,14 +20,14 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Input volume:</string>
+         <string>RF image:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="qMRMLNodeComboBox" name="inputSelector">
         <property name="toolTip">
-         <string>Pick the input to the algorithm.</string>
+         <string>Radio-frequency (RF) ultrasound image.</string>
         </property>
         <property name="nodeTypes">
          <stringlist notr="true">
@@ -48,27 +48,30 @@
       <item row="2" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>Image threshold:</string>
+         <string>Axis of propagation:</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="ctkSliderWidget" name="imageThresholdSliderWidget">
+       <widget class="ctkComboBox" name="imageThresholdSliderWidget">
         <property name="toolTip">
-         <string>Set threshold value for computing the output image. Voxels that have intensities lower than this value will set to zero.</string>
+         <string>Image axis along which ultrasound waves propagate.</string>
         </property>
-        <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="minimum">
-         <double>-100.000000000000000</double>
-        </property>
-        <property name="maximum">
-         <double>500.000000000000000</double>
-        </property>
-        <property name="value">
-         <double>0.500000000000000</double>
-        </property>
+        <item>
+         <property name="text">
+          <string>0</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>1</string>
+         </property>
+        </item>
+        <item>
+         <property name="text">
+          <string>2</string>
+         </property>
+        </item>
        </widget>
       </item>
      </layout>
@@ -83,14 +86,14 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Thresholded volume:</string>
+         <string>B-mode image:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="qMRMLNodeComboBox" name="outputSelector">
         <property name="toolTip">
-         <string>Pick the output to the algorithm.</string>
+         <string>Standard ultrasound B-Mode image.</string>
         </property>
         <property name="nodeTypes">
          <stringlist notr="true">
@@ -123,7 +126,7 @@
       <string>Run the algorithm.</string>
      </property>
      <property name="text">
-      <string>Apply</string>
+      <string>Convert RF -> B-mode</string>
      </property>
     </widget>
    </item>
@@ -150,9 +153,9 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ctkSliderWidget</class>
-   <extends>QWidget</extends>
-   <header>ctkSliderWidget.h</header>
+   <class>ctkComboBox</class>
+   <extends>QComboBox</extends>
+   <header>ctkComboBox.h</header>
   </customwidget>
   <customwidget>
    <class>qMRMLNodeComboBox</class>
