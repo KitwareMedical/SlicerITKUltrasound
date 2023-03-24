@@ -103,7 +103,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # (in the selected parameter node).
         self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
         self.ui.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
-        self.ui.imageThresholdSliderWidget.connect("currentIndexChanged(int)", self.updateParameterNodeFromGUI)
+        self.ui.axisOfPropagationComboBox.connect("currentIndexChanged(int)", self.updateParameterNodeFromGUI)
 
 
         # Buttons
@@ -198,7 +198,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         # Update node selectors and sliders
         self.ui.inputSelector.setCurrentNode(self._parameterNode.GetNodeReference("InputVolume"))
         self.ui.outputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume"))
-        self.ui.imageThresholdSliderWidget.currentIndex = int(self._parameterNode.GetParameter("Threshold"))
+        self.ui.axisOfPropagationComboBox.currentIndex = int(self._parameterNode.GetParameter("AxisOfPropagation"))
 
         # Update buttons states and tooltips
         if self._parameterNode.GetNodeReference("InputVolume") and self._parameterNode.GetNodeReference("OutputVolume"):
@@ -224,7 +224,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
         self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
-        self._parameterNode.SetParameter("Threshold", str(self.ui.imageThresholdSliderWidget.currentIndex))
+        self._parameterNode.SetParameter("AxisOfPropagation", str(self.ui.axisOfPropagationComboBox.currentIndex))
         self._parameterNode.EndModify(wasModified)
 
     def onApplyButton(self):
@@ -235,7 +235,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
             # Compute output
             self.logic.process(self.ui.inputSelector.currentNode(), self.ui.outputSelector.currentNode(),
-                               self.ui.imageThresholdSliderWidget.currentIndex)
+                               self.ui.axisOfPropagationComboBox.currentIndex)
 
 
 class BModeFromRFLogic(ITKUltrasoundCommonLogic):
@@ -258,8 +258,8 @@ class BModeFromRFLogic(ITKUltrasoundCommonLogic):
         """
         Initialize parameter node with default settings.
         """
-        if not parameterNode.GetParameter("Threshold"):
-            parameterNode.SetParameter("Threshold", "0")
+        if not parameterNode.GetParameter("AxisOfPropagation"):
+            parameterNode.SetParameter("AxisOfPropagation", "0")
         if not parameterNode.GetParameter("Invert"):
             parameterNode.SetParameter("Invert", "false")
 
@@ -268,11 +268,9 @@ class BModeFromRFLogic(ITKUltrasoundCommonLogic):
         """
         Run the processing algorithm.
         Can be used without GUI widget.
-        :param inputVolume: volume to be thresholded
-        :param outputVolume: thresholding result
-        :param imageThreshold: values above/below this threshold will be set to 0
-        :param invert: if True then values above the threshold will be set to 0, otherwise values below are set to 0
-        :param showResult: show output volume in slice viewers
+        :param inputVolume: volume to be converted
+        :param outputVolume: RF -> Bmode conversion result
+        :param axisOfPropagation: ultrasound waves propagated along this image axis
         """
         if not inputVolume or not outputVolume:
             raise ValueError("Input or output volume is invalid")
