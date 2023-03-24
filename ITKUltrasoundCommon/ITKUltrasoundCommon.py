@@ -208,9 +208,13 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
     def setITKImageToVolumeNode(self, itkImage, outputVolumeNode):
         rasAffine = self.get_ras_affine_from_itk(itkImage)
         ijkToRAS = slicer.util.vtkMatrixFromArray(rasAffine)
-        unitSpacing = [1.0] * itkImage.ndim
         vtkImage = self.itk.vtk_image_from_image(itkImage)
-        vtkImage.SetSpacing(unitSpacing)  # otherwise slice display is bugged
+        # set identity metadata on the vtkImageData for the volume node
+        # otherwise display properties are bugged, see:
+        # https://github.com/Slicer/Slicer/issues/6911
+        vtkImage.SetSpacing([1.0] * itkImage.ndim)
+        vtkImage.SetOrigin([0.0] * itkImage.ndim)
+        vtkImage.SetDirectionMatrix (np.eye(itkImage.ndim).flatten())
         outputVolumeNode.SetAndObserveImageData(vtkImage)
         outputVolumeNode.SetIJKToRASMatrix(ijkToRAS)
         slicer.util.setSliceViewerLayers(background=outputVolumeNode)
