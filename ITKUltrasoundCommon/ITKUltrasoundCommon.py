@@ -67,23 +67,10 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         try:
             import itk
         except ModuleNotFoundError:
-            with self.showWaitCursor(), self.peakPythonConsole():
+            with self.showWaitCursor(), slicer.util.displayPythonShell():
                 itk = self.installITK(confirmInstallation)
         logging.info(f'ITK {itk.__version__} imported correctly')
         return itk
-
-
-    @contextmanager
-    def peakPythonConsole(self, show=True):
-        if slicer.app.testingEnabled():
-            show = False
-        if show:
-            console = self.getPythonConsoleWidget()
-            pythonVisible = console.visible
-            console.setVisible(True)
-        yield
-        if show:
-            console.setVisible(pythonVisible)
 
 
     @contextmanager
