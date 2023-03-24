@@ -43,51 +43,19 @@ def registerSampleData():
     """
     Add data sets to Sample Data module.
     """
-    # It is always recommended to provide sample data for users to make it easy to try the module,
-    # but if no sample data is available then this method (and associated startupCompeted signal connection) can be removed.
-
     import SampleData
     iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons')
-
-    # To ensure that the source code repository remains small (can be downloaded and installed quickly)
-    # it is recommended to store data sets that are larger than a few MB in a Github release.
-
-    # BModeFromRF1
+    file_sha512 = "b648140f38d2c3189388a35fea65ef3b4311237de8c454c6b98480d84b139ec8afb8ec5881c5d9513cdc208ae781e1e442988be81564adff77edcfb30b921a28"
     SampleData.SampleDataLogic.registerCustomSampleDataSource(
-        # Category and sample name displayed in Sample Data module
-        category='BModeFromRF',
-        sampleName='BModeFromRF1',
-        # Thumbnail should have size of approximately 260x280 pixels and stored in Resources/Icons folder.
-        # It can be created by Screen Capture module, "Capture all views" option enabled, "Number of images" set to "Single".
-        thumbnailFileName=os.path.join(iconsPath, 'BModeFromRF1.png'),
-        # Download URL and target file name
-        uris="https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/998cb522173839c78657f4bc0ea907cea09fd04e44601f17c82ea27927937b95",
-        fileNames='BModeFromRF1.nrrd',
-        # Checksum to ensure file integrity. Can be computed by this command:
-        #  import hashlib; print(hashlib.sha256(open(filename, "rb").read()).hexdigest())
-        checksums='SHA256:998cb522173839c78657f4bc0ea907cea09fd04e44601f17c82ea27927937b95',
-        # This node name will be used when the data set is loaded
-        nodeNames='BModeFromRF1'
+        category='ITKUltrasound',
+        sampleName='ITKUltrasoundPhantomRF',
+        thumbnailFileName=os.path.join(iconsPath, 'SampleRF.png'),
+        uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/api/v1/item/57b5d5d88d777f10f269444b/download", "https://data.kitware.com/api/v1/file/57b5d5d88d777f10f269444f/download",
+        fileNames='uniform_phantom_8.9_MHz.mha',
+        checksums=f'SHA512:{file_sha512}',
+        nodeNames='ITKUltrasoundPhantomRF'
     )
 
-    # BModeFromRF2
-    SampleData.SampleDataLogic.registerCustomSampleDataSource(
-        # Category and sample name displayed in Sample Data module
-        category='BModeFromRF',
-        sampleName='BModeFromRF2',
-        thumbnailFileName=os.path.join(iconsPath, 'BModeFromRF2.png'),
-        # Download URL and target file name
-        uris="https://github.com/Slicer/SlicerTestingData/releases/download/SHA256/1a64f3f422eb3d1c9b093d1a18da354b13bcf307907c66317e2463ee530b7a97",
-        fileNames='BModeFromRF2.nrrd',
-        checksums='SHA256:1a64f3f422eb3d1c9b093d1a18da354b13bcf307907c66317e2463ee530b7a97',
-        # This node name will be used when the data set is loaded
-        nodeNames='BModeFromRF2'
-    )
-
-
-#
-# BModeFromRFWidget
-#
 
 class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """Uses ScriptedLoadableModuleWidget base class, available at:
@@ -270,11 +238,6 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                                self.ui.imageThresholdSliderWidget.currentIndex)
 
 
-
-#
-# BModeFromRFLogic
-#
-
 class BModeFromRFLogic(ITKUltrasoundCommonLogic):
     """This class should implement all the actual
     computation done by your module.  The interface
@@ -331,10 +294,6 @@ class BModeFromRFLogic(ITKUltrasoundCommonLogic):
         logging.info('GUI updated with results')
 
 
-#
-# BModeFromRFTest
-#
-
 class BModeFromRFTest(ScriptedLoadableModuleTest):
     """
     This is the test case for your scripted module.
@@ -354,11 +313,7 @@ class BModeFromRFTest(ScriptedLoadableModuleTest):
         self.test_BModeFromRF1()
 
     def test_BModeFromRF1(self):
-        """ Ideally you should have several levels of tests.  At the lowest level
-        tests should exercise the functionality of the logic with different inputs
-        (both valid and invalid).  At higher levels your tests should emulate the
-        way the user would interact with your code and confirm that it still works
-        the way you intended.
+        """
         One of the most important features of the tests is that it should alert other
         developers when their changes will have an impact on the behavior of your
         module.  For example, if a developer removes a feature that you depend on,
@@ -371,30 +326,35 @@ class BModeFromRFTest(ScriptedLoadableModuleTest):
 
         import SampleData
         registerSampleData()
-        inputVolume = SampleData.downloadSample('BModeFromRF1')
+        inputVolume = SampleData.downloadSample('ITKUltrasoundPhantomRF')
         self.delayDisplay('Loaded test data set')
 
         inputScalarRange = inputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(inputScalarRange[0], 0)
-        self.assertEqual(inputScalarRange[1], 695)
+        self.assertEqual(inputScalarRange[0], -4569)
+        self.assertEqual(inputScalarRange[1], 4173)
 
         outputVolume = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLScalarVolumeNode")
-        threshold = 100
 
         # Test the module logic
 
         logic = BModeFromRFLogic()
 
-        # Test algorithm with non-inverted threshold
-        logic.process(inputVolume, outputVolume, threshold, True)
+        # Test algorithm with axis of propagation: 2
+        logic.process(inputVolume, outputVolume, 2)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(outputScalarRange[0], inputScalarRange[0])
-        self.assertEqual(outputScalarRange[1], threshold)
+        self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
+        self.assertAlmostEqual(outputScalarRange[1], 3.65992, places=5)
 
-        # Test algorithm with inverted threshold
-        logic.process(inputVolume, outputVolume, threshold, False)
+        # Test algorithm with axis of propagation: 1
+        logic.process(inputVolume, outputVolume, 1)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(outputScalarRange[0], inputScalarRange[0])
-        self.assertEqual(outputScalarRange[1], inputScalarRange[1])
+        self.assertAlmostEqual(outputScalarRange[0], 0.027904, places=5)
+        self.assertAlmostEqual(outputScalarRange[1], 3.67797, places=5)
+
+        # Test algorithm with axis of propagation: 0
+        logic.process(inputVolume, outputVolume, 0)
+        outputScalarRange = outputVolume.GetImageData().GetScalarRange()
+        self.assertAlmostEqual(outputScalarRange[0], 0.00406048, places=5)
+        self.assertAlmostEqual(outputScalarRange[1], 3.66787, places=5)
 
         self.delayDisplay('Test passed')
