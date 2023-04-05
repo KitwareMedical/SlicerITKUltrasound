@@ -6,7 +6,7 @@ project(SlicerITKUltrasound)
 # Extension meta-information
 set(EXTENSION_HOMEPAGE "https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/")
 set(EXTENSION_CATEGORY "Filtering")
-set(EXTENSION_CONTRIBUTORS "Matt McCormick (Kitware, Inc.), Mark Palmeri (Duke University), Stephen Aylward (Kitware, Inc.), Jean-Christophe Fillion-Robin (Kitware, Inc.)")
+set(EXTENSION_CONTRIBUTORS "Matt McCormick (Kitware, Inc.), Mark Palmeri (Duke University), Stephen Aylward (Kitware, Inc.), Jean-Christophe Fillion-Robin (Kitware, Inc.), Dženan Zukić (Kitware, Inc.)")
 set(EXTENSION_DESCRIPTION "Ultrasound image formation, processing, and analysis. Interfaces built off the ITKUltrasound library.")
 set(EXTENSION_ICONURL "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/master/SlicerITKUltrasound.png")
 set(EXTENSION_SCREENSHOTURLS
@@ -41,7 +41,6 @@ endif()
 #-----------------------------------------------------------------------------
 # Extension modules
 add_subdirectory(ApplyButterworthHighpass1D)
-add_subdirectory(GenerateBModeFromRF)
 add_subdirectory(GenerateDisplacementFromTimeSeries)
 add_subdirectory(GenerateDisplacementFromFrames)
 add_subdirectory(ScanConvertPhasedArray3D)
