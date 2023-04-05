@@ -113,7 +113,7 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
     def get_itk_metadata_from_ras_affine(
         self,
         affine: np.ndarray,
-        is_2d: bool = False,
+        is_2d: bool=False,
         lps: bool = True,
     ) -> Tuple[Any, Any, Any]:
         direction_ras, spacing_array = self.get_rotation_and_spacing_from_affine(affine)
@@ -130,7 +130,7 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         # (although there must be prettier ways to do this)
         ox, oy, oz = origin_array
         sx, sy, sz = spacing_array
-        direction: Any
+        direction : Any
         if is_2d:
             d1, d2, d3, d4 = direction_array
             direction = d1, d2, d3, d4
@@ -195,10 +195,14 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         # https://github.com/Slicer/Slicer/issues/6911
         vtkImage.SetSpacing([1.0] * itkImage.ndim)
         vtkImage.SetOrigin([0.0] * itkImage.ndim)
-        vtkImage.SetDirectionMatrix (np.eye(itkImage.ndim).flatten())
+        vtkImage.SetDirectionMatrix(np.eye(itkImage.ndim).flatten())
         outputVolumeNode.SetAndObserveImageData(vtkImage)
         outputVolumeNode.SetIJKToRASMatrix(ijkToRAS)
-        slicer.util.setSliceViewerLayers(background=outputVolumeNode)
+        slicer.util.setSliceViewerLayers(
+            background=outputVolumeNode,
+            fit=True,
+            rotateToVolumePlane=True,
+            )
 
 
 def preloadITK():
