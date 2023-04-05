@@ -355,4 +355,22 @@ class BModeFromRFTest(ScriptedLoadableModuleTest):
         self.assertAlmostEqual(outputScalarRange[0], 0.00406048, places=5)
         self.assertAlmostEqual(outputScalarRange[1], 3.66787, places=5)
 
+        file_sha512 = "27998dfea16be10830384536f021f42f96c3f7095c9e5a1e983a10c37d4eddea514b45f217234eeccf062e9bdd0f811c49698658689e62924f6f96c0173f3176"
+        import SampleData
+        expectedResult = SampleData.downloadFromURL(
+            nodeNames='BModeFromRFTestOutput',
+            fileNames='GenerateBModeFromRFTestOutput.mha',
+            uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",
+            checksums=f'SHA512:{file_sha512}',
+            loadFiles=True)
+
+        itk = logic.itk
+        FloatImage = itk.Image[itk.F, 3]
+        comparer = itk.ComparisonImageFilter[FloatImage, FloatImage].New()
+        comparer.SetValidInput(logic.getITKImageFromVolumeNode(expectedResult[0]))
+        comparer.SetTestInput(logic.getITKImageFromVolumeNode(outputVolume))
+        comparer.SetDifferenceThreshold(1e-5)
+        comparer.Update()
+        self.assertEqual(comparer.GetNumberOfPixelsWithDifferences(), 0)
+
         self.delayDisplay('Test passed')
