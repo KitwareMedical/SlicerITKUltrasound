@@ -21,13 +21,13 @@ class ScanConvertCurvilinearArray(ScriptedLoadableModule):
 
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
-        self.parent.title = "B-Mode from RF"
+        self.parent.title = "ScanConvertCurvilinearArray"
         self.parent.categories = ["Ultrasound"]
-        self.parent.dependencies = ["ITKUltrasoundCommon"]
+        self.parent.dependencies = ["ITKUltrasoundCommon", "ScanConvertCommon"]
         self.parent.contributors = ["Dženan Zukić (Kitware Inc.)"]
         self.parent.helpText = """
-Computes ultrasound B-mode image from Radio-Frequency (RF) image. 
-<a href="https://github.com/KitwareMedical/ITKUltrasound/blob/v0.6.0/include/itkBModeImageFilter.h#L37-L41">Filter documentation</a>.
+Converts ultrasound image from curvilinear coordinates into rectilinear image.
+<a href="https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/Modules/ScanConversion/CurvilinearArray.html">Filter documentation</a>.
 """
         self.parent.acknowledgementText = """
 This file was originally developed by Dženan Zukić, Kitware Inc., 
