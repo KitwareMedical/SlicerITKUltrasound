@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BModeFromRF</class>
- <widget class="qMRMLWidget" name="BModeFromRF">
+ <class>ScanConvertCurvilinearArray</class>
+ <widget class="qMRMLWidget" name="ScanConvertCurvilinearArray">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -156,12 +156,15 @@
        </widget>
       </item>
       <item row="6" column="1">
-       <widget class="ctkComboBox" name="method">
+       <widget class="ctkComboBox" name="resamplingMethod">
         <property name="toolTip">
          <string>Scan conversion resampling method.</string>
         </property>
         <property name="currentText">
          <string>ITKLinear</string>
+        </property>
+        <property name="currentIndex">
+         <number>1</number>
         </property>
         <item>
          <property name="text">
@@ -318,7 +321,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>BModeFromRF</sender>
+   <sender>ScanConvertCurvilinearArray</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>inputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
@@ -334,7 +337,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>BModeFromRF</sender>
+   <sender>ScanConvertCurvilinearArray</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>outputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>

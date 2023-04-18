@@ -1,3 +1,4 @@
+from enum import IntEnum
 import logging
 import os
 
@@ -57,6 +58,18 @@ def registerSampleData():
     )
 
 
+class ScanConversionResamplingMethod(IntEnum):
+  ITK_NEAREST_NEIGHBOR = 0,
+  ITK_LINEAR = 1
+  ITK_GAUSSIAN = 2
+  ITK_WINDOWED_SINC = 3
+  VTK_PROBE_FILTER = 4
+  VTK_GAUSSIAN_KERNEL = 5
+  VTK_LINEAR_KERNEL = 6
+  VTK_SHEPARD_KERNEL = 7
+  VTK_VORONOI_KERNEL = 8
+
+
 class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """Uses ScriptedLoadableModuleWidget base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
@@ -103,7 +116,12 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
         # (in the selected parameter node).
         self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
         self.ui.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
-        self.ui.axisOfPropagationComboBox.connect("currentIndexChanged(int)", self.updateParameterNodeFromGUI)
+        self.ui.lateralAngularSeparation.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
+        self.ui.radiusSampleSize.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
+        self.ui.firstSampleDistance.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
+        self.ui.outputSize.connect("coordinatesChanged(double*)", self.updateParameterNodeFromGUI)
+        self.ui.outputSpacing.connect("coordinatesChanged(double*)", self.updateParameterNodeFromGUI)
+        self.ui.resamplingMethod.connect("currentIndexChanged(int)", self.updateParameterNodeFromGUI)
 
 
         # Buttons
@@ -129,7 +147,7 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
         """
         Called each time the user opens a different module.
         """
-        # Do not react to parameter node changes (GUI wlil be updated when the user enters into the module)
+        # Do not react to parameter node changes (GUI will be updated when the user enters into the module)
         self.removeObserver(self._parameterNode, vtk.vtkCommand.ModifiedEvent, self.updateGUIFromParameterNode)
 
     def onSceneStartClose(self, caller, event):
@@ -198,11 +216,12 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
         # Update node selectors and sliders
         self.ui.inputSelector.setCurrentNode(self._parameterNode.GetNodeReference("InputVolume"))
         self.ui.outputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume"))
-        self.ui.axisOfPropagationComboBox.currentIndex = int(self._parameterNode.GetParameter("AxisOfPropagation"))
+        strMethod = self._parameterNode.GetParameter("ResamplingMethod")
+        self.ui.resamplingMethod.currentIndex = ScanConversionResamplingMethod[strMethod].value
 
         # Update buttons states and tooltips
         if self._parameterNode.GetNodeReference("InputVolume") and self._parameterNode.GetNodeReference("OutputVolume"):
-            self.ui.applyButton.toolTip = "Compute output volume"
+            self.ui.applyButton.toolTip = "Run conversion"
             self.ui.applyButton.enabled = True
         else:
             self.ui.applyButton.toolTip = "Select input and output volume nodes"
@@ -224,7 +243,8 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
 
         self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
         self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
-        self._parameterNode.SetParameter("AxisOfPropagation", str(self.ui.axisOfPropagationComboBox.currentIndex))
+        eMethod = ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex)
+        self._parameterNode.SetParameter("ResamplingMethod", str(eMethod))
         self._parameterNode.EndModify(wasModified)
 
     def onApplyButton(self):
@@ -235,7 +255,7 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
 
             # Compute output
             self.logic.process(self.ui.inputSelector.currentNode(), self.ui.outputSelector.currentNode(),
-                               self.ui.axisOfPropagationComboBox.currentIndex)
+                               self.ui.resamplingMethod.currentIndex)
 
 
 class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
@@ -258,8 +278,8 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
         """
         Initialize parameter node with default settings.
         """
-        if not parameterNode.GetParameter("AxisOfPropagation"):
-            parameterNode.SetParameter("AxisOfPropagation", "0")
+        if not parameterNode.GetParameter("ResamplingMethod"):
+            parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR))
         if not parameterNode.GetParameter("Invert"):
             parameterNode.SetParameter("Invert", "false")
 
