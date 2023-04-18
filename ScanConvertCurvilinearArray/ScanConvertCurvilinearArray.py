@@ -245,7 +245,7 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
         self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
         self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
         eMethod = ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex)
-        self._parameterNode.SetParameter("ResamplingMethod", str(eMethod))
+        self._parameterNode.SetParameter("ResamplingMethod", str(eMethod.name))
         self._parameterNode.EndModify(wasModified)
 
     def onApplyButton(self):
@@ -280,7 +280,7 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
         Initialize parameter node with default settings.
         """
         if not parameterNode.GetParameter("ResamplingMethod"):
-            parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR))
+            parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR.name))
         if not parameterNode.GetParameter("Invert"):
             parameterNode.SetParameter("Invert", "false")
 
