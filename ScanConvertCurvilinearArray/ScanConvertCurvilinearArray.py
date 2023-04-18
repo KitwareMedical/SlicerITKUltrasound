@@ -11,6 +11,7 @@ import slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
 from ITKUltrasoundCommon import ITKUltrasoundCommonLogic
+from ScanConvertCommon import ScanConvertCommonLogic, ScanConversionResamplingMethod
 
 
 class ScanConvertCurvilinearArray(ScriptedLoadableModule):
@@ -59,15 +60,15 @@ def registerSampleData():
 
 
 class ScanConversionResamplingMethod(IntEnum):
-  ITK_NEAREST_NEIGHBOR = 0,
-  ITK_LINEAR = 1
-  ITK_GAUSSIAN = 2
-  ITK_WINDOWED_SINC = 3
-  VTK_PROBE_FILTER = 4
-  VTK_GAUSSIAN_KERNEL = 5
-  VTK_LINEAR_KERNEL = 6
-  VTK_SHEPARD_KERNEL = 7
-  VTK_VORONOI_KERNEL = 8
+    ITK_NEAREST_NEIGHBOR = 0,
+    ITK_LINEAR = 1
+    ITK_GAUSSIAN = 2
+    ITK_WINDOWED_SINC = 3
+    VTK_PROBE_FILTER = 4
+    VTK_GAUSSIAN_KERNEL = 5
+    VTK_LINEAR_KERNEL = 6
+    VTK_SHEPARD_KERNEL = 7
+    VTK_VORONOI_KERNEL = 8
 
 
 class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
