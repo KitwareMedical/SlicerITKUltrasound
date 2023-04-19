@@ -220,6 +220,8 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
         self.ui.lateralAngularSeparation.value = float(self._parameterNode.GetParameter("LateralAngularSeparation"))
         self.ui.radiusSampleSize.value = float(self._parameterNode.GetParameter("RadiusSampleSize"))
         self.ui.firstSampleDistance.value = float(self._parameterNode.GetParameter("FirstSampleDistance"))
+        self.ui.outputSize.coordinates = self._parameterNode.GetParameter("OutputSize")
+        self.ui.outputSpacing.coordinates = self._parameterNode.GetParameter("OutputSpacing")
         strMethod = self._parameterNode.GetParameter("ResamplingMethod")
         self.ui.resamplingMethod.currentIndex = ScanConversionResamplingMethod[strMethod].value
 
@@ -250,6 +252,8 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
         self._parameterNode.SetParameter("LateralAngularSeparation", str(self.ui.lateralAngularSeparation.value))
         self._parameterNode.SetParameter("RadiusSampleSize", str(self.ui.radiusSampleSize.value))
         self._parameterNode.SetParameter("FirstSampleDistance", str(self.ui.firstSampleDistance.value))
+        self._parameterNode.SetParameter("OutputSize", self.ui.outputSize.coordinates)
+        self._parameterNode.SetParameter("OutputSpacing", self.ui.outputSpacing.coordinates)
         eMethod = ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex)
         self._parameterNode.SetParameter("ResamplingMethod", str(eMethod.name))
 
@@ -265,9 +269,11 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
             self.logic.process(
                 self.ui.inputSelector.currentNode(),
                 self.ui.outputSelector.currentNode(),
-                self.ui.lateralAngularSeparation.value,
-                self.ui.radiusSampleSize.value,
-                self.ui.firstSampleDistance.value,
+                self.ui.lateralAngularSeparation,
+                self.ui.radiusSampleSize,
+                self.ui.firstSampleDistance,
+                self.ui.outputSize.coordinates,
+                self.ui.outputSpacing.coordinates,
                 ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex),
                 )
 
@@ -298,17 +304,35 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
             parameterNode.SetParameter("RadiusSampleSize", "1.0")
         if not parameterNode.GetParameter("FirstSampleDistance"):
             parameterNode.SetParameter("FirstSampleDistance", "1.0")
+        if not parameterNode.GetParameter("OutputSize"):
+            parameterNode.SetParameter("OutputSize", "128,128,128")
+        if not parameterNode.GetParameter("OutputSpacing"):
+            parameterNode.SetParameter("OutputSpacing", "0.2,0.2,0.2")
         if not parameterNode.GetParameter("ResamplingMethod"):
             parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR.name))
 
 
-    def process(self, inputVolume, outputVolume, axisOfPropagation=0):
+    def process(self,
+                inputVolume,
+                outputVolume,
+                lateralAngularSeparation: float,
+                radiusSampleSize: float,
+                firstSampleDistance: float,
+                outputSize: str,  # comma-separated list of 3 integers
+                outputSpacing: str,  # comma-separated list of 3 floats
+                resamplingMethod: ScanConversionResamplingMethod,
+                ):
         """
         Run the processing algorithm.
         Can be used without GUI widget.
-        :param inputVolume: volume to be converted
-        :param outputVolume: RF -> Bmode conversion result
-        :param axisOfPropagation: ultrasound waves propagated along this image axis
+        :param inputVolume: curvilinear volume to be converted
+        :param outputVolume: rectilinear conversion result
+        :param lateralAngularSeparation: angular separation between samples in the lateral direction
+        :param radiusSampleSize: distance between samples in the radial direction
+        :param firstSampleDistance: distance from the center of the transducer to the first sample
+        :param outputSize: Number of voxels in each direction of the output image
+        :param outputSpacing: Spacing between voxels in each direction of the output image
+        :param resamplingMethod: Scan conversion resampling method to use
         """
         if not inputVolume or not outputVolume:
             raise ValueError("Input or output volume is invalid")
