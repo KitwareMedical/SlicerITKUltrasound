@@ -208,3 +208,4 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
 def preloadITK():
     logic = ITKUltrasoundCommonLogic()
     logic.importITK(True)
+    logic.itk.ImageToImageFilter  # trigger loading of ITK's DLLs
