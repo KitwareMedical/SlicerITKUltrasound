@@ -225,6 +225,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
         self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
         self._parameterNode.SetParameter("AxisOfPropagation", str(self.ui.axisOfPropagationComboBox.currentIndex))
+
         self._parameterNode.EndModify(wasModified)
 
     def onApplyButton(self):

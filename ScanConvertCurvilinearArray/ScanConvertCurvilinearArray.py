@@ -217,6 +217,9 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
         # Update node selectors and sliders
         self.ui.inputSelector.setCurrentNode(self._parameterNode.GetNodeReference("InputVolume"))
         self.ui.outputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume"))
+        self.ui.lateralAngularSeparation.value = float(self._parameterNode.GetParameter("LateralAngularSeparation"))
+        self.ui.radiusSampleSize.value = float(self._parameterNode.GetParameter("RadiusSampleSize"))
+        self.ui.firstSampleDistance.value = float(self._parameterNode.GetParameter("FirstSampleDistance"))
         strMethod = self._parameterNode.GetParameter("ResamplingMethod")
         self.ui.resamplingMethod.currentIndex = ScanConversionResamplingMethod[strMethod].value
 
@@ -244,8 +247,12 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
 
         self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
         self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
+        self._parameterNode.SetParameter("LateralAngularSeparation", str(self.ui.lateralAngularSeparation.value))
+        self._parameterNode.SetParameter("RadiusSampleSize", str(self.ui.radiusSampleSize.value))
+        self._parameterNode.SetParameter("FirstSampleDistance", str(self.ui.firstSampleDistance.value))
         eMethod = ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex)
         self._parameterNode.SetParameter("ResamplingMethod", str(eMethod.name))
+
         self._parameterNode.EndModify(wasModified)
 
     def onApplyButton(self):
@@ -255,8 +262,14 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
         with slicer.util.tryWithErrorDisplay("Failed to compute results.", waitCursor=True):
 
             # Compute output
-            self.logic.process(self.ui.inputSelector.currentNode(), self.ui.outputSelector.currentNode(),
-                               self.ui.resamplingMethod.currentIndex)
+            self.logic.process(
+                self.ui.inputSelector.currentNode(),
+                self.ui.outputSelector.currentNode(),
+                self.ui.lateralAngularSeparation.value,
+                self.ui.radiusSampleSize.value,
+                self.ui.firstSampleDistance.value,
+                ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex),
+                )
 
 
 class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
@@ -279,10 +292,14 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
         """
         Initialize parameter node with default settings.
         """
+        if not parameterNode.GetParameter("LateralAngularSeparation"):
+            parameterNode.SetParameter("LateralAngularSeparation", "0.017453292519943")
+        if not parameterNode.GetParameter("RadiusSampleSize"):
+            parameterNode.SetParameter("RadiusSampleSize", "1.0")
+        if not parameterNode.GetParameter("FirstSampleDistance"):
+            parameterNode.SetParameter("FirstSampleDistance", "1.0")
         if not parameterNode.GetParameter("ResamplingMethod"):
             parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR.name))
-        if not parameterNode.GetParameter("Invert"):
-            parameterNode.SetParameter("Invert", "false")
 
 
     def process(self, inputVolume, outputVolume, axisOfPropagation=0):
