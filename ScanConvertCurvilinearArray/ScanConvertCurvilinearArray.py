@@ -1,6 +1,7 @@
 from enum import IntEnum
 import logging
 import os
+import math
 
 import numpy as np
 import vtk
@@ -269,9 +270,9 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
             self.logic.process(
                 self.ui.inputSelector.currentNode(),
                 self.ui.outputSelector.currentNode(),
-                self.ui.lateralAngularSeparation,
-                self.ui.radiusSampleSize,
-                self.ui.firstSampleDistance,
+                self.ui.lateralAngularSeparation.value,
+                self.ui.radiusSampleSize.value,
+                self.ui.firstSampleDistance.value,
                 self.ui.outputSize.coordinates,
                 self.ui.outputSpacing.coordinates,
                 ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex),
@@ -340,13 +341,44 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
         logging.info('Instantiating the filter')
         itk = self.itk
         itkImage = self.getITKImageFromVolumeNode(inputVolume)
-        floatImage = itkImage.astype(itk.F)
-        bmode_filter = itk.BModeImageFilter.New(floatImage, Direction=axisOfPropagation)
+        PixelType = itk.template(itkImage)[1][0]
+        Dimension = itkImage.GetImageDimension()
+        CurvilinearType = itk.CurvilinearArraySpecialCoordinatesImage[PixelType, Dimension]
+        inputImage = CurvilinearType.New()
+        inputImage.SetPixelContainer(itkImage.GetPixelContainer())
+
+        inputImage.SetLateralAngularSeparation( lateralAngularSeparation );
+        inputImage.SetRadiusSampleSize( radiusSampleSize );
+        inputImage.SetFirstSampleDistance( firstSampleDistance );
+
+        # Initializing these from the input image gives us proper type and dimension
+        size = itk.size(inputImage)
+        spacing = itk.spacing(inputImage)
+        origin = itk.origin(inputImage)
+        direction = inputImage.GetDirection()
+
+        # Update to correct values
+        for i, sizeI in enumerate(outputSize.split(',')):
+            size[i]=int(sizeI)
+        for i, spacingI in enumerate(outputSpacing.split(',')):
+            spacing[i]=float(spacingI)
+        origin[0] = size[0] * spacing[0] / -2.0;
+        origin[1] = firstSampleDistance * math.cos( (inputImage.GetLargestPossibleRegion().GetSize()[1] - 1) / 2.0 * lateralAngularSeparation )
+        origin[2] = inputImage.GetOrigin()[2];
+        direction.SetIdentity()
+        
+        logic = ScanConvertCommonLogic()
 
         logging.info('Processing started')
         startTime = time.time()
-        bmode_filter.Update()
-        result = bmode_filter.GetOutput()
+        result = logic.ScanConversionResampling(
+            inputImage,
+            size,
+            spacing,
+            origin,
+            direction,
+            resamplingMethod
+            )
         stopTime = time.time()
         logging.info(f'Processing completed in {stopTime-startTime:.2f} seconds')
 

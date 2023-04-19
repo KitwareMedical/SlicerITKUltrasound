@@ -78,7 +78,6 @@ class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
     def ITKScanConversionResampling(
         self,
         inputImage,
-        outputImage,
         size,
         spacing,
         origin,
@@ -90,7 +89,6 @@ class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
     def VTKProbeFilterResampling(
         self,
         inputImage,
-        outputImage,
         size,
         spacing,
         origin,
@@ -102,7 +100,6 @@ class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
     def VTKPointInterpolatorResampling(
         self,
         inputImage,
-        outputImage,
         size,
         spacing,
         origin,
@@ -114,7 +111,6 @@ class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
     def ScanConversionResampling(
         self,
         inputImage,
-        outputImage,
         size,
         spacing,
         origin,
@@ -124,9 +120,8 @@ class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
         implementingFunction = self.ResamplingMethodImplementingFunction[resamplingMethod]
         
         # forward all parameters to the implementing function
-        implementingFunction(
+        return implementingFunction(
             inputImage,
-            outputImage,
             size,
             spacing,
             origin,
