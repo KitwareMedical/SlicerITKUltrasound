@@ -75,6 +75,7 @@ class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
             ScanConversionResamplingMethod.VTK_VORONOI_KERNEL:   self.VTKPointInterpolatorResampling,
             }
 
+
     def ITKScanConversionResampling(
         self,
         inputImage,
