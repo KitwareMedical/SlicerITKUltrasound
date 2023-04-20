@@ -418,12 +418,12 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
 
         import SampleData
         registerSampleData()
-        inputVolume = SampleData.downloadSample('ITKUltrasoundPhantomRF')
+        inputVolume = SampleData.downloadSample('ITKUltrasoundCurvilinearImage')
         self.delayDisplay('Loaded test data set')
 
         inputScalarRange = inputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(inputScalarRange[0], -4569)
-        self.assertEqual(inputScalarRange[1], 4173)
+        self.assertEqual(inputScalarRange[0], 4)
+        self.assertEqual(inputScalarRange[1], 254)
 
         outputVolume = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLScalarVolumeNode")
 
@@ -431,29 +431,23 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
 
         logic = ScanConvertCurvilinearArrayLogic()
 
-        # Test algorithm with axis of propagation: 2
-        logic.process(inputVolume, outputVolume, 2)
-        outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
-        self.assertAlmostEqual(outputScalarRange[1], 3.65992, places=5)
-
-        # Test algorithm with axis of propagation: 1
+        # Test nearest neighbor interpolation
         logic.process(inputVolume, outputVolume, 1)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertAlmostEqual(outputScalarRange[0], 0.027904, places=5)
-        self.assertAlmostEqual(outputScalarRange[1], 3.67797, places=5)
+        self.assertAlmostEqual(outputScalarRange[0], 4, places=0)
+        self.assertAlmostEqual(outputScalarRange[1], 254, places=0)
 
-        # Test algorithm with axis of propagation: 0
+        # Test linear interpolation
         logic.process(inputVolume, outputVolume, 0)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertAlmostEqual(outputScalarRange[0], 0.00406048, places=5)
-        self.assertAlmostEqual(outputScalarRange[1], 3.66787, places=5)
+        self.assertAlmostEqual(outputScalarRange[0], 4, places=0)
+        self.assertAlmostEqual(outputScalarRange[1], 254, places=0)
 
-        file_sha512 = "27998dfea16be10830384536f021f42f96c3f7095c9e5a1e983a10c37d4eddea514b45f217234eeccf062e9bdd0f811c49698658689e62924f6f96c0173f3176"
+        file_sha512 = "f26953117f160b89a522edc6cb2cf45d622c6068632b5addd49cfaff0c8787aa783bcaaa310cdc61958ab2cd808a75a04479757e822ba573a128c4e7c7311041"
         import SampleData
         expectedResult = SampleData.downloadFromURL(
             nodeNames='ScanConvertCurvilinearArrayTestOutput',
-            fileNames='GenerateScanConvertCurvilinearArrayTestOutput.mha',
+            fileNames='ScanConvertCurvilinearArrayTestOutput.mha',
             uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",
             checksums=f'SHA512:{file_sha512}',
             loadFiles=True)
@@ -463,7 +457,7 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
         comparer = itk.ComparisonImageFilter[FloatImage, FloatImage].New()
         comparer.SetValidInput(logic.getITKImageFromVolumeNode(expectedResult[0]))
         comparer.SetTestInput(logic.getITKImageFromVolumeNode(outputVolume))
-        comparer.SetDifferenceThreshold(1e-5)
+        comparer.SetDifferenceThreshold(0.1)
         comparer.Update()
         self.assertEqual(comparer.GetNumberOfPixelsWithDifferences(), 0)
 
