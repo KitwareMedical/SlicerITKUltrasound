@@ -48,15 +48,15 @@ def registerSampleData():
     """
     import SampleData
     iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons')
-    file_sha512 = "b648140f38d2c3189388a35fea65ef3b4311237de8c454c6b98480d84b139ec8afb8ec5881c5d9513cdc208ae781e1e442988be81564adff77edcfb30b921a28"
+    file_sha512 = "8ccb41e91098e571264d18db9d8f632c4312210d0b59c1c5a62a0ebf0311be893232c13abb5d8943235658da94bc973a586406704c7a749f03595e4a72d90617"
     SampleData.SampleDataLogic.registerCustomSampleDataSource(
         category='ITKUltrasound',
-        sampleName='ITKUltrasoundPhantomRF',
-        thumbnailFileName=os.path.join(iconsPath, 'SampleRF.png'),
-        uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/api/v1/item/57b5d5d88d777f10f269444b/download", "https://data.kitware.com/api/v1/file/57b5d5d88d777f10f269444f/download",
-        fileNames='uniform_phantom_8.9_MHz.mha',
+        sampleName='ITKUltrasoundCurvilinearImage',
+        thumbnailFileName=os.path.join(iconsPath, 'Curvilinear.png'),
+        uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/api/v1/file/64418c2dcffd1a074ef045a3/download", "https://data.kitware.com/api/v1/item/64418c2dcffd1a074ef045a2/download",
+        fileNames='ScanConvertCurvilinearArrayTestInput.mha',
         checksums=f'SHA512:{file_sha512}',
-        nodeNames='ITKUltrasoundPhantomRF'
+        nodeNames='ScanConvertCurvilinearArrayTestInput'
     )
 
 
