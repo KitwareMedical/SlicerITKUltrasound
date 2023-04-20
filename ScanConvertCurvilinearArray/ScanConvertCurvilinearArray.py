@@ -313,57 +313,6 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
             parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR.name))
 
 
-    def ITKScanConversionResampling(
-        self,
-        inputImage,
-        size,
-        spacing,
-        origin,
-        direction,
-        resamplingMethod: ScanConversionResamplingMethod,
-        ):
-        itk = self.itk
-        Dimension = inputImage.GetImageDimension()
-        if resamplingMethod == ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR:
-            interpolator = itk.NearestNeighborInterpolateImageFunction.New(inputImage)
-        elif resamplingMethod == ScanConversionResamplingMethod.ITK_LINEAR:
-            interpolator = itk.LinearInterpolateImageFunction.New(inputImage)
-        elif resamplingMethod == ScanConversionResamplingMethod.ITK_GAUSSIAN:
-            interpolator = itk.GaussianInterpolateImageFunction[type(inputImage),Dimension].New()
-            interpolator.SetSigma( spacing );
-            interpolator.SetAlpha( 3.0 * max(spacing) );
-        elif resamplingMethod == ScanConversionResamplingMethod.ITK_WINDOWED_SINC:
-            WindowType = itk.LanczosWindowFunction[Dimension]
-            interpolator = itk.WindowedSincInterpolateImageFunction[type(inputImage),Dimension,WindowType].New()
-        else:
-            raise ValueError(f"ITKScanConversionResampling does not support: {resamplingMethod.name}")
-
-        resampled = itk.resample_image_filter(
-            inputImage,
-            interpolator=interpolator,
-            size=size,
-            output_spacing=spacing,
-            output_origin=origin,
-            output_direction=direction,
-            )
-        return resampled
-
-    def VTKProbeFilterResampling(
-        self,
-        inputImage,
-        size,
-        spacing,
-        origin,
-        direction,
-        resamplingMethod: ScanConversionResamplingMethod=ScanConversionResamplingMethod.VTK_PROBE_FILTER
-        ):
-        assert resamplingMethod == ScanConversionResamplingMethod.VTK_PROBE_FILTER
-        itk = self.itk
-        conversionFilter = itk.SpecialCoordinatesImageToVTKStructuredGridFilter.New(inputImage)
-        conversionFilter.Update()
-        inputStructuredGrid = conversionFilter.GetOutput()
-        inputStructuredGrid = itk.special_coordinates_image_to_vtk_structured_grid_filter(inputImage)
-
     def process(self,
                 inputVolume,
                 outputVolume,
@@ -422,9 +371,7 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
 
         logging.info('Processing started')
         startTime = time.time()
-        # result = logic.ScanConversionResampling(
-        # result = self.ITKScanConversionResampling(
-        result = self.VTKProbeFilterResampling(
+        result = logic.ScanConversionResampling(
             inputImage,
             size,
             spacing,

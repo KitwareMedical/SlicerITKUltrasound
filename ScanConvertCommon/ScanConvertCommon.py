@@ -62,52 +62,7 @@ class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
         Called when the logic class is instantiated. Can be used for initializing member variables.
         """
         ScriptedLoadableModuleLogic.__init__(self)
-       
-        self.ResamplingMethodImplementingFunction = {
-            ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR: self.ITKScanConversionResampling,
-            ScanConversionResamplingMethod.ITK_LINEAR:           self.ITKScanConversionResampling,
-            ScanConversionResamplingMethod.ITK_GAUSSIAN:         self.ITKScanConversionResampling,
-            ScanConversionResamplingMethod.ITK_WINDOWED_SINC:    self.ITKScanConversionResampling,
-            ScanConversionResamplingMethod.VTK_PROBE_FILTER:     self.VTKProbeFilterResampling,
-            ScanConversionResamplingMethod.VTK_GAUSSIAN_KERNEL:  self.VTKPointInterpolatorResampling,
-            ScanConversionResamplingMethod.VTK_LINEAR_KERNEL:    self.VTKPointInterpolatorResampling,
-            ScanConversionResamplingMethod.VTK_SHEPARD_KERNEL:   self.VTKPointInterpolatorResampling,
-            ScanConversionResamplingMethod.VTK_VORONOI_KERNEL:   self.VTKPointInterpolatorResampling,
-            }
 
-
-    def ITKScanConversionResampling(
-        self,
-        inputImage,
-        size,
-        spacing,
-        origin,
-        direction,
-        resamplingMethod: ScanConversionResamplingMethod,
-        ):
-        pass
-
-    def VTKProbeFilterResampling(
-        self,
-        inputImage,
-        size,
-        spacing,
-        origin,
-        direction,
-        resamplingMethod: ScanConversionResamplingMethod=ScanConversionResamplingMethod.VTK_PROBE_FILTER
-        ):
-        assert resamplingMethod == ScanConversionResamplingMethod.VTK_PROBE_FILTER
-
-    def VTKPointInterpolatorResampling(
-        self,
-        inputImage,
-        size,
-        spacing,
-        origin,
-        direction,
-        resamplingMethod: ScanConversionResamplingMethod,
-        ):
-        pass
 
     def ScanConversionResampling(
         self,
@@ -118,15 +73,29 @@ class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
         direction,
         resamplingMethod: ScanConversionResamplingMethod,
         ):
-        implementingFunction = self.ResamplingMethodImplementingFunction[resamplingMethod]
-        
-        # forward all parameters to the implementing function
-        return implementingFunction(
+        itk = self.itk
+        Dimension = inputImage.GetImageDimension()
+        if resamplingMethod == ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR:
+            interpolator = itk.NearestNeighborInterpolateImageFunction.New(inputImage)
+        elif resamplingMethod == ScanConversionResamplingMethod.ITK_LINEAR:
+            interpolator = itk.LinearInterpolateImageFunction.New(inputImage)
+        elif resamplingMethod == ScanConversionResamplingMethod.ITK_GAUSSIAN:
+            interpolator = itk.GaussianInterpolateImageFunction[type(inputImage), itk.D].New()
+            interpolator.SetSigma( spacing );
+            interpolator.SetAlpha( 3.0 * max(spacing) );
+        elif resamplingMethod == ScanConversionResamplingMethod.ITK_WINDOWED_SINC:
+            WindowType = itk.LanczosWindowFunction[Dimension]
+            interpolator = itk.WindowedSincInterpolateImageFunction[type(inputImage),Dimension,WindowType].New()
+        else:
+            raise ValueError(f"ITKScanConversionResampling does not support: {resamplingMethod.name}")
+
+        resampled = itk.resample_image_filter(
             inputImage,
-            size,
-            spacing,
-            origin,
-            direction,
-            resamplingMethod
+            interpolator=interpolator,
+            size=size,
+            output_spacing=spacing,
+            output_origin=origin,
+            output_direction=direction,
             )
+        return resampled
 
