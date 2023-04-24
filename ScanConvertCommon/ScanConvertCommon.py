@@ -1,10 +1,6 @@
 from enum import IntEnum
-import logging
-import os
 from contextlib import contextmanager
 
-import vtk
-import numpy as np
 from typing import Any, Tuple
 
 import qt
@@ -13,7 +9,7 @@ from slicer.ScriptedLoadableModule import (
   ScriptedLoadableModule,
   ScriptedLoadableModuleLogic,
 )
-from slicer.util import VTKObservationMixin
+from ITKUltrasoundCommon import ITKUltrasoundCommonLogic
 
 
 
@@ -40,14 +36,9 @@ class ScanConversionResamplingMethod(IntEnum):
     ITK_LINEAR = 1
     ITK_GAUSSIAN = 2
     ITK_WINDOWED_SINC = 3
-    VTK_PROBE_FILTER = 4
-    VTK_GAUSSIAN_KERNEL = 5
-    VTK_LINEAR_KERNEL = 6
-    VTK_SHEPARD_KERNEL = 7
-    VTK_VORONOI_KERNEL = 8
 
 
-class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
+class ScanConvertCommonLogic(ITKUltrasoundCommonLogic):
     """This class should implement all the actual
     computation done by your module.  The interface
     should be such that other python code can import
@@ -61,18 +52,18 @@ class ScanConvertCommonLogic(ScriptedLoadableModuleLogic):
         """
         Called when the logic class is instantiated. Can be used for initializing member variables.
         """
-        ScriptedLoadableModuleLogic.__init__(self)
+        ITKUltrasoundCommonLogic.__init__(self)
 
 
     def ScanConversionResampling(
         self,
-        inputImage,
-        size,
-        spacing,
-        origin,
-        direction,
+        inputImage: Any,
+        size: Tuple[int],
+        spacing: Tuple[float],
+        origin: Tuple[float],
+        direction: Any,
         resamplingMethod: ScanConversionResamplingMethod,
-        ):
+        ) -> Any:
         itk = self.itk
         Dimension = inputImage.GetImageDimension()
         if resamplingMethod == ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR:

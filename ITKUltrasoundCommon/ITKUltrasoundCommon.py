@@ -12,7 +12,6 @@ from slicer.ScriptedLoadableModule import (
   ScriptedLoadableModule,
   ScriptedLoadableModuleLogic,
 )
-from slicer.util import VTKObservationMixin
 
 
 
