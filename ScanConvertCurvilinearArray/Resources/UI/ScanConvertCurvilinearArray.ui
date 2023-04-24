@@ -195,31 +195,6 @@
           <string>ITKWindowedSinc</string>
          </property>
         </item>
-        <item>
-         <property name="text">
-          <string>VTKProbeFilter</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>VTKGaussianKernel</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>VTKLinearKernel</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>VTKShepardKernel</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>VTKVoronoiKernel</string>
-         </property>
-        </item>
        </widget>
       </item>
      </layout>
