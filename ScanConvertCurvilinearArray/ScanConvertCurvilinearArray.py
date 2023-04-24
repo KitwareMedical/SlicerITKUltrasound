@@ -432,13 +432,15 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
         logic = ScanConvertCurvilinearArrayLogic()
 
         # Test nearest neighbor interpolation
-        logic.process(inputVolume, outputVolume, 1)
+        logic.process(inputVolume, outputVolume, 0.00862832, 0.0513434, 26.4, "800,800,3", "0.15,0.15,0.15",
+                      ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 4, places=0)
         self.assertAlmostEqual(outputScalarRange[1], 254, places=0)
 
         # Test linear interpolation
-        logic.process(inputVolume, outputVolume, 0)
+        logic.process(inputVolume, outputVolume, 0.00862832, 0.0513434, 26.4, "800,800,3", "0.15,0.15,0.15",
+                      ScanConversionResamplingMethod.ITK_LINEAR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 4, places=0)
         self.assertAlmostEqual(outputScalarRange[1], 254, places=0)
