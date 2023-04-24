@@ -3,6 +3,7 @@ import logging
 import os
 import math
 
+from typing import Any, Tuple
 import numpy as np
 import vtk
 import time
@@ -279,7 +280,7 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
                 )
 
 
-class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
+class ScanConvertCurvilinearArrayLogic(ScanConvertCommonLogic):
     """This class should implement all the actual
     computation done by your module.  The interface
     should be such that other python code can import
@@ -312,6 +313,44 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
         if not parameterNode.GetParameter("ResamplingMethod"):
             parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR.name))
 
+    def ScanConversionResampling(
+        self,
+        inputImage: Any,
+        size: Tuple[int],
+        spacing: Tuple[float],
+        origin: Tuple[float],
+        direction: Any,
+        resamplingMethod: ScanConversionResamplingMethod,
+        ) -> Any:
+        itk = self.itk
+        Dimension = inputImage.GetImageDimension()
+        if resamplingMethod == ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR:
+            interpolator = itk.NearestNeighborInterpolateImageFunction.New(inputImage)
+        elif resamplingMethod == ScanConversionResamplingMethod.ITK_LINEAR:
+            interpolator = itk.LinearInterpolateImageFunction.New(inputImage)
+        elif resamplingMethod == ScanConversionResamplingMethod.ITK_GAUSSIAN:
+            interpolator = itk.GaussianInterpolateImageFunction[type(inputImage), itk.D].New()
+            interpolator.SetSigma( spacing );
+            interpolator.SetAlpha( 3.0 * max(spacing) );
+        elif resamplingMethod == ScanConversionResamplingMethod.ITK_WINDOWED_SINC:
+            WindowType = itk.LanczosWindowFunction[Dimension]
+            interpolator = itk.WindowedSincInterpolateImageFunction[type(inputImage),Dimension,WindowType].New()
+        else:
+            raise ValueError(f"ITKScanConversionResampling does not support: {resamplingMethod.name}")
+        
+        centerPixel = inputImage.GetPixel([128,128,0])
+        print(f"centerPixel[inner]: {centerPixel}")  # 214
+
+        resampled = itk.resample_image_filter(
+            inputImage,
+            interpolator=interpolator,
+            size=size,
+            output_spacing=spacing,
+            output_origin=origin,
+            output_direction=direction,
+            )
+        print(f"resampled: {resampled}")
+        return resampled
 
     def process(self,
                 inputVolume,
@@ -347,6 +386,9 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
         inputImage = CurvilinearType.New()
         inputImage.SetPixelContainer(itkImage.GetPixelContainer())
 
+        centerPixel = inputImage.GetPixel([128,128,0])
+        print(f"centerPixel: {centerPixel}")  # 214
+
         inputImage.SetLateralAngularSeparation( lateralAngularSeparation );
         inputImage.SetRadiusSampleSize( radiusSampleSize );
         inputImage.SetFirstSampleDistance( firstSampleDistance );
@@ -371,7 +413,8 @@ class ScanConvertCurvilinearArrayLogic(ITKUltrasoundCommonLogic):
 
         logging.info('Processing started')
         startTime = time.time()
-        result = logic.ScanConversionResampling(
+        # result = logic.ScanConversionResampling(
+        result = self.ScanConversionResampling(
             inputImage,
             size,
             spacing,
@@ -435,14 +478,14 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
         logic.process(inputVolume, outputVolume, 0.00862832, 0.0513434, 26.4, "800,800,3", "0.15,0.15,0.15",
                       ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertAlmostEqual(outputScalarRange[0], 4, places=0)
+        self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
         self.assertAlmostEqual(outputScalarRange[1], 254, places=0)
 
         # Test linear interpolation
         logic.process(inputVolume, outputVolume, 0.00862832, 0.0513434, 26.4, "800,800,3", "0.15,0.15,0.15",
                       ScanConversionResamplingMethod.ITK_LINEAR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
-        self.assertAlmostEqual(outputScalarRange[0], 4, places=0)
+        self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
         self.assertAlmostEqual(outputScalarRange[1], 254, places=0)
 
         file_sha512 = "f26953117f160b89a522edc6cb2cf45d622c6068632b5addd49cfaff0c8787aa783bcaaa310cdc61958ab2cd808a75a04479757e822ba573a128c4e7c7311041"
