@@ -170,29 +170,29 @@
          <string>Scan conversion resampling method.</string>
         </property>
         <property name="currentText">
-         <string>ITKLinear</string>
+         <string>Linear</string>
         </property>
         <property name="currentIndex">
          <number>1</number>
         </property>
         <item>
          <property name="text">
-          <string>ITKNearestNeighbor</string>
+          <string>Nearest Neighbor</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>ITKLinear</string>
+          <string>Linear</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>ITKGaussian</string>
+          <string>Gaussian</string>
          </property>
         </item>
         <item>
          <property name="text">
-          <string>ITKWindowedSinc</string>
+          <string>Windowed Sinc</string>
          </property>
         </item>
        </widget>
