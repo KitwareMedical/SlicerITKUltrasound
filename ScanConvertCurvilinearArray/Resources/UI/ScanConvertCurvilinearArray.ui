@@ -58,7 +58,7 @@
          <string>The number of radians between each lateral unit.</string>
         </property>
         <property name="decimals">
-         <number>6</number>
+         <number>8</number>
         </property>
         <property name="singleStep">
          <double>0.001000000000000</double>
@@ -81,10 +81,10 @@
          <string>The number of Cartesian units between each unit along the R.</string>
         </property>
         <property name="decimals">
-         <number>3</number>
+         <number>8</number>
         </property>
         <property name="singleStep">
-         <double>0.100000000000000</double>
+         <double>0.010000000000000</double>
         </property>
         <property name="value">
          <double>1.000000000000000</double>
