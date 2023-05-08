@@ -337,9 +337,6 @@ class ScanConvertCurvilinearArrayLogic(ScanConvertCommonLogic):
             interpolator = itk.WindowedSincInterpolateImageFunction[type(inputImage),Dimension,WindowType].New()
         else:
             raise ValueError(f"ITKScanConversionResampling does not support: {resamplingMethod.name}")
-        
-        centerPixel = inputImage.GetPixel([128,128,0])
-        print(f"centerPixel[inner]: {centerPixel}")  # 214
 
         resampled = itk.resample_image_filter(
             inputImage,
@@ -349,7 +346,6 @@ class ScanConvertCurvilinearArrayLogic(ScanConvertCommonLogic):
             output_origin=origin,
             output_direction=direction,
             )
-        print(f"resampled: {resampled}")
         return resampled
 
     def process(self,
@@ -384,10 +380,8 @@ class ScanConvertCurvilinearArrayLogic(ScanConvertCommonLogic):
         Dimension = itkImage.GetImageDimension()
         CurvilinearType = itk.CurvilinearArraySpecialCoordinatesImage[PixelType, Dimension]
         inputImage = CurvilinearType.New()
+        inputImage.SetRegions(itkImage.GetLargestPossibleRegion())
         inputImage.SetPixelContainer(itkImage.GetPixelContainer())
-
-        centerPixel = inputImage.GetPixel([128,128,0])
-        print(f"centerPixel: {centerPixel}")  # 214
 
         inputImage.SetLateralAngularSeparation( lateralAngularSeparation );
         inputImage.SetRadiusSampleSize( radiusSampleSize );
@@ -486,7 +480,7 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
                       ScanConversionResamplingMethod.ITK_LINEAR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
-        self.assertAlmostEqual(outputScalarRange[1], 254, places=0)
+        self.assertAlmostEqual(outputScalarRange[1], 252, places=0)
 
         file_sha512 = "f26953117f160b89a522edc6cb2cf45d622c6068632b5addd49cfaff0c8787aa783bcaaa310cdc61958ab2cd808a75a04479757e822ba573a128c4e7c7311041"
         import SampleData
@@ -498,11 +492,11 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
             loadFiles=True)
 
         itk = logic.itk
-        FloatImage = itk.Image[itk.F, 3]
-        comparer = itk.ComparisonImageFilter[FloatImage, FloatImage].New()
+        ImageType = itk.Image[itk.UC, 3]
+        comparer = itk.ComparisonImageFilter[ImageType, ImageType].New()
         comparer.SetValidInput(logic.getITKImageFromVolumeNode(expectedResult[0]))
         comparer.SetTestInput(logic.getITKImageFromVolumeNode(outputVolume))
-        comparer.SetDifferenceThreshold(0.1)
+        comparer.SetDifferenceThreshold(0)
         comparer.Update()
         self.assertEqual(comparer.GetNumberOfPixelsWithDifferences(), 0)
 
