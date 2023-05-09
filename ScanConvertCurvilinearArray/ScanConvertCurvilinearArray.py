@@ -313,41 +313,6 @@ class ScanConvertCurvilinearArrayLogic(ScanConvertCommonLogic):
         if not parameterNode.GetParameter("ResamplingMethod"):
             parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR.name))
 
-    def ScanConversionResampling(
-        self,
-        inputImage: Any,
-        size: Tuple[int],
-        spacing: Tuple[float],
-        origin: Tuple[float],
-        direction: Any,
-        resamplingMethod: ScanConversionResamplingMethod,
-        ) -> Any:
-        itk = self.itk
-        Dimension = inputImage.GetImageDimension()
-        if resamplingMethod == ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR:
-            interpolator = itk.NearestNeighborInterpolateImageFunction.New(inputImage)
-        elif resamplingMethod == ScanConversionResamplingMethod.ITK_LINEAR:
-            interpolator = itk.LinearInterpolateImageFunction.New(inputImage)
-        elif resamplingMethod == ScanConversionResamplingMethod.ITK_GAUSSIAN:
-            interpolator = itk.GaussianInterpolateImageFunction[type(inputImage), itk.D].New()
-            interpolator.SetSigma( spacing );
-            interpolator.SetAlpha( 3.0 * max(spacing) );
-        elif resamplingMethod == ScanConversionResamplingMethod.ITK_WINDOWED_SINC:
-            WindowType = itk.LanczosWindowFunction[Dimension]
-            interpolator = itk.WindowedSincInterpolateImageFunction[type(inputImage),Dimension,WindowType].New()
-        else:
-            raise ValueError(f"ITKScanConversionResampling does not support: {resamplingMethod.name}")
-
-        resampled = itk.resample_image_filter(
-            inputImage,
-            interpolator=interpolator,
-            size=size,
-            output_spacing=spacing,
-            output_origin=origin,
-            output_direction=direction,
-            )
-        return resampled
-
     def process(self,
                 inputVolume,
                 outputVolume,
@@ -407,8 +372,7 @@ class ScanConvertCurvilinearArrayLogic(ScanConvertCommonLogic):
 
         logging.info('Processing started')
         startTime = time.time()
-        # result = logic.ScanConversionResampling(
-        result = self.ScanConversionResampling(
+        result = logic.ScanConversionResampling(
             inputImage,
             size,
             spacing,
