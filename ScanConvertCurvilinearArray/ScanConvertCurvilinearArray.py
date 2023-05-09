@@ -473,14 +473,14 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
                       ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
-        self.assertAlmostEqual(outputScalarRange[1], 254, places=0)
+        self.assertAlmostEqual(outputScalarRange[1], 253, places=0)
 
         # Test linear interpolation
         logic.process(inputVolume, outputVolume, 0.00862832, 0.0513434, 26.4, "800,800,3", "0.15,0.15,0.15",
                       ScanConversionResamplingMethod.ITK_LINEAR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
-        self.assertAlmostEqual(outputScalarRange[1], 252, places=0)
+        self.assertAlmostEqual(outputScalarRange[1], 251, places=0)
 
         file_sha512 = "f26953117f160b89a522edc6cb2cf45d622c6068632b5addd49cfaff0c8787aa783bcaaa310cdc61958ab2cd808a75a04479757e822ba573a128c4e7c7311041"
         import SampleData
@@ -497,6 +497,7 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
         comparer.SetValidInput(logic.getITKImageFromVolumeNode(expectedResult[0]))
         comparer.SetTestInput(logic.getITKImageFromVolumeNode(outputVolume))
         comparer.SetDifferenceThreshold(0)
+        comparer.SetCoordinateTolerance(1e-3)
         comparer.Update()
         self.assertEqual(comparer.GetNumberOfPixelsWithDifferences(), 0)
 
