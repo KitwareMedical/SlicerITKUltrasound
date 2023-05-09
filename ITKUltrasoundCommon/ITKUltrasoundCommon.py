@@ -12,7 +12,6 @@ from slicer.ScriptedLoadableModule import (
   ScriptedLoadableModule,
   ScriptedLoadableModuleLogic,
 )
-from slicer.util import VTKObservationMixin
 
 
 
@@ -33,7 +32,7 @@ This file was originally developed by Dženan Zukić, Kitware Inc.,
 and was partially funded by NIH grant 5R44CA239830.
 """
         # Additional initialization step after application startup is complete
-        slicer.app.connect("startupCompleted()", preloadITK)
+        # slicer.app.connect("startupCompleted()", preloadITK)
 
 
 
@@ -90,7 +89,7 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
             if not install:
                 logging.info('Installation of ITK aborted by the user')
                 return None
-        slicer.util.pip_install('itk-ultrasound')
+        slicer.util.pip_install('itk-ultrasound>=0.6.1')
         import itk
         logging.info(f'ITK {itk.__version__} installed correctly')
         return itk
@@ -208,3 +207,4 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
 def preloadITK():
     logic = ITKUltrasoundCommonLogic()
     logic.importITK(True)
+    logic.itk.CurvilinearArraySpecialCoordinatesImage  # trigger loading of ITKUltrasound's DLL

@@ -129,7 +129,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         """
         Called each time the user opens a different module.
         """
-        # Do not react to parameter node changes (GUI wlil be updated when the user enters into the module)
+        # Do not react to parameter node changes (GUI will be updated when the user enters into the module)
         self.removeObserver(self._parameterNode, vtk.vtkCommand.ModifiedEvent, self.updateGUIFromParameterNode)
 
     def onSceneStartClose(self, caller, event):
@@ -225,6 +225,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
         self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
         self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
         self._parameterNode.SetParameter("AxisOfPropagation", str(self.ui.axisOfPropagationComboBox.currentIndex))
+
         self._parameterNode.EndModify(wasModified)
 
     def onApplyButton(self):
@@ -260,8 +261,6 @@ class BModeFromRFLogic(ITKUltrasoundCommonLogic):
         """
         if not parameterNode.GetParameter("AxisOfPropagation"):
             parameterNode.SetParameter("AxisOfPropagation", "0")
-        if not parameterNode.GetParameter("Invert"):
-            parameterNode.SetParameter("Invert", "false")
 
 
     def process(self, inputVolume, outputVolume, axisOfPropagation=0):
