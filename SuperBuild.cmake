@@ -22,7 +22,7 @@ if(NOT CMAKE_CONFIGURATION_TYPES)
 endif()
 
 set(proj ${SUPERBUILD_TOPLEVEL_PROJECT})
-set(${proj}_DEPENDS ITKStrain ITKSplitComponents ITKHigherOrderAccurateGradient ITKBSplineGradient ITKUltrasound)
+set(${proj}_DEPENDS ITKUltrasound)
 
 ExternalProject_Include_Dependencies(${proj}
   PROJECT_VAR proj

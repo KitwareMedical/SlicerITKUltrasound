@@ -4,7 +4,12 @@
 set(proj ITKUltrasound)
 
 # Dependencies
-set(${proj}_DEPENDENCIES )
+set(${proj}_DEPENDENCIES
+  ITKBSplineGradient
+  ITKHigherOrderAccurateGradient
+  ITKSplitComponents
+  ITKStrain
+  )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
