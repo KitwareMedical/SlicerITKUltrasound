@@ -9,7 +9,7 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
-set(${proj}_GIT_TAG 3dfd5775ec5702428d6319091e58990e9fe1e42d)
+set(${proj}_GIT_TAG 5c077779c3176a73f19f968e57e2a11835e4e4ac)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/InsightSoftwareConsortium/ITKSplitComponents.git

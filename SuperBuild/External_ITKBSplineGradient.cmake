@@ -9,7 +9,7 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
-set(${proj}_GIT_TAG ba1417c320c75ba0987e8a6cb12d9bb8a3f47365)
+set(${proj}_GIT_TAG 96b48fa7d921bf8d30a663f9c0eaf8bbb1a69162)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/InsightSoftwareConsortium/ITKBSplineGradient.git

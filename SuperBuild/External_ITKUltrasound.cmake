@@ -9,7 +9,7 @@ ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
-set(${proj}_GIT_TAG 2443abe29ae44799a5e189fb66c7b8b7a044dcdf)
+set(${proj}_GIT_TAG 6f126b84d9a6511c695c197330800c5612fced93)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
   GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/KitwareMedical/ITKUltrasound.git
