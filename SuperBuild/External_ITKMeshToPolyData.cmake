@@ -1,20 +1,18 @@
 #-----------------------------------------------------------------------------
-# Build the ITK BSplineGradient module, pointing it to Slicer's ITK
+# Build the ITK Strain module, pointing it to Slicer's ITK
 
-set(proj ITKBSplineGradient)
+set(proj ITKMeshToPolyData)
 
 # Dependencies
-set(${proj}_DEPENDENCIES
-  ITKMeshToPolyData
-  )
+set(${proj}_DEPENDENCIES )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
 set(${proj}_BINARY_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
 
-set(${proj}_GIT_TAG 96b48fa7d921bf8d30a663f9c0eaf8bbb1a69162)
+set(${proj}_GIT_TAG 40e3e6cc6a0742382b8a7983c092f1b20da51c2e)
 ExternalProject_Add(${proj}
   ${${proj}_EP_ARGS}
-  GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/InsightSoftwareConsortium/ITKBSplineGradient.git
+  GIT_REPOSITORY ${EP_GIT_PROTOCOL}://github.com/InsightSoftwareConsortium/ITKMeshToPolyData.git
   GIT_TAG ${${proj}_GIT_TAG}
   SOURCE_DIR ${proj}
   BINARY_DIR ${${proj}_BINARY_DIR}
