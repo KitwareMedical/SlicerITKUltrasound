@@ -5,6 +5,7 @@ set(proj ITKUltrasound)
 
 # Dependencies
 set(${proj}_DEPENDENCIES
+  ITK
   ITKBSplineGradient
   ITKHigherOrderAccurateGradient
   ITKSplitComponents
