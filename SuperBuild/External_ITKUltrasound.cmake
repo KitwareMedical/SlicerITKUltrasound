@@ -10,6 +10,7 @@ set(${proj}_DEPENDENCIES
   ITKHigherOrderAccurateGradient
   ITKSplitComponents
   ITKStrain
+  VTK
   )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
