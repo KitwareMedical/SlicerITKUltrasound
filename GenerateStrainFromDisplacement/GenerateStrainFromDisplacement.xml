@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<executable>
+  <category>Ultrasound</category>
+  <title>GenerateStrainFromDisplacement</title>
+  <description><![CDATA[Generate a strain image from a displacement image.]]></description>
+  <version>0.1.0</version>
+  <documentation-url>https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/Modules/GenerateStrainFromDisplacement/GenerateStrainFromDisplacement.html</documentation-url>
+  <license>Apache 2.0</license>
+  <contributor>Matthew McCormick (Kitware, Inc)</contributor>
+  <acknowledgements></acknowledgements>
+  <parameters>
+    <label>IO</label>
+    <description><![CDATA[Input/output parameters]]></description>
+
+    <image>
+      <name>inputImage</name>
+      <label>Input Image</label>
+      <channel>input</channel>
+      <index>0</index>
+      <description><![CDATA[Input image -- displacement vectors.]]></description>
+    </image>
+
+    <image>
+      <name>outputImage</name>
+      <label>Output Image</label>
+      <channel>output</channel>
+      <index>1</index>
+      <description><![CDATA[Output Image -- strain tensors.]]></description>
+    </image>
+
+    <image>
+      <name>strainComponent0</name>
+      <label>Strain Component 0</label>
+      <channel>output</channel>
+      <longflag>component0</longflag>
+      <flag>c</flag>
+      <description><![CDATA[Output Image -- strain component 0 image]]></description>
+    </image>
+
+    <image>
+      <name>strainComponent1</name>
+      <label>Strain Component 1</label>
+      <channel>output</channel>
+      <longflag>component1</longflag>
+      <flag>d</flag>
+      <description><![CDATA[Output Image -- strain component 1 image]]></description>
+    </image>
+
+    <image>
+      <name>strainComponent2</name>
+      <label>Strain Component 2</label>
+      <channel>output</channel>
+      <longflag>component2</longflag>
+      <flag>e</flag>
+      <description><![CDATA[Output Image -- strain component 2 image]]></description>
+    </image>
+  </parameters>
+</executable>
