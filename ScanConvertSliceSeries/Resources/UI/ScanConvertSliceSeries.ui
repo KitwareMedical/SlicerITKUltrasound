@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ScanConvertPhasedArray3D</class>
- <widget class="qMRMLWidget" name="ScanConvertPhasedArray3D">
+ <class>ScanConvertSliceSeries</class>
+ <widget class="qMRMLWidget" name="ScanConvertSliceSeries">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -328,7 +328,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>ScanConvertPhasedArray3D</sender>
+   <sender>ScanConvertSliceSeries</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>inputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
@@ -344,7 +344,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ScanConvertPhasedArray3D</sender>
+   <sender>ScanConvertSliceSeries</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>outputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>

@@ -16,14 +16,14 @@ from ITKUltrasoundCommon import ITKUltrasoundCommonLogic
 from ScanConvertCommon import ScanConvertCommonLogic, ScanConversionResamplingMethod
 
 
-class ScanConvertPhasedArray3D(ScriptedLoadableModule):
+class ScanConvertSliceSeries(ScriptedLoadableModule):
     """Uses ScriptedLoadableModule base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
     """
 
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
-        self.parent.title = "ScanConvertPhasedArray3D"
+        self.parent.title = "ScanConvertSliceSeries"
         self.parent.categories = ["Ultrasound"]
         self.parent.dependencies = ["ITKUltrasoundCommon", "ScanConvertCommon"]
         self.parent.contributors = ["Dženan Zukić (Kitware Inc.)"]
@@ -55,13 +55,13 @@ def registerSampleData():
         sampleName='ITKUltrasoundPhasedArray3D',
         thumbnailFileName=os.path.join(iconsPath, 'PhasedArray3D.png'),
         uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/api/v1/file/649f0c1a93a5dcdba24e08cf/download", "https://data.kitware.com/api/v1/item/649f0c1993a5dcdba24e08ce/download",
-        fileNames='ScanConvertPhasedArray3DTestInput.mha',
+        fileNames='ScanConvertSliceSeriesTestInput.mha',
         checksums=f'SHA512:{file_sha512}',
-        nodeNames='ScanConvertPhasedArray3DTestInput'
+        nodeNames='ScanConvertSliceSeriesTestInput'
     )
 
 
-class ScanConvertPhasedArray3DWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
+class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """Uses ScriptedLoadableModuleWidget base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
     """
@@ -84,7 +84,7 @@ class ScanConvertPhasedArray3DWidget(ScriptedLoadableModuleWidget, VTKObservatio
 
         # Load widget from .ui file (created by Qt Designer).
         # Additional widgets can be instantiated manually and added to self.layout.
-        uiWidget = slicer.util.loadUI(self.resourcePath('UI/ScanConvertPhasedArray3D.ui'))
+        uiWidget = slicer.util.loadUI(self.resourcePath('UI/ScanConvertSliceSeries.ui'))
         self.layout.addWidget(uiWidget)
         self.ui = slicer.util.childWidgetVariables(uiWidget)
 
@@ -95,7 +95,7 @@ class ScanConvertPhasedArray3DWidget(ScriptedLoadableModuleWidget, VTKObservatio
 
         # Create logic class. Logic implements all computations that should be possible to run
         # in batch mode, without a graphical user interface.
-        self.logic = ScanConvertPhasedArray3DLogic()
+        self.logic = ScanConvertSliceSeriesLogic()
 
         # Connections
 
@@ -272,7 +272,7 @@ class ScanConvertPhasedArray3DWidget(ScriptedLoadableModuleWidget, VTKObservatio
                 )
 
 
-class ScanConvertPhasedArray3DLogic(ScanConvertCommonLogic):
+class ScanConvertSliceSeriesLogic(ScanConvertCommonLogic):
     """This class should implement all the actual
     computation done by your module.  The interface
     should be such that other python code can import
@@ -386,7 +386,7 @@ class ScanConvertPhasedArray3DLogic(ScanConvertCommonLogic):
         logging.info('GUI updated with results')
 
 
-class ScanConvertPhasedArray3DTest(ScriptedLoadableModuleTest):
+class ScanConvertSliceSeriesTest(ScriptedLoadableModuleTest):
     """
     This is the test case for your scripted module.
     Uses ScriptedLoadableModuleTest base class, available at:
@@ -402,9 +402,9 @@ class ScanConvertPhasedArray3DTest(ScriptedLoadableModuleTest):
         """Run as few or as many tests as needed here.
         """
         self.setUp()
-        self.test_ScanConvertPhasedArray3D()
+        self.test_ScanConvertSliceSeries()
 
-    def test_ScanConvertPhasedArray3D(self):
+    def test_ScanConvertSliceSeries(self):
         """
         One of the most important features of the tests is that it should alert other
         developers when their changes will have an impact on the behavior of your
@@ -429,7 +429,7 @@ class ScanConvertPhasedArray3DTest(ScriptedLoadableModuleTest):
 
         # Test the module logic
 
-        logic = ScanConvertPhasedArray3DLogic()
+        logic = ScanConvertSliceSeriesLogic()
 
         # Test nearest neighbor interpolation
         logic.process(inputVolume, outputVolume,0.0872665, 0.0174533, 0.2, 8.0, "128,128,128", "0.2,0.2,0.2",
@@ -448,8 +448,8 @@ class ScanConvertPhasedArray3DTest(ScriptedLoadableModuleTest):
         file_sha512 = "6e589887b660f79513d1c09479cc70bd815e532e013fcb3bb185a21c641e417210d6a8286199a265b8e6b9159254e6237108539d0c5eb865a7bedb03d64cbf50"
         import SampleData
         expectedResult = SampleData.downloadFromURL(
-            nodeNames='ScanConvertPhasedArray3DTestOutput',
-            fileNames='ScanConvertPhasedArray3DTestOutput.mha',
+            nodeNames='ScanConvertSliceSeriesTestOutput',
+            fileNames='ScanConvertSliceSeriesTestOutput.mha',
             uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",
             checksums=f'SHA512:{file_sha512}',
             loadFiles=True)

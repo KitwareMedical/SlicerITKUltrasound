@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-set(MODULE_NAME ScanConvertPhasedArray3D)
+set(MODULE_NAME ScanConvertSliceSeries)
 
 #-----------------------------------------------------------------------------
 set(MODULE_PYTHON_SCRIPTS
