@@ -107,11 +107,6 @@ class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationM
         # (in the selected parameter node).
         self.ui.inputSelector.connect("currentPathChanged(QString)", self.updateParameterNodeFromGUI)
         self.ui.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
-        self.ui.azimuthAngularSeparation.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
-        self.ui.elevationAngularSeparation.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
-        self.ui.radiusSampleSize.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
-        self.ui.firstSampleDistance.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
-        self.ui.outputSize.connect("coordinatesChanged(double*)", self.updateParameterNodeFromGUI)
         self.ui.outputSpacing.connect("coordinatesChanged(double*)", self.updateParameterNodeFromGUI)
         self.ui.resamplingMethod.connect("currentIndexChanged(int)", self.updateParameterNodeFromGUI)
 
@@ -166,11 +161,6 @@ class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationM
 
         self.setParameterNode(self.logic.getParameterNode())
 
-        # Select default input nodes if nothing is selected yet to save a few clicks for the user
-        if not self._parameterNode.GetNodeReference("InputVolume"):
-            firstVolumeNode = slicer.mrmlScene.GetFirstNodeByClass("vtkMRMLScalarVolumeNode")
-            if firstVolumeNode:
-                self._parameterNode.SetNodeReferenceID("InputVolume", firstVolumeNode.GetID())
 
     def setParameterNode(self, inputParameterNode):
         """
@@ -206,23 +196,18 @@ class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationM
         self._updatingGUIFromParameterNode = True
 
         # Update node selectors and sliders
-        self.ui.inputSelector.currentPath = self._parameterNode.GetNodeReference("InputVolume")
+        self.ui.inputSelector.currentPath = self._parameterNode.GetParameter("InputVolume")
         self.ui.outputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume"))
-        self.ui.azimuthAngularSeparation.value = float(self._parameterNode.GetParameter("AzimuthAngularSeparation"))
-        self.ui.elevationAngularSeparation.value = float(self._parameterNode.GetParameter("ElevationAngularSeparation"))
-        self.ui.radiusSampleSize.value = float(self._parameterNode.GetParameter("RadiusSampleSize"))
-        self.ui.firstSampleDistance.value = float(self._parameterNode.GetParameter("FirstSampleDistance"))
-        self.ui.outputSize.coordinates = self._parameterNode.GetParameter("OutputSize")
         self.ui.outputSpacing.coordinates = self._parameterNode.GetParameter("OutputSpacing")
         strMethod = self._parameterNode.GetParameter("ResamplingMethod")
         self.ui.resamplingMethod.currentIndex = ScanConversionResamplingMethod[strMethod].value
 
         # Update buttons states and tooltips
-        if self._parameterNode.GetNodeReference("InputVolume") and self._parameterNode.GetNodeReference("OutputVolume"):
+        if os.path.isfile(self.ui.inputSelector.currentPath) and self._parameterNode.GetNodeReference("OutputVolume"):
             self.ui.applyButton.toolTip = "Run conversion"
             self.ui.applyButton.enabled = True
         else:
-            self.ui.applyButton.toolTip = "Select input and output volume nodes"
+            self.ui.applyButton.toolTip = "Select input file and output volume node"
             self.ui.applyButton.enabled = False
 
         # All the GUI updates are done
@@ -241,11 +226,6 @@ class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationM
 
         self._parameterNode.SetParameter("InputVolume", self.ui.inputSelector.currentPath)
         self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
-        self._parameterNode.SetParameter("AzimuthAngularSeparation", str(self.ui.azimuthAngularSeparation.value))
-        self._parameterNode.SetParameter("ElevationAngularSeparation", str(self.ui.elevationAngularSeparation.value))
-        self._parameterNode.SetParameter("RadiusSampleSize", str(self.ui.radiusSampleSize.value))
-        self._parameterNode.SetParameter("FirstSampleDistance", str(self.ui.firstSampleDistance.value))
-        self._parameterNode.SetParameter("OutputSize", self.ui.outputSize.coordinates)
         self._parameterNode.SetParameter("OutputSpacing", self.ui.outputSpacing.coordinates)
         eMethod = ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex)
         self._parameterNode.SetParameter("ResamplingMethod", str(eMethod.name))
@@ -260,13 +240,8 @@ class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationM
 
             # Compute output
             self.logic.process(
-                self.ui.inputSelector.currentNode(),
+                self.ui.inputSelector.currentPath,
                 self.ui.outputSelector.currentNode(),
-                self.ui.azimuthAngularSeparation.value,
-                self.ui.elevationAngularSeparation.value,
-                self.ui.radiusSampleSize.value,
-                self.ui.firstSampleDistance.value,
-                self.ui.outputSize.coordinates,
                 self.ui.outputSpacing.coordinates,
                 ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex),
                 )
@@ -292,16 +267,6 @@ class ScanConvertSliceSeriesLogic(ScanConvertCommonLogic):
         """
         Initialize parameter node with default settings.
         """
-        if not parameterNode.GetParameter("AzimuthAngularSeparation"):
-            parameterNode.SetParameter("AzimuthAngularSeparation", "0.017453292519943")
-        if not parameterNode.GetParameter("ElevationAngularSeparation"):
-            parameterNode.SetParameter("ElevationAngularSeparation", "0.017453292519943")
-        if not parameterNode.GetParameter("RadiusSampleSize"):
-            parameterNode.SetParameter("RadiusSampleSize", "1.0")
-        if not parameterNode.GetParameter("FirstSampleDistance"):
-            parameterNode.SetParameter("FirstSampleDistance", "1.0")
-        if not parameterNode.GetParameter("OutputSize"):
-            parameterNode.SetParameter("OutputSize", "128,128,128")
         if not parameterNode.GetParameter("OutputSpacing"):
             parameterNode.SetParameter("OutputSpacing", "0.2,0.2,0.2")
         if not parameterNode.GetParameter("ResamplingMethod"):
@@ -310,62 +275,54 @@ class ScanConvertSliceSeriesLogic(ScanConvertCommonLogic):
     def process(self,
                 inputVolume,
                 outputVolume,
-                azimuthAngularSeparation: float,
-                elevationAngularSeparation: float,
-                radiusSampleSize: float,
-                firstSampleDistance: float,
-                outputSize: str,  # comma-separated list of 3 integers
                 outputSpacing: str,  # comma-separated list of 3 floats
                 resamplingMethod: ScanConversionResamplingMethod,
                 ):
         """
         Run the processing algorithm.
         Can be used without GUI widget.
-        :param inputVolume: curvilinear volume to be converted
+        :param inputVolume: slice series to be converted (a path on disk)
         :param outputVolume: rectilinear conversion result
-        :param azimuthAngularSeparation: angular separation between samples in the azimuth direction
-        :param elevationAngularSeparation: angular separation between samples in the elevation direction
-        :param radiusSampleSize: distance between samples in the radial direction
-        :param firstSampleDistance: distance from the center of the transducer to the first sample
-        :param outputSize: Number of voxels in each direction of the output image
         :param outputSpacing: Spacing between voxels in each direction of the output image
         :param resamplingMethod: Scan conversion resampling method to use
         """
-        if not inputVolume or not outputVolume:
-            raise ValueError("Input or output volume is invalid")
+        if not os.path.isfile(inputVolume):
+            raise ValueError("Input file does not exist")
+        if not outputVolume:
+            raise ValueError("Output volume is invalid")
 
         logging.info('Instantiating the filter')
         itk = self.itk
-        itkImage = self.getITKImageFromVolumeNode(inputVolume)
-        PixelType = itk.template(itkImage)[1][0]
-        Dimension = itkImage.GetImageDimension()
-        if Dimension != 3:
-            raise ValueError("Input volume must be a 3D image")
-        CurvilinearType = itk.PhasedArray3DSpecialCoordinatesImage[PixelType]
-        inputImage = CurvilinearType.New()
-        inputImage.SetRegions(itkImage.GetLargestPossibleRegion())
-        inputImage.SetPixelContainer(itkImage.GetPixelContainer())
 
-        inputImage.SetAzimuthAngularSeparation( azimuthAngularSeparation );
-        inputImage.SetElevationAngularSeparation( elevationAngularSeparation );
-        inputImage.SetRadiusSampleSize( radiusSampleSize );
-        inputImage.SetFirstSampleDistance( firstSampleDistance );
+        PixelType = itk.UC
+        Dimension = 3
+        slice_type = itk.Image[PixelType, Dimension - 1]
+        transform_type = itk.Euler3DTransform[itk.D]
+        image_type = itk.SliceSeriesSpecialCoordinatesImage[slice_type, transform_type]
 
-        # Initializing these from the input image gives us proper type and dimension
-        size = itk.size(inputImage)
-        spacing = itk.spacing(inputImage)
-        origin = itk.origin(inputImage)
-        direction = inputImage.GetDirection()
+        reader = itk.UltrasoundImageFileReader[image_type].New()
+        reader.SetFileName(inputVolume)
+        reader.Update()
+        inputImage = reader.GetOutput()
 
         # Update to correct values
-        for i, sizeI in enumerate(outputSize.split(',')):
-            size[i] = int(sizeI)
+        spacing = itk.Spacing[Dimension]()
         for i, spacingI in enumerate(outputSpacing.split(',')):
             spacing[i] = float(spacingI)
-        origin[0] = -1 * spacing[0] * size[0] / 2.0
-        origin[1] = -1 * spacing[1] * size[1] / 2.0
-        origin[2] = 0.0;
+        direction = inputImage.GetDirection()
         direction.SetIdentity()
+
+        # TODO: determine output image size and origin
+        size = itk.Size[Dimension]()
+        size[0] = 64
+        size[1] = 64
+        size[2] = 64
+
+        origin = itk.Point[itk.D, Dimension]()
+        origin[0] = 0.0
+        origin[1] = -1 * spacing[1] * size[1] / 2.0
+        origin[2] = -1 * spacing[2] * size[2] / 2.0
+
         
         logic = ScanConvertCommonLogic()
 
