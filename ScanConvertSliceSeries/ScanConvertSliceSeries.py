@@ -105,7 +105,7 @@ class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationM
 
         # These connections ensure that whenever user changes some settings on the GUI, that is saved in the MRML scene
         # (in the selected parameter node).
-        self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
+        self.ui.inputSelector.connect("currentPathChanged(QString)", self.updateParameterNodeFromGUI)
         self.ui.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
         self.ui.azimuthAngularSeparation.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
         self.ui.elevationAngularSeparation.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
@@ -206,7 +206,7 @@ class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationM
         self._updatingGUIFromParameterNode = True
 
         # Update node selectors and sliders
-        self.ui.inputSelector.setCurrentNode(self._parameterNode.GetNodeReference("InputVolume"))
+        self.ui.inputSelector.currentPath = self._parameterNode.GetNodeReference("InputVolume")
         self.ui.outputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume"))
         self.ui.azimuthAngularSeparation.value = float(self._parameterNode.GetParameter("AzimuthAngularSeparation"))
         self.ui.elevationAngularSeparation.value = float(self._parameterNode.GetParameter("ElevationAngularSeparation"))
@@ -239,7 +239,7 @@ class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationM
 
         wasModified = self._parameterNode.StartModify()  # Modify all properties in a single batch
 
-        self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
+        self._parameterNode.SetParameter("InputVolume", self.ui.inputSelector.currentPath)
         self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
         self._parameterNode.SetParameter("AzimuthAngularSeparation", str(self.ui.azimuthAngularSeparation.value))
         self._parameterNode.SetParameter("ElevationAngularSeparation", str(self.ui.elevationAngularSeparation.value))
