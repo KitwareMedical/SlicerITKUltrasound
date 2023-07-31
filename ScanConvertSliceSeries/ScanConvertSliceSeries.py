@@ -49,13 +49,13 @@ def registerSampleData():
     """
     import SampleData
     iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons')
-    file_sha512 = "7d5e6c2b070107a279277c48ead400bab15edd7aaa1b1b2238a8437da1435c41f75c3b2323fdba17f6415d10ea37992ff053f52a5f6d7a0937f78cfaf1f3687a"
+    file_sha512 = "637863e4b552e0d58c5ee9ce1f414b3b3c89b782a29a9503c0f2eca4fc23bbbf0ad8d741b5d884400e4aed71e8f43c3881113914c6ca34a79fcdc85272066179"
     SampleData.SampleDataLogic.registerCustomSampleDataSource(
         category='ITKUltrasound',
-        sampleName='ITKUltrasoundPhasedArray3D',
-        thumbnailFileName=os.path.join(iconsPath, 'PhasedArray3D.png'),
-        uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/api/v1/file/649f0c1a93a5dcdba24e08cf/download", "https://data.kitware.com/api/v1/item/649f0c1993a5dcdba24e08ce/download",
-        fileNames='ScanConvertSliceSeriesTestInput.mha',
+        sampleName='ITKUltrasoundSliceSeries',
+        thumbnailFileName=os.path.join(iconsPath, 'TestDataThumbnail.png'),
+        uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/#item/57b5d9208d777f10f2694f80/download", "https://data.kitware.com/api/v1/file/57b5d9238d777f10f2694f8e/download",
+        fileNames='bmode_p59.hdf5',
         checksums=f'SHA512:{file_sha512}',
         nodeNames='ScanConvertSliceSeriesTestInput'
     )
@@ -410,6 +410,13 @@ class ScanConvertSliceSeriesTest(ScriptedLoadableModuleTest):
         import SampleData
         registerSampleData()
         inputVolume = SampleData.downloadSample('ITKUltrasoundPhasedArray3D')
+        # "https://data.kitware.com/api/v1/file/649f0c1a93a5dcdba24e08cf/download"
+        file_sha512 = "7d5e6c2b070107a279277c48ead400bab15edd7aaa1b1b2238a8437da1435c41f75c3b2323fdba17f6415d10ea37992ff053f52a5f6d7a0937f78cfaf1f3687a"
+        inputPath = SampleData.downloadFromURL(
+            uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/#item/57b5d9208d777f10f2694f80/download", "https://data.kitware.com/api/v1/file/57b5d9238d777f10f2694f8e/download",
+            fileNames='bmode_p59.hdf5',
+            checksums=f'SHA512:{file_sha512}',
+            loadFiles=False)[0]
         self.delayDisplay('Loaded test data set')
 
         inputScalarRange = inputVolume.GetImageData().GetScalarRange()
@@ -423,20 +430,20 @@ class ScanConvertSliceSeriesTest(ScriptedLoadableModuleTest):
         logic = ScanConvertSliceSeriesLogic()
 
         # Test nearest neighbor interpolation
-        logic.process(inputVolume, outputVolume, "0.2,0.2,0.2",
+        logic.process(inputPath, outputVolume, "1,1,1",
                       ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
         self.assertAlmostEqual(outputScalarRange[1], 202, places=0)
 
         # Test linear interpolation
-        logic.process(inputVolume, outputVolume,0.0872665, 0.0174533, 0.2, 8.0, "128,128,128", "0.2,0.2,0.2",
+        logic.process(inputPath, outputVolume, "1,1,1",
                       ScanConversionResamplingMethod.ITK_LINEAR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
         self.assertAlmostEqual(outputScalarRange[1], 199, places=0)
 
-        file_sha512 = "6e589887b660f79513d1c09479cc70bd815e532e013fcb3bb185a21c641e417210d6a8286199a265b8e6b9159254e6237108539d0c5eb865a7bedb03d64cbf50"
+        file_sha512 = "637863e4b552e0d58c5ee9ce1f414b3b3c89b782a29a9503c0f2eca4fc23bbbf0ad8d741b5d884400e4aed71e8f43c3881113914c6ca34a79fcdc85272066179"
         import SampleData
         expectedResult = SampleData.downloadFromURL(
             nodeNames='ScanConvertSliceSeriesTestOutput',
