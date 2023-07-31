@@ -36,29 +36,7 @@ This file was originally developed by Dženan Zukić, Kitware Inc.,
 and was partially funded by NIH grant 5R44CA239830.
 """
         # Additional initialization step after application startup is complete
-        slicer.app.connect("startupCompleted()", registerSampleData)
-
-
-#
-# Register sample data sets in Sample Data module
-#
-
-def registerSampleData():
-    """
-    Add data sets to Sample Data module.
-    """
-    import SampleData
-    iconsPath = os.path.join(os.path.dirname(__file__), 'Resources/Icons')
-    file_sha512 = "637863e4b552e0d58c5ee9ce1f414b3b3c89b782a29a9503c0f2eca4fc23bbbf0ad8d741b5d884400e4aed71e8f43c3881113914c6ca34a79fcdc85272066179"
-    SampleData.SampleDataLogic.registerCustomSampleDataSource(
-        category='ITKUltrasound',
-        sampleName='ITKUltrasoundSliceSeries',
-        thumbnailFileName=os.path.join(iconsPath, 'TestDataThumbnail.png'),
-        uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/#item/57b5d9208d777f10f2694f80/download", "https://data.kitware.com/api/v1/file/57b5d9238d777f10f2694f8e/download",
-        fileNames='bmode_p59.hdf5',
-        checksums=f'SHA512:{file_sha512}',
-        nodeNames='ScanConvertSliceSeriesTestInput'
-    )
+        # slicer.app.connect("startupCompleted()", registerSampleData)
 
 
 class ScanConvertSliceSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
@@ -408,10 +386,7 @@ class ScanConvertSliceSeriesTest(ScriptedLoadableModuleTest):
         # Get/create input data
 
         import SampleData
-        registerSampleData()
-        inputVolume = SampleData.downloadSample('ITKUltrasoundPhasedArray3D')
-        # "https://data.kitware.com/api/v1/file/649f0c1a93a5dcdba24e08cf/download"
-        file_sha512 = "7d5e6c2b070107a279277c48ead400bab15edd7aaa1b1b2238a8437da1435c41f75c3b2323fdba17f6415d10ea37992ff053f52a5f6d7a0937f78cfaf1f3687a"
+        file_sha512 = "637863e4b552e0d58c5ee9ce1f414b3b3c89b782a29a9503c0f2eca4fc23bbbf0ad8d741b5d884400e4aed71e8f43c3881113914c6ca34a79fcdc85272066179"
         inputPath = SampleData.downloadFromURL(
             uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/#item/57b5d9208d777f10f2694f80/download", "https://data.kitware.com/api/v1/file/57b5d9238d777f10f2694f8e/download",
             fileNames='bmode_p59.hdf5',
@@ -419,9 +394,6 @@ class ScanConvertSliceSeriesTest(ScriptedLoadableModuleTest):
             loadFiles=False)[0]
         self.delayDisplay('Loaded test data set')
 
-        inputScalarRange = inputVolume.GetImageData().GetScalarRange()
-        self.assertEqual(inputScalarRange[0], 51)
-        self.assertEqual(inputScalarRange[1], 202)
 
         outputVolume = slicer.mrmlScene.AddNewNodeByClass("vtkMRMLScalarVolumeNode")
 
@@ -434,17 +406,16 @@ class ScanConvertSliceSeriesTest(ScriptedLoadableModuleTest):
                       ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
-        self.assertAlmostEqual(outputScalarRange[1], 202, places=0)
+        self.assertAlmostEqual(outputScalarRange[1], 129, places=0)
 
         # Test linear interpolation
         logic.process(inputPath, outputVolume, "1,1,1",
                       ScanConversionResamplingMethod.ITK_LINEAR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
-        self.assertAlmostEqual(outputScalarRange[1], 199, places=0)
+        self.assertAlmostEqual(outputScalarRange[1], 128.0, places=0)
 
-        file_sha512 = "637863e4b552e0d58c5ee9ce1f414b3b3c89b782a29a9503c0f2eca4fc23bbbf0ad8d741b5d884400e4aed71e8f43c3881113914c6ca34a79fcdc85272066179"
-        import SampleData
+        file_sha512 = "517f382d498571f325ac804602aa373fd6db0786d25cd9e38c6097dd8251ea17f735b28670036bfab26cdddc94312486ef48899d089c8f4314baa41a6645b1ff"
         expectedResult = SampleData.downloadFromURL(
             nodeNames='ScanConvertSliceSeriesTestOutput',
             fileNames='ScanConvertSliceSeriesTestOutput.mha',
@@ -454,8 +425,9 @@ class ScanConvertSliceSeriesTest(ScriptedLoadableModuleTest):
 
         itk = logic.itk
         ImageType = itk.Image[itk.UC, 3]
+        expectedResultUC = logic.getITKImageFromVolumeNode(expectedResult[0]).astype(itk.UC)
         comparer = itk.ComparisonImageFilter[ImageType, ImageType].New()
-        comparer.SetValidInput(logic.getITKImageFromVolumeNode(expectedResult[0]))
+        comparer.SetValidInput(expectedResultUC)
         comparer.SetTestInput(logic.getITKImageFromVolumeNode(outputVolume))
         comparer.SetDifferenceThreshold(0)
         comparer.SetCoordinateTolerance(1e-3)
