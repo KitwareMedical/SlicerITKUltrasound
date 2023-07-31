@@ -29,7 +29,7 @@ class ScanConvertPhasedArray3D(ScriptedLoadableModule):
         self.parent.contributors = ["Dženan Zukić (Kitware Inc.)"]
         self.parent.helpText = """
 Converts ultrasound image from curvilinear coordinates into rectilinear image.
-<a href="https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/Modules/ScanConversion/CurvilinearArray.html">Filter documentation</a>.
+<a href="https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/Modules/ScanConversion/PhasedArray3D.html">Filter documentation</a>.
 """
         self.parent.acknowledgementText = """
 This file was originally developed by Dženan Zukić, Kitware Inc., 
