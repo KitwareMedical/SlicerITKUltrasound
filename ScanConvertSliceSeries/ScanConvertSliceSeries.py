@@ -272,9 +272,20 @@ class ScanConvertSliceSeriesLogic(ScanConvertCommonLogic):
         if not parameterNode.GetParameter("ResamplingMethod"):
             parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR.name))
 
+    def updateBounds(self, inputImage, index, lower, upper):
+        """Calculate the index' position within the image and update the bounds if needed."""
+        point = inputImage.TransformIndexToPhysicalPoint(index);
+        for i in range(0, len(index)):
+            if point[i] < lower[i]:
+                lower[i] = point[i]
+            if point[i] > upper[i]:
+                upper[i] = point[i]
+
+        return lower, upper
+
     def process(self,
-                inputVolume,
-                outputVolume,
+                inputPath: str,  # path to the input file on disk
+                outputVolume,  # MRML volume node
                 outputSpacing: str,  # comma-separated list of 3 floats
                 resamplingMethod: ScanConversionResamplingMethod,
                 ):
@@ -286,8 +297,8 @@ class ScanConvertSliceSeriesLogic(ScanConvertCommonLogic):
         :param outputSpacing: Spacing between voxels in each direction of the output image
         :param resamplingMethod: Scan conversion resampling method to use
         """
-        if not os.path.isfile(inputVolume):
-            raise ValueError("Input file does not exist")
+        if not os.path.isfile(inputPath):
+            raise ValueError(f"Input file {inputPath} does not exist")
         if not outputVolume:
             raise ValueError("Output volume is invalid")
 
@@ -301,28 +312,51 @@ class ScanConvertSliceSeriesLogic(ScanConvertCommonLogic):
         image_type = itk.SliceSeriesSpecialCoordinatesImage[slice_type, transform_type]
 
         reader = itk.UltrasoundImageFileReader[image_type].New()
-        reader.SetFileName(inputVolume)
+        reader.SetFileName(inputPath)
         reader.Update()
         inputImage = reader.GetOutput()
 
-        # Update to correct values
-        spacing = itk.Spacing[Dimension]()
+        # Create spacing and direction variables
+        FloatArray = itk.Point[itk.D, Dimension]
+        spacing = FloatArray()
         for i, spacingI in enumerate(outputSpacing.split(',')):
             spacing[i] = float(spacingI)
-        direction = inputImage.GetDirection()
+
+        direction = itk.Matrix[itk.D, Dimension, Dimension]()
         direction.SetIdentity()
 
-        # TODO: determine output image size and origin
+        # Compute upper and lower bounds of the output image
+        inputSize = inputImage.GetLargestPossibleRegion().GetSize()
+        lowerBound = FloatArray()
+        upperBound = FloatArray()
+
+        sliceStride = 4
+        indices = list(range(0, inputSize[2], sliceStride))  # Only sample with some of the slices
+        if inputSize[2] % sliceStride != 1:
+            indices.append(inputSize[2] - 1)
+
+        for i in indices:
+            inputIndex = itk.Index[Dimension]()
+            inputIndex[2] = i
+
+            inputIndex[0] = 0
+            inputIndex[1] = 0
+            self.updateBounds(inputImage, inputIndex, lowerBound, upperBound)
+            inputIndex[0] = inputSize[0] - 1
+            inputIndex[1] = 0
+            self.updateBounds(inputImage, inputIndex, lowerBound, upperBound)
+            inputIndex[0] = 0
+            inputIndex[1] = inputSize[1] - 1
+            self.updateBounds(inputImage, inputIndex, lowerBound, upperBound)
+            inputIndex[0] = inputSize[0] - 1
+            inputIndex[1] = inputSize[1] - 1
+            self.updateBounds(inputImage, inputIndex, lowerBound, upperBound)
+
+        # Determine output image size and origin
         size = itk.Size[Dimension]()
-        size[0] = 64
-        size[1] = 64
-        size[2] = 64
-
-        origin = itk.Point[itk.D, Dimension]()
-        origin[0] = 0.0
-        origin[1] = -1 * spacing[1] * size[1] / 2.0
-        origin[2] = -1 * spacing[2] * size[2] / 2.0
-
+        for d in range(Dimension):
+            size[d] = int(( upperBound[d] - lowerBound[d] ) / spacing[d] + 1)
+        origin = lowerBound
         
         logic = ScanConvertCommonLogic()
 
@@ -389,7 +423,7 @@ class ScanConvertSliceSeriesTest(ScriptedLoadableModuleTest):
         logic = ScanConvertSliceSeriesLogic()
 
         # Test nearest neighbor interpolation
-        logic.process(inputVolume, outputVolume,0.0872665, 0.0174533, 0.2, 8.0, "128,128,128", "0.2,0.2,0.2",
+        logic.process(inputVolume, outputVolume, "0.2,0.2,0.2",
                       ScanConversionResamplingMethod.ITK_NEAREST_NEIGHBOR)
         outputScalarRange = outputVolume.GetImageData().GetScalarRange()
         self.assertAlmostEqual(outputScalarRange[0], 0, places=5)
