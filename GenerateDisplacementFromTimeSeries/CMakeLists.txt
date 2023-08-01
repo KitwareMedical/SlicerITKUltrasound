@@ -1,53 +1,31 @@
+#-----------------------------------------------------------------------------
+set(MODULE_NAME BModeFromRF)
 
 #-----------------------------------------------------------------------------
-set(MODULE_NAME GenerateDisplacementFromTimeSeries)
-
-#-----------------------------------------------------------------------------
-
-#
-# SlicerExecutionModel
-#
-find_package(SlicerExecutionModel REQUIRED)
-include(${SlicerExecutionModel_USE_FILE})
-
-#
-# ITK
-#
-set(${PROJECT_NAME}_ITK_COMPONENTS
-  ITKIOImageBase
-  Ultrasound
-  Strain
-  )
-if(NOT DEFINED Slicer_DIR)
-  list(APPEND ${PROJECT_NAME}_ITK_COMPONENTS ITKImageIO)
-endif()
-find_package(ITK 4.9 COMPONENTS ${${PROJECT_NAME}_ITK_COMPONENTS} REQUIRED)
-if(DEFINED Slicer_DIR)
-  set(ITK_NO_IO_FACTORY_REGISTER_MANAGER 1) # See Libs/ITKFactoryRegistration/CMakeLists.txt
-endif()
-include(${ITK_USE_FILE})
-
-#-----------------------------------------------------------------------------
-set(MODULE_INCLUDE_DIRECTORIES
-  ${CMAKE_CURRENT_SOURCE_DIR}/../include
+set(MODULE_PYTHON_SCRIPTS
+  ${MODULE_NAME}.py
   )
 
-set(MODULE_SRCS
-  )
-
-set(MODULE_TARGET_LIBRARIES
-  ${ITK_LIBRARIES}
+set(MODULE_PYTHON_RESOURCES
+  Resources/Icons/${MODULE_NAME}.png
+  Resources/UI/${MODULE_NAME}.ui
   )
 
 #-----------------------------------------------------------------------------
-SEMMacroBuildCLI(
+slicerMacroBuildScriptedModule(
   NAME ${MODULE_NAME}
-  TARGET_LIBRARIES ${MODULE_TARGET_LIBRARIES}
-  INCLUDE_DIRECTORIES ${MODULE_INCLUDE_DIRECTORIES}
-  ADDITIONAL_SRCS ${MODULE_SRCS}
+  SCRIPTS ${MODULE_PYTHON_SCRIPTS}
+  RESOURCES ${MODULE_PYTHON_RESOURCES}
+  WITH_GENERIC_TESTS
   )
 
 #-----------------------------------------------------------------------------
 if(BUILD_TESTING)
+
+  # Register the unittest subclass in the main script as a ctest.
+  # Note that the test will also be available at runtime.
+  slicer_add_python_unittest(SCRIPT ${MODULE_NAME}.py)
+
+  # Additional build-time testing
   add_subdirectory(Testing)
 endif()
