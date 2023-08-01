@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-set(MODULE_NAME BModeFromRF)
+set(MODULE_NAME DisplacementFromTimeSeries)
 
 #-----------------------------------------------------------------------------
 set(MODULE_PYTHON_SCRIPTS

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>BModeFromRF</class>
- <widget class="qMRMLWidget" name="BModeFromRF">
+ <class>DisplacementFromTimeSeries</class>
+ <widget class="qMRMLWidget" name="DisplacementFromTimeSeries">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -172,7 +172,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>BModeFromRF</sender>
+   <sender>DisplacementFromTimeSeries</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>inputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
@@ -188,7 +188,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>BModeFromRF</sender>
+   <sender>DisplacementFromTimeSeries</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>outputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>

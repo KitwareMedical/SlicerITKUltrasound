@@ -41,7 +41,7 @@ endif()
 #-----------------------------------------------------------------------------
 # Extension modules
 add_subdirectory(ApplyButterworthHighpass1D)
-add_subdirectory(GenerateDisplacementFromTimeSeries)
+add_subdirectory(DisplacementFromTimeSeries)
 add_subdirectory(GenerateDisplacementFromFrames)
 add_subdirectory(ScanConvertPhasedArray3D)
 add_subdirectory(ScanConvertCurvilinearArray)

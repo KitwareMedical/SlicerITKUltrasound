@@ -12,7 +12,7 @@ from slicer.util import VTKObservationMixin
 from ITKUltrasoundCommon import ITKUltrasoundCommonLogic
 
 
-class BModeFromRF(ScriptedLoadableModule):
+class DisplacementFromTimeSeries(ScriptedLoadableModule):
     """Uses ScriptedLoadableModule base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
     """
@@ -57,7 +57,7 @@ def registerSampleData():
     )
 
 
-class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
+class DisplacementFromTimeSeriesWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """Uses ScriptedLoadableModuleWidget base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
     """
@@ -80,7 +80,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # Load widget from .ui file (created by Qt Designer).
         # Additional widgets can be instantiated manually and added to self.layout.
-        uiWidget = slicer.util.loadUI(self.resourcePath('UI/BModeFromRF.ui'))
+        uiWidget = slicer.util.loadUI(self.resourcePath('UI/DisplacementFromTimeSeries.ui'))
         self.layout.addWidget(uiWidget)
         self.ui = slicer.util.childWidgetVariables(uiWidget)
 
@@ -91,7 +91,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
 
         # Create logic class. Logic implements all computations that should be possible to run
         # in batch mode, without a graphical user interface.
-        self.logic = BModeFromRFLogic()
+        self.logic = DisplacementFromTimeSeriesLogic()
 
         # Connections
 
@@ -239,7 +239,7 @@ class BModeFromRFWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
                                self.ui.axisOfPropagationComboBox.currentIndex)
 
 
-class BModeFromRFLogic(ITKUltrasoundCommonLogic):
+class DisplacementFromTimeSeriesLogic(ITKUltrasoundCommonLogic):
     """This class should implement all the actual
     computation done by your module.  The interface
     should be such that other python code can import
@@ -291,7 +291,7 @@ class BModeFromRFLogic(ITKUltrasoundCommonLogic):
         logging.info('GUI updated with results')
 
 
-class BModeFromRFTest(ScriptedLoadableModuleTest):
+class DisplacementFromTimeSeriesTest(ScriptedLoadableModuleTest):
     """
     This is the test case for your scripted module.
     Uses ScriptedLoadableModuleTest base class, available at:
@@ -307,9 +307,9 @@ class BModeFromRFTest(ScriptedLoadableModuleTest):
         """Run as few or as many tests as needed here.
         """
         self.setUp()
-        self.test_BModeFromRF1()
+        self.test_DisplacementFromTimeSeries1()
 
-    def test_BModeFromRF1(self):
+    def test_DisplacementFromTimeSeries1(self):
         """
         One of the most important features of the tests is that it should alert other
         developers when their changes will have an impact on the behavior of your
@@ -334,7 +334,7 @@ class BModeFromRFTest(ScriptedLoadableModuleTest):
 
         # Test the module logic
 
-        logic = BModeFromRFLogic()
+        logic = DisplacementFromTimeSeriesLogic()
 
         # Test algorithm with axis of propagation: 2
         logic.process(inputVolume, outputVolume, 2)
@@ -357,8 +357,8 @@ class BModeFromRFTest(ScriptedLoadableModuleTest):
         file_sha512 = "27998dfea16be10830384536f021f42f96c3f7095c9e5a1e983a10c37d4eddea514b45f217234eeccf062e9bdd0f811c49698658689e62924f6f96c0173f3176"
         import SampleData
         expectedResult = SampleData.downloadFromURL(
-            nodeNames='BModeFromRFTestOutput',
-            fileNames='GenerateBModeFromRFTestOutput.mha',
+            nodeNames='DisplacementFromTimeSeriesTestOutput',
+            fileNames='GenerateDisplacementFromTimeSeriesTestOutput.mha',
             uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",
             checksums=f'SHA512:{file_sha512}',
             loadFiles=True)
