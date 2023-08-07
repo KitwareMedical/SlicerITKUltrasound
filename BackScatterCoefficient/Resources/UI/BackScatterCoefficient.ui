@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>373</width>
-    <height>371</height>
+    <height>335</height>
    </rect>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
@@ -20,14 +20,14 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label">
         <property name="text">
-         <string>Curvilinear image:</string>
+         <string>Frequency image:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
        <widget class="qMRMLNodeComboBox" name="inputSelector">
         <property name="toolTip">
-         <string>Curvilinear array image.</string>
+         <string>Multi-component frequency image.</string>
         </property>
         <property name="nodeTypes">
          <stringlist notr="true">
@@ -48,153 +48,70 @@
       <item row="1" column="0">
        <widget class="QLabel" name="label_1">
         <property name="text">
-         <string>Lateral Angular Separation:</string>
+         <string>Sampling Frequency (MHz):</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="ctkDoubleSpinBox" name="lateralAngularSeparation">
+       <widget class="ctkDoubleSpinBox" name="samplingFrequency">
         <property name="toolTip">
-         <string>The number of radians between each lateral unit.</string>
+         <string>Ultrasound sampling frequency in megahertz.</string>
         </property>
         <property name="decimals">
-         <number>8</number>
+         <number>2</number>
         </property>
         <property name="singleStep">
-         <double>0.001000000000000</double>
+         <double>1.000000000000000</double>
         </property>
         <property name="value">
-         <double>0.017453292519943</double>
+         <double>60.000000000000000</double>
         </property>
        </widget>
       </item>
       <item row="2" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Radius Sample Size:</string>
+         <string>Frequency Band Start (MHz):</string>
         </property>
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="ctkDoubleSpinBox" name="radiusSampleSize">
+       <widget class="ctkDoubleSpinBox" name="frequencyBandStart">
         <property name="toolTip">
-         <string>The number of Cartesian units between each unit along the R.</string>
+         <string>Ignore data for frequencies below this.</string>
         </property>
         <property name="decimals">
-         <number>8</number>
+         <number>2</number>
         </property>
         <property name="singleStep">
-         <double>0.010000000000000</double>
+         <double>1.000000000000000</double>
         </property>
         <property name="value">
-         <double>1.000000000000000</double>
+         <double>5.000000000000000</double>
         </property>
        </widget>
       </item>
       <item row="3" column="0">
        <widget class="QLabel" name="label_3">
         <property name="text">
-         <string>First Sample Distance:</string>
+         <string>Frequency Band End (MHz):</string>
         </property>
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="ctkDoubleSpinBox" name="firstSampleDistance">
+       <widget class="ctkDoubleSpinBox" name="frequencyBandEnd">
         <property name="toolTip">
-         <string>The distance to add to the radius.</string>
+         <string>Ignore data for frequencies above this.</string>
         </property>
         <property name="decimals">
          <number>2</number>
         </property>
         <property name="singleStep">
-         <double>0.100000000000000</double>
-        </property>
-        <property name="value">
          <double>1.000000000000000</double>
         </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
-       <widget class="QLabel" name="label_4">
-        <property name="text">
-         <string>Output Size:</string>
+        <property name="value">
+         <double>20.000000000000000</double>
         </property>
-       </widget>
-      </item>
-      <item row="4" column="1">
-       <widget class="ctkCoordinatesWidget" name="outputSize">
-        <property name="toolTip">
-         <string>Number of voxels in each direction of the output image.</string>
-        </property>
-        <property name="decimals">
-         <number>0</number>
-        </property>
-        <property name="coordinates" stdset="0">
-         <string>128,128,128</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="label_5">
-        <property name="text">
-         <string>Output Spacing:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="5" column="1">
-       <widget class="ctkCoordinatesWidget" name="outputSpacing">
-        <property name="toolTip">
-         <string>Spacing between voxels in each direction of the output image.</string>
-        </property>
-        <property name="decimals">
-         <number>4</number>
-        </property>
-        <property name="singleStep">
-         <double>0.010000000000000</double>
-        </property>
-        <property name="coordinates" stdset="0">
-         <string>0.2,0.2,0.2</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="0">
-       <widget class="QLabel" name="label_6">
-        <property name="text">
-         <string>Resampling Method:</string>
-        </property>
-       </widget>
-      </item>
-      <item row="6" column="1">
-       <widget class="ctkComboBox" name="resamplingMethod">
-        <property name="toolTip">
-         <string>Scan conversion resampling method.</string>
-        </property>
-        <property name="currentText">
-         <string>Linear</string>
-        </property>
-        <property name="currentIndex">
-         <number>1</number>
-        </property>
-        <item>
-         <property name="text">
-          <string>Nearest Neighbor</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Linear</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Gaussian</string>
-         </property>
-        </item>
-        <item>
-         <property name="text">
-          <string>Windowed Sinc</string>
-         </property>
-        </item>
        </widget>
       </item>
      </layout>
@@ -209,14 +126,77 @@
       <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Rectilinear image:</string>
+         <string>Average image:</string>
         </property>
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="qMRMLNodeComboBox" name="outputSelector">
+       <widget class="qMRMLNodeComboBox" name="outputSelector0">
         <property name="toolTip">
-         <string>Standard rectilinear image.</string>
+         <string>Average of intensities of selected frequency components.</string>
+        </property>
+        <property name="nodeTypes">
+         <stringlist notr="true">
+          <string>vtkMRMLScalarVolumeNode</string>
+         </stringlist>
+        </property>
+        <property name="showChildNodeTypes">
+         <bool>false</bool>
+        </property>
+        <property name="noneEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="addEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="removeEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="olabel_1">
+        <property name="text">
+         <string>Slope image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="qMRMLNodeComboBox" name="outputSelector1">
+        <property name="toolTip">
+         <string>Negative slope of a line fit to the selected frequency components.
+The slope is negated because it is expected to be mostly negative.</string>
+        </property>
+        <property name="nodeTypes">
+         <stringlist notr="true">
+          <string>vtkMRMLScalarVolumeNode</string>
+         </stringlist>
+        </property>
+        <property name="showChildNodeTypes">
+         <bool>false</bool>
+        </property>
+        <property name="noneEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="addEnabled">
+         <bool>true</bool>
+        </property>
+        <property name="removeEnabled">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="olabel_2">
+        <property name="text">
+         <string>Intercept image:</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="qMRMLNodeComboBox" name="outputSelector2">
+        <property name="toolTip">
+         <string>Intercept of a line fit to the selected frequency components.</string>
         </property>
         <property name="nodeTypes">
          <stringlist notr="true">
@@ -276,16 +256,6 @@
    <container>1</container>
   </customwidget>
   <customwidget>
-   <class>ctkComboBox</class>
-   <extends>QComboBox</extends>
-   <header>ctkComboBox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>ctkCoordinatesWidget</class>
-   <extends>QWidget</extends>
-   <header>ctkCoordinatesWidget.h</header>
-  </customwidget>
-  <customwidget>
    <class>ctkDoubleSpinBox</class>
    <extends>QWidget</extends>
    <header>ctkDoubleSpinBox.h</header>
@@ -323,7 +293,7 @@
   <connection>
    <sender>BackScatterCoefficient</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
-   <receiver>outputSelector</receiver>
+   <receiver>outputSelector0</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
    <hints>
     <hint type="sourcelabel">
@@ -333,6 +303,38 @@
     <hint type="destinationlabel">
      <x>220</x>
      <y>161</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>BackScatterCoefficient</sender>
+   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
+   <receiver>outputSelector1</receiver>
+   <slot>setMRMLScene(vtkMRMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>186</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>229</x>
+     <y>223</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>BackScatterCoefficient</sender>
+   <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
+   <receiver>outputSelector2</receiver>
+   <slot>setMRMLScene(vtkMRMLScene*)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>186</x>
+     <y>185</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>229</x>
+     <y>249</y>
     </hint>
    </hints>
   </connection>

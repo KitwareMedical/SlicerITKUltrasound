@@ -13,7 +13,6 @@ import slicer
 from slicer.ScriptedLoadableModule import *
 from slicer.util import VTKObservationMixin
 from ITKUltrasoundCommon import ITKUltrasoundCommonLogic
-from ScanConvertCommon import ScanConvertCommonLogic, ScanConversionResamplingMethod
 
 
 class BackScatterCoefficient(ScriptedLoadableModule):
@@ -25,12 +24,9 @@ class BackScatterCoefficient(ScriptedLoadableModule):
         ScriptedLoadableModule.__init__(self, parent)
         self.parent.title = "BackScatterCoefficient"
         self.parent.categories = ["Ultrasound"]
-        self.parent.dependencies = ["ITKUltrasoundCommon", "ScanConvertCommon"]
+        self.parent.dependencies = ["ITKUltrasoundCommon"]
         self.parent.contributors = ["Dženan Zukić (Kitware Inc.)"]
-        self.parent.helpText = """
-Converts ultrasound image from curvilinear coordinates into rectilinear image.
-<a href="https://kitwaremedical.github.io/SlicerITKUltrasoundDoc/Modules/ScanConversion/CurvilinearArray.html">Filter documentation</a>.
-"""
+        self.parent.helpText = """Estimates Back-Scatter Coefficient (BSC) from a multi-component frequency image."""
         self.parent.acknowledgementText = """
 This file was originally developed by Dženan Zukić, Kitware Inc., 
 and was partially funded by NIH grant 5R44CA239830.
@@ -106,13 +102,12 @@ class BackScatterCoefficientWidget(ScriptedLoadableModuleWidget, VTKObservationM
         # These connections ensure that whenever user changes some settings on the GUI, that is saved in the MRML scene
         # (in the selected parameter node).
         self.ui.inputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
-        self.ui.outputSelector.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
-        self.ui.lateralAngularSeparation.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
-        self.ui.radiusSampleSize.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
-        self.ui.firstSampleDistance.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
-        self.ui.outputSize.connect("coordinatesChanged(double*)", self.updateParameterNodeFromGUI)
-        self.ui.outputSpacing.connect("coordinatesChanged(double*)", self.updateParameterNodeFromGUI)
-        self.ui.resamplingMethod.connect("currentIndexChanged(int)", self.updateParameterNodeFromGUI)
+        self.ui.outputSelector0.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
+        self.ui.outputSelector1.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
+        self.ui.outputSelector2.connect("currentNodeChanged(vtkMRMLNode*)", self.updateParameterNodeFromGUI)
+        self.ui.samplingFrequency.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
+        self.ui.frequencyBandStart.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
+        self.ui.frequencyBandEnd.connect("valueChanged(double)", self.updateParameterNodeFromGUI)
 
 
         # Buttons
@@ -206,21 +201,29 @@ class BackScatterCoefficientWidget(ScriptedLoadableModuleWidget, VTKObservationM
 
         # Update node selectors and sliders
         self.ui.inputSelector.setCurrentNode(self._parameterNode.GetNodeReference("InputVolume"))
-        self.ui.outputSelector.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume"))
-        self.ui.lateralAngularSeparation.value = float(self._parameterNode.GetParameter("LateralAngularSeparation"))
-        self.ui.radiusSampleSize.value = float(self._parameterNode.GetParameter("RadiusSampleSize"))
-        self.ui.firstSampleDistance.value = float(self._parameterNode.GetParameter("FirstSampleDistance"))
-        self.ui.outputSize.coordinates = self._parameterNode.GetParameter("OutputSize")
-        self.ui.outputSpacing.coordinates = self._parameterNode.GetParameter("OutputSpacing")
-        strMethod = self._parameterNode.GetParameter("ResamplingMethod")
-        self.ui.resamplingMethod.currentIndex = ScanConversionResamplingMethod[strMethod].value
+        self.ui.outputSelector0.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume0"))
+        self.ui.outputSelector1.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume1"))
+        self.ui.outputSelector2.setCurrentNode(self._parameterNode.GetNodeReference("OutputVolume2"))
+        self.ui.samplingFrequency.value = float(self._parameterNode.GetParameter("SamplingFrequency"))
+        self.ui.frequencyBandStart.value = float(self._parameterNode.GetParameter("FrequencyBandStart"))
+        self.ui.frequencyBandEnd.value = float(self._parameterNode.GetParameter("FrequencyBandEnd"))
 
         # Update buttons states and tooltips
-        if self._parameterNode.GetNodeReference("InputVolume") and self._parameterNode.GetNodeReference("OutputVolume"):
+        inputIsSet=False
+        if self._parameterNode.GetNodeReference("InputVolume"):
+            inputIsSet=True
+        outputIsSet=False
+        if self._parameterNode.GetNodeReference("OutputVolume0"):
+            outputIsSet=True
+        if self._parameterNode.GetNodeReference("OutputVolume1"):
+            outputIsSet=True
+        if self._parameterNode.GetNodeReference("OutputVolume2"):
+            outputIsSet=True
+        if inputIsSet and outputIsSet:
             self.ui.applyButton.toolTip = "Run conversion"
             self.ui.applyButton.enabled = True
         else:
-            self.ui.applyButton.toolTip = "Select input and output volume nodes"
+            self.ui.applyButton.toolTip = "Select input node and at least one output volume node"
             self.ui.applyButton.enabled = False
 
         # All the GUI updates are done
@@ -238,14 +241,12 @@ class BackScatterCoefficientWidget(ScriptedLoadableModuleWidget, VTKObservationM
         wasModified = self._parameterNode.StartModify()  # Modify all properties in a single batch
 
         self._parameterNode.SetNodeReferenceID("InputVolume", self.ui.inputSelector.currentNodeID)
-        self._parameterNode.SetNodeReferenceID("OutputVolume", self.ui.outputSelector.currentNodeID)
-        self._parameterNode.SetParameter("LateralAngularSeparation", str(self.ui.lateralAngularSeparation.value))
-        self._parameterNode.SetParameter("RadiusSampleSize", str(self.ui.radiusSampleSize.value))
-        self._parameterNode.SetParameter("FirstSampleDistance", str(self.ui.firstSampleDistance.value))
-        self._parameterNode.SetParameter("OutputSize", self.ui.outputSize.coordinates)
-        self._parameterNode.SetParameter("OutputSpacing", self.ui.outputSpacing.coordinates)
-        eMethod = ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex)
-        self._parameterNode.SetParameter("ResamplingMethod", str(eMethod.name))
+        self._parameterNode.SetNodeReferenceID("OutputVolume0", self.ui.outputSelector0.currentNodeID)
+        self._parameterNode.SetNodeReferenceID("OutputVolume1", self.ui.outputSelector1.currentNodeID)
+        self._parameterNode.SetNodeReferenceID("OutputVolume2", self.ui.outputSelector2.currentNodeID)
+        self._parameterNode.SetParameter("LateralAngularSeparation", str(self.ui.samplingFrequency.value))
+        self._parameterNode.SetParameter("FrequencyBandStart", str(self.ui.frequencyBandStart.value))
+        self._parameterNode.SetParameter("FrequencyBandEnd", str(self.ui.frequencyBandEnd.value))
 
         self._parameterNode.EndModify(wasModified)
 
@@ -258,17 +259,16 @@ class BackScatterCoefficientWidget(ScriptedLoadableModuleWidget, VTKObservationM
             # Compute output
             self.logic.process(
                 self.ui.inputSelector.currentNode(),
-                self.ui.outputSelector.currentNode(),
-                self.ui.lateralAngularSeparation.value,
-                self.ui.radiusSampleSize.value,
-                self.ui.firstSampleDistance.value,
-                self.ui.outputSize.coordinates,
-                self.ui.outputSpacing.coordinates,
-                ScanConversionResamplingMethod(self.ui.resamplingMethod.currentIndex),
+                self.ui.outputSelector0.currentNode(),
+                self.ui.outputSelector1.currentNode(),
+                self.ui.outputSelector2.currentNode(),
+                self.ui.samplingFrequency.value,
+                self.ui.frequencyBandStart.value,
+                self.ui.frequencyBandEnd.value,
                 )
 
 
-class BackScatterCoefficientLogic(ScanConvertCommonLogic):
+class BackScatterCoefficientLogic(ITKUltrasoundCommonLogic):
     """This class should implement all the actual
     computation done by your module.  The interface
     should be such that other python code can import
@@ -288,90 +288,65 @@ class BackScatterCoefficientLogic(ScanConvertCommonLogic):
         """
         Initialize parameter node with default settings.
         """
-        if not parameterNode.GetParameter("LateralAngularSeparation"):
-            parameterNode.SetParameter("LateralAngularSeparation", "0.017453292519943")
-        if not parameterNode.GetParameter("RadiusSampleSize"):
-            parameterNode.SetParameter("RadiusSampleSize", "1.0")
-        if not parameterNode.GetParameter("FirstSampleDistance"):
-            parameterNode.SetParameter("FirstSampleDistance", "1.0")
-        if not parameterNode.GetParameter("OutputSize"):
-            parameterNode.SetParameter("OutputSize", "128,128,128")
-        if not parameterNode.GetParameter("OutputSpacing"):
-            parameterNode.SetParameter("OutputSpacing", "0.2,0.2,0.2")
-        if not parameterNode.GetParameter("ResamplingMethod"):
-            parameterNode.SetParameter("ResamplingMethod", str(ScanConversionResamplingMethod.ITK_LINEAR.name))
+        if not parameterNode.GetParameter("SamplingFrequency"):
+            parameterNode.SetParameter("SamplingFrequency", "60.00")
+        if not parameterNode.GetParameter("FrequencyBandStart"):
+            parameterNode.SetParameter("FrequencyBandStart", "5.00")
+        if not parameterNode.GetParameter("FrequencyBandEnd"):
+            parameterNode.SetParameter("FrequencyBandEnd", "20.00")
 
     def process(self,
                 inputVolume,
-                outputVolume,
-                lateralAngularSeparation: float,
-                radiusSampleSize: float,
-                firstSampleDistance: float,
-                outputSize: str,  # comma-separated list of 3 integers
-                outputSpacing: str,  # comma-separated list of 3 floats
-                resamplingMethod: ScanConversionResamplingMethod,
+                averageOutput,
+                slopeOutput,
+                interceptOutput,
+                samplingFrequency: float,
+                frequencyBandStart: float,
+                frequencyBandEnd: float,
                 ):
         """
         Run the processing algorithm.
         Can be used without GUI widget.
-        :param inputVolume: curvilinear volume to be converted
-        :param outputVolume: rectilinear conversion result
-        :param lateralAngularSeparation: angular separation between samples in the lateral direction
-        :param radiusSampleSize: distance between samples in the radial direction
-        :param firstSampleDistance: distance from the center of the transducer to the first sample
-        :param outputSize: Number of voxels in each direction of the output image
-        :param outputSpacing: Spacing between voxels in each direction of the output image
-        :param resamplingMethod: Scan conversion resampling method to use
+        :param inputVolume: multi-component frequency image
+        :param averageOutput: average of intensities of selected frequency components
+        :param slopeOutput: negative slope of a line fit to the selected frequency components
+        :param interceptOutput: intercept of a line fit to the selected frequency components
+        :param samplingFrequency: angular separation between samples in the lateral direction
+        :param frequencyBandStart: distance between samples in the radial direction
+        :param frequencyBandEnd: distance from the center of the transducer to the first sample
         """
-        if not inputVolume or not outputVolume:
-            raise ValueError("Input or output volume is invalid")
+        if not inputVolume:
+            raise ValueError("Input volume is invalid")
+        if not averageOutput and not slopeOutput and not interceptOutput:
+            raise ValueError("At least one output volume must be provided")
 
         logging.info('Instantiating the filter')
         itk = self.itk
         itkImage = self.getITKImageFromVolumeNode(inputVolume)
         PixelType = itk.template(itkImage)[1][0]
         Dimension = itkImage.GetImageDimension()
-        CurvilinearType = itk.CurvilinearArraySpecialCoordinatesImage[PixelType, Dimension]
-        inputImage = CurvilinearType.New()
-        inputImage.SetRegions(itkImage.GetLargestPossibleRegion())
-        inputImage.SetPixelContainer(itkImage.GetPixelContainer())
+        logging.info(f"Dimension: {Dimension}, PixelType: {PixelType}")
 
-        inputImage.SetLateralAngularSeparation( lateralAngularSeparation );
-        inputImage.SetRadiusSampleSize( radiusSampleSize );
-        inputImage.SetFirstSampleDistance( firstSampleDistance );
-
-        # Initializing these from the input image gives us proper type and dimension
-        size = itk.size(inputImage)
-        spacing = itk.spacing(inputImage)
-        origin = itk.origin(inputImage)
-        direction = inputImage.GetDirection()
-
-        # Update to correct values
-        for i, sizeI in enumerate(outputSize.split(',')):
-            size[i]=int(sizeI)
-        for i, spacingI in enumerate(outputSpacing.split(',')):
-            spacing[i]=float(spacingI)
-        origin[0] = size[0] * spacing[0] / -2.0;
-        origin[1] = firstSampleDistance * math.cos( (inputImage.GetLargestPossibleRegion().GetSize()[1] - 1) / 2.0 * lateralAngularSeparation )
-        origin[2] = inputImage.GetOrigin()[2];
-        direction.SetIdentity()
-        
-        logic = ScanConvertCommonLogic()
+        bsc_filter = itk.BackscatterImageFilter.New(itkImage)
+        bsc_filter.SetSamplingFrequencyMHz(samplingFrequency)
+        bsc_filter.SetFrequencyBandStartMHz(frequencyBandStart)
+        bsc_filter.SetFrequencyBandEndMHz(frequencyBandEnd)
 
         logging.info('Processing started')
         startTime = time.time()
-        result = logic.ScanConversionResampling(
-            inputImage,
-            size,
-            spacing,
-            origin,
-            direction,
-            resamplingMethod
-            )
+        bsc_filter.Update()
         stopTime = time.time()
         logging.info(f'Processing completed in {stopTime-startTime:.2f} seconds')
 
-        self.setITKImageToVolumeNode(result, outputVolume)
+        if averageOutput:
+            result = bsc_filter.GetOutput(0)
+            self.setITKImageToVolumeNode(result, averageOutput)
+        if slopeOutput:
+            result = bsc_filter.GetOutput(1)
+            self.setITKImageToVolumeNode(result, slopeOutput)
+        if interceptOutput:
+            result = bsc_filter.GetOutput(2)
+            self.setITKImageToVolumeNode(result, interceptOutput)
         logging.info('GUI updated with results')
 
 

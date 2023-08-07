@@ -184,7 +184,7 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         origin, spacing, directionTuple = self.get_itk_metadata_from_ras_affine(rasAffine)
         itkImage.SetOrigin(origin)
         itkImage.SetSpacing(spacing)
-        directionMatrix = np.asarray(directionTuple).reshape((itkImage.ndim, itkImage.ndim))
+        directionMatrix = np.asarray(directionTuple).reshape((3, 3))
         itkImage.SetDirection(self.itk.matrix_from_array(directionMatrix))
 
         return itkImage
