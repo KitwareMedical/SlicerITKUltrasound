@@ -84,6 +84,42 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         logging.info(f'ITK {itk.__version__} installed correctly')
         return itk
 
+    @property
+    def monai(self):
+        if self._monai is None:
+            logging.info('Importing monai...')
+            self._monai = self.importMONAI()
+        return self._monai
+
+    def importMONAI(self, confirmInstallation=True):
+        try:
+            import monai
+        except ModuleNotFoundError:
+            with self.showWaitCursor(), slicer.util.displayPythonShell():
+                monai = self.installMONAI(confirmInstallation)
+        logging.info(f'MONAI {monai.__version__} imported correctly')
+        return monai
+
+    @staticmethod
+    def installMONAI(confirm=True):
+        try:
+            import torch
+        except ModuleNotFoundError:
+            slicer.util.errorDisplay(
+            'Please install PyTorch first. That will ensure correct version will provide optimal performance.'
+            )
+            return None
+        if confirm and not slicer.app.commandOptions().testingEnabled:
+            install = slicer.util.confirmOkCancelDisplay(
+            'MONAI will be downloaded and installed now. The process might take a minute.'
+            )
+            if not install:
+                logging.info('Installation of MONAI aborted by the user')
+                return None
+        slicer.util.pip_install('monai>=1.2.0')
+        import monai
+        logging.info(f'MONAI {monai.__version__} installed correctly')
+        return monai
 
     @contextmanager
     def showWaitCursor(self, show=True):
