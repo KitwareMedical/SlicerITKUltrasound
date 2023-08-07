@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ScanConvertCurvilinearArray</class>
- <widget class="qMRMLWidget" name="ScanConvertCurvilinearArray">
+ <class>BackScatterCoefficient</class>
+ <widget class="qMRMLWidget" name="BackScatterCoefficient">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -305,7 +305,7 @@
  <resources/>
  <connections>
   <connection>
-   <sender>ScanConvertCurvilinearArray</sender>
+   <sender>BackScatterCoefficient</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>inputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>
@@ -321,7 +321,7 @@
    </hints>
   </connection>
   <connection>
-   <sender>ScanConvertCurvilinearArray</sender>
+   <sender>BackScatterCoefficient</sender>
    <signal>mrmlSceneChanged(vtkMRMLScene*)</signal>
    <receiver>outputSelector</receiver>
    <slot>setMRMLScene(vtkMRMLScene*)</slot>

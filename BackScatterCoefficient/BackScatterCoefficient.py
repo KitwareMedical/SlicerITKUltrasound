@@ -16,14 +16,14 @@ from ITKUltrasoundCommon import ITKUltrasoundCommonLogic
 from ScanConvertCommon import ScanConvertCommonLogic, ScanConversionResamplingMethod
 
 
-class ScanConvertCurvilinearArray(ScriptedLoadableModule):
+class BackScatterCoefficient(ScriptedLoadableModule):
     """Uses ScriptedLoadableModule base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
     """
 
     def __init__(self, parent):
         ScriptedLoadableModule.__init__(self, parent)
-        self.parent.title = "ScanConvertCurvilinearArray"
+        self.parent.title = "BackScatterCoefficient"
         self.parent.categories = ["Ultrasound"]
         self.parent.dependencies = ["ITKUltrasoundCommon", "ScanConvertCommon"]
         self.parent.contributors = ["Dženan Zukić (Kitware Inc.)"]
@@ -55,13 +55,13 @@ def registerSampleData():
         sampleName='ITKUltrasoundCurvilinearImage',
         thumbnailFileName=os.path.join(iconsPath, 'Curvilinear.png'),
         uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",  # "https://data.kitware.com/api/v1/file/64418c2dcffd1a074ef045a3/download", "https://data.kitware.com/api/v1/item/64418c2dcffd1a074ef045a2/download",
-        fileNames='ScanConvertCurvilinearArrayTestInput.mha',
+        fileNames='BackScatterCoefficientTestInput.mha',
         checksums=f'SHA512:{file_sha512}',
-        nodeNames='ScanConvertCurvilinearArrayTestInput'
+        nodeNames='BackScatterCoefficientTestInput'
     )
 
 
-class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
+class BackScatterCoefficientWidget(ScriptedLoadableModuleWidget, VTKObservationMixin):
     """Uses ScriptedLoadableModuleWidget base class, available at:
     https://github.com/Slicer/Slicer/blob/main/Base/Python/slicer/ScriptedLoadableModule.py
     """
@@ -84,7 +84,7 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
 
         # Load widget from .ui file (created by Qt Designer).
         # Additional widgets can be instantiated manually and added to self.layout.
-        uiWidget = slicer.util.loadUI(self.resourcePath('UI/ScanConvertCurvilinearArray.ui'))
+        uiWidget = slicer.util.loadUI(self.resourcePath('UI/BackScatterCoefficient.ui'))
         self.layout.addWidget(uiWidget)
         self.ui = slicer.util.childWidgetVariables(uiWidget)
 
@@ -95,7 +95,7 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
 
         # Create logic class. Logic implements all computations that should be possible to run
         # in batch mode, without a graphical user interface.
-        self.logic = ScanConvertCurvilinearArrayLogic()
+        self.logic = BackScatterCoefficientLogic()
 
         # Connections
 
@@ -268,7 +268,7 @@ class ScanConvertCurvilinearArrayWidget(ScriptedLoadableModuleWidget, VTKObserva
                 )
 
 
-class ScanConvertCurvilinearArrayLogic(ScanConvertCommonLogic):
+class BackScatterCoefficientLogic(ScanConvertCommonLogic):
     """This class should implement all the actual
     computation done by your module.  The interface
     should be such that other python code can import
@@ -375,7 +375,7 @@ class ScanConvertCurvilinearArrayLogic(ScanConvertCommonLogic):
         logging.info('GUI updated with results')
 
 
-class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
+class BackScatterCoefficientTest(ScriptedLoadableModuleTest):
     """
     This is the test case for your scripted module.
     Uses ScriptedLoadableModuleTest base class, available at:
@@ -391,9 +391,9 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
         """Run as few or as many tests as needed here.
         """
         self.setUp()
-        self.test_ScanConvertCurvilinearArray1()
+        self.test_BackScatterCoefficient1()
 
-    def test_ScanConvertCurvilinearArray1(self):
+    def test_BackScatterCoefficient1(self):
         """
         One of the most important features of the tests is that it should alert other
         developers when their changes will have an impact on the behavior of your
@@ -418,7 +418,7 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
 
         # Test the module logic
 
-        logic = ScanConvertCurvilinearArrayLogic()
+        logic = BackScatterCoefficientLogic()
 
         # Test nearest neighbor interpolation
         logic.process(inputVolume, outputVolume, 0.00862832, 0.0513434, 26.4, "800,800,3", "0.15,0.15,0.15",
@@ -437,8 +437,8 @@ class ScanConvertCurvilinearArrayTest(ScriptedLoadableModuleTest):
         file_sha512 = "f26953117f160b89a522edc6cb2cf45d622c6068632b5addd49cfaff0c8787aa783bcaaa310cdc61958ab2cd808a75a04479757e822ba573a128c4e7c7311041"
         import SampleData
         expectedResult = SampleData.downloadFromURL(
-            nodeNames='ScanConvertCurvilinearArrayTestOutput',
-            fileNames='ScanConvertCurvilinearArrayTestOutput.mha',
+            nodeNames='BackScatterCoefficientTestOutput',
+            fileNames='BackScatterCoefficientTestOutput.mha',
             uris=f"https://data.kitware.com:443/api/v1/file/hashsum/SHA512/{file_sha512}/download",
             checksums=f'SHA512:{file_sha512}',
             loadFiles=True)

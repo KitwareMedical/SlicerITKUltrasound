@@ -1,5 +1,5 @@
 #-----------------------------------------------------------------------------
-set(MODULE_NAME ScanConvertCurvilinearArray)
+set(MODULE_NAME BackScatterCoefficient)
 
 #-----------------------------------------------------------------------------
 set(MODULE_PYTHON_SCRIPTS
