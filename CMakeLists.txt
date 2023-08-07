@@ -14,6 +14,7 @@ set(EXTENSION_SCREENSHOTURLS
   "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/f1f347fc6b9a1a56200ed1bbc2ff7f4e3d0836ef/Documentation/source/Modules/ScanConversion/ScanConvertCurvilinearArray.png"
   "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/f1f347fc6b9a1a56200ed1bbc2ff7f4e3d0836ef/Documentation/source/Modules/ScanConversion/ScanConvertSliceSeries.png"
   )
+set(EXTENSION_DEPENDS "PyTorch") # Specified as a list or "NA" if no dependencies
 set(EXTENSION_BUILD_SUBDIRECTORY SlicerITKUltrasound-build)
 set(EXTENSION_STATUS Beta)
 
