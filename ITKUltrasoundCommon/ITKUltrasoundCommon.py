@@ -89,7 +89,7 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
             if not install:
                 logging.info('Installation of ITK aborted by the user')
                 return None
-        slicer.util.pip_install('itk-ultrasound>=0.6.3')
+        slicer.util.pip_install('itk-ultrasound>=0.6.4')
         import itk
         logging.info(f'ITK {itk.__version__} installed correctly')
         return itk
@@ -150,7 +150,7 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         origin, spacing, directionTuple = self.get_itk_metadata_from_ras_affine(rasAffine)
         itkImage.SetOrigin(origin)
         itkImage.SetSpacing(spacing)
-        directionMatrix = np.asarray(directionTuple).reshape((itkImage.ndim, itkImage.ndim))
+        directionMatrix = np.asarray(directionTuple).reshape((3, 3))
         itkImage.SetDirection(self.itk.matrix_from_array(directionMatrix))
 
         return itkImage
