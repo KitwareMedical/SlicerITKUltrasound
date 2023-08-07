@@ -28,7 +28,7 @@ class ITKUltrasoundCommon(ScriptedLoadableModule):
         self.parent.contributors = ["Dženan Zukić (Kitware Inc.)"]
         self.parent.helpText = "This is a helper module, which contains commonly used ITKUltrasound functions."
         self.parent.acknowledgementText = """
-This file was originally developed by Dženan Zukić, Kitware Inc., 
+This file was originally developed by Dženan Zukić, Kitware Inc.,
 and was partially funded by NIH grant 5R44CA239830.
 """
         # Additional initialization step after application startup is complete
@@ -53,7 +53,6 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         ScriptedLoadableModuleLogic.__init__(self)
         self._itk = None
         self.FLIPXY_33 = np.diag([-1, -1, 1])  # Matrix used to switch between LPS and RAS
-       
 
     @property
     def itk(self):
@@ -71,15 +70,6 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         logging.info(f'ITK {itk.__version__} imported correctly')
         return itk
 
-
-    @contextmanager
-    def showWaitCursor(self, show=True):
-        if show:
-            qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
-        yield
-        if show:
-            qt.QApplication.restoreOverrideCursor()
-
     @staticmethod
     def installITK(confirm=True):
         if confirm and not slicer.app.commandOptions().testingEnabled:
@@ -94,6 +84,50 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         logging.info(f'ITK {itk.__version__} installed correctly')
         return itk
 
+    @property
+    def monai(self):
+        if self._monai is None:
+            logging.info('Importing monai...')
+            self._monai = self.importMONAI()
+        return self._monai
+
+    def importMONAI(self, confirmInstallation=True):
+        try:
+            import monai
+        except ModuleNotFoundError:
+            with self.showWaitCursor(), slicer.util.displayPythonShell():
+                monai = self.installMONAI(confirmInstallation)
+        logging.info(f'MONAI {monai.__version__} imported correctly')
+        return monai
+
+    @staticmethod
+    def installMONAI(confirm=True):
+        try:
+            import torch
+        except ModuleNotFoundError:
+            slicer.util.errorDisplay(
+            'Please install PyTorch first. That will ensure correct version will provide optimal performance.'
+            )
+            return None
+        if confirm and not slicer.app.commandOptions().testingEnabled:
+            install = slicer.util.confirmOkCancelDisplay(
+            'MONAI will be downloaded and installed now. The process might take a minute.'
+            )
+            if not install:
+                logging.info('Installation of MONAI aborted by the user')
+                return None
+        slicer.util.pip_install('monai>=1.2.0')
+        import monai
+        logging.info(f'MONAI {monai.__version__} installed correctly')
+        return monai
+
+    @contextmanager
+    def showWaitCursor(self, show=True):
+        if show:
+            qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
+        yield
+        if show:
+            qt.QApplication.restoreOverrideCursor()
 
     # Adapted from TorchIO
     # https://github.com/fepegar/torchio/blob/4c1b3d83a7962699a15afe76ae6f39db1aae7a99/src/torchio/data/io.py#L278-L285
