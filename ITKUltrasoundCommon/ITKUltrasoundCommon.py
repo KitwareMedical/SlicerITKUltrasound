@@ -79,7 +79,7 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
             if not install:
                 logging.info('Installation of ITK aborted by the user')
                 return None
-        slicer.util.pip_install('itk-ultrasound>=0.6.3')
+        slicer.util.pip_install('itk-ultrasound>=0.6.4')
         import itk
         logging.info(f'ITK {itk.__version__} installed correctly')
         return itk
