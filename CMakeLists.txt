@@ -49,6 +49,7 @@ add_subdirectory(ScanConvertSliceSeries)
 add_subdirectory(ScanConvertCommon)
 add_subdirectory(BModeFromRF)
 add_subdirectory(ITKUltrasoundCommon)
+add_subdirectory(BackScatterCoefficient)
 
 #-----------------------------------------------------------------------------
 set(EXTENSION_CPACK_INSTALL_CMAKE_PROJECTS)
