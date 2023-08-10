@@ -1,6 +1,5 @@
 import logging
 import os
-from contextlib import contextmanager
 
 import vtk
 import numpy as np
@@ -66,19 +65,11 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         try:
             import itk
         except ModuleNotFoundError:
-            with self.showWaitCursor(), slicer.util.displayPythonShell():
+            with slicer.util.WaitCursor(), slicer.util.displayPythonShell():
                 itk = self.installITK(confirmInstallation)
         logging.info(f'ITK {itk.__version__} imported correctly')
         return itk
 
-
-    @contextmanager
-    def showWaitCursor(self, show=True):
-        if show:
-            qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
-        yield
-        if show:
-            qt.QApplication.restoreOverrideCursor()
 
     @staticmethod
     def installITK(confirm=True):
