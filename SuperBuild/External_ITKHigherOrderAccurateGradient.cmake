@@ -5,7 +5,6 @@ set(proj ITKHigherOrderAccurateGradient)
 
 # Dependencies
 set(${proj}_DEPENDENCIES
-  ITK
   )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
