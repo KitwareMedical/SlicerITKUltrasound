@@ -244,7 +244,7 @@ class BackScatterCoefficientWidget(ScriptedLoadableModuleWidget, VTKObservationM
         self._parameterNode.SetNodeReferenceID("OutputVolume0", self.ui.outputSelector0.currentNodeID)
         self._parameterNode.SetNodeReferenceID("OutputVolume1", self.ui.outputSelector1.currentNodeID)
         self._parameterNode.SetNodeReferenceID("OutputVolume2", self.ui.outputSelector2.currentNodeID)
-        self._parameterNode.SetParameter("LateralAngularSeparation", str(self.ui.samplingFrequency.value))
+        self._parameterNode.SetParameter("SamplingFrequency", str(self.ui.samplingFrequency.value))
         self._parameterNode.SetParameter("FrequencyBandStart", str(self.ui.frequencyBandStart.value))
         self._parameterNode.SetParameter("FrequencyBandEnd", str(self.ui.frequencyBandEnd.value))
 
