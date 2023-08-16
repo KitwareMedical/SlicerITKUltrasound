@@ -5,12 +5,10 @@ set(proj ITKUltrasound)
 
 # Dependencies
 set(${proj}_DEPENDENCIES
-  ITK
   ITKBSplineGradient
   ITKHigherOrderAccurateGradient
   ITKSplitComponents
   ITKStrain
-  VTK
   )
 ExternalProject_Include_Dependencies(${proj} PROJECT_VAR proj DEPENDS_VAR ${proj}_DEPENDENCIES)
 
