@@ -1,10 +1,6 @@
 import logging
 import os
 
-import vtk
-import numpy as np
-from typing import Any, Tuple
-
 import qt
 import slicer
 from slicer.ScriptedLoadableModule import (
@@ -51,8 +47,6 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         """
         ScriptedLoadableModuleLogic.__init__(self)
         self._itk = None
-        self.FLIPXY_33 = np.diag([-1, -1, 1])  # Matrix used to switch between LPS and RAS
-       
 
     @property
     def itk(self):
@@ -80,114 +74,18 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
             if not install:
                 logging.info('Installation of ITK aborted by the user')
                 return None
-        slicer.util.pip_install('itk-ultrasound>=0.6.4')
+        slicer.util.pip_install('itk-ultrasound>=0.6.3')
         import itk
         logging.info(f'ITK {itk.__version__} installed correctly')
         return itk
 
 
-    # Adapted from TorchIO
-    # https://github.com/fepegar/torchio/blob/4c1b3d83a7962699a15afe76ae6f39db1aae7a99/src/torchio/data/io.py#L278-L285
-    def get_rotation_and_spacing_from_affine(
-        self,
-        affine: np.ndarray,
-    ) -> Tuple[np.ndarray, np.ndarray]:
-        # From https://github.com/nipy/nibabel/blob/master/nibabel/orientations.py
-        rotation_zoom = affine[:3, :3]
-        spacing = np.sqrt(np.sum(rotation_zoom * rotation_zoom, axis=0))
-        rotation = rotation_zoom / spacing
-        return rotation, spacing
-
-    # Adapted from TorchIO
-    # https://github.com/fepegar/torchio/blob/4c1b3d83a7962699a15afe76ae6f39db1aae7a99/src/torchio/data/io.py#L384-L412
-    def get_itk_metadata_from_ras_affine(
-        self,
-        affine: np.ndarray,
-        is_2d: bool=False,
-        lps: bool = True,
-    ) -> Tuple[Any, Any, Any]:
-        direction_ras, spacing_array = self.get_rotation_and_spacing_from_affine(affine)
-        origin_ras = affine[:3, 3]
-        origin_lps = np.dot(self.FLIPXY_33, origin_ras)
-        direction_lps = np.dot(self.FLIPXY_33, direction_ras)
-        if is_2d:  # ignore orientation if 2D (1, W, H, 1)
-            direction_lps = np.diag((-1, -1)).astype(np.float64)
-            direction_ras = np.diag((1, 1)).astype(np.float64)
-        origin_array = origin_lps if lps else origin_ras
-        direction_array = direction_lps if lps else direction_ras
-        direction_array = direction_array.flatten()
-        # The following are to comply with mypy
-        # (although there must be prettier ways to do this)
-        ox, oy, oz = origin_array
-        sx, sy, sz = spacing_array
-        direction : Any
-        if is_2d:
-            d1, d2, d3, d4 = direction_array
-            direction = d1, d2, d3, d4
-        else:
-            d1, d2, d3, d4, d5, d6, d7, d8, d9 = direction_array
-            direction = d1, d2, d3, d4, d5, d6, d7, d8, d9
-        origin = ox, oy, oz
-        spacing = sx, sy, sz
-        return origin, spacing, direction
-
     def getITKImageFromVolumeNode(self, volumeNode):
-        itkImage = self.itk.image_from_vtk_image(volumeNode.GetImageData())
-
-        ijkToRAS = vtk.vtkMatrix4x4()
-        volumeNode.GetIJKToRASMatrix(ijkToRAS)
-        rasAffine = slicer.util.arrayFromVTKMatrix(ijkToRAS)
-
-        origin, spacing, directionTuple = self.get_itk_metadata_from_ras_affine(rasAffine)
-        itkImage.SetOrigin(origin)
-        itkImage.SetSpacing(spacing)
-        directionMatrix = np.asarray(directionTuple).reshape((3, 3))
-        itkImage.SetDirection(self.itk.matrix_from_array(directionMatrix))
-
-        return itkImage
-
-    # Adapted from TorchIO
-    # https://github.com/fepegar/torchio/blob/4c1b3d83a7962699a15afe76ae6f39db1aae7a99/src/torchio/data/io.py#L356-L381
-    def get_ras_affine_from_itk(
-        self,
-        itkImage,
-    ) -> np.ndarray:
-        spacing = np.array(itkImage.GetSpacing())
-        direction_lps = np.array(itkImage.GetDirection())
-        origin_lps = np.array(itkImage.GetOrigin())
-        direction_length = len(direction_lps)
-        if itkImage.ndim == 3:
-            rotation_lps = direction_lps.reshape(3, 3)
-        elif itkImage.ndim == 2:  # ignore last dimension if 2D (1, W, H, 1)
-            rotation_lps_2d = direction_lps.reshape(2, 2)
-            rotation_lps = np.eye(3)
-            rotation_lps[:2, :2] = rotation_lps_2d
-            spacing = np.append(spacing, 1)
-            origin_lps = np.append(origin_lps, 0)
-        elif itkImage.ndim == 4:  # probably a bad NIfTI. Let's try to fix it
-            rotation_lps = direction_lps.reshape(4, 4)[:3, :3]
-            spacing = spacing[:-1]
-            origin_lps = origin_lps[:-1]
-        rotation_ras = np.dot(self.FLIPXY_33, rotation_lps)
-        rotation_ras_zoom = rotation_ras * spacing
-        translation_ras = np.dot(self.FLIPXY_33, origin_lps)
-        affine = np.eye(4)
-        affine[:3, :3] = rotation_ras_zoom
-        affine[:3, 3] = translation_ras
-        return affine
+        return slicer.util.itkImageFromVolume(volumeNode)
 
     def setITKImageToVolumeNode(self, itkImage, outputVolumeNode):
-        rasAffine = self.get_ras_affine_from_itk(itkImage)
-        ijkToRAS = slicer.util.vtkMatrixFromArray(rasAffine)
-        vtkImage = self.itk.vtk_image_from_image(itkImage)
-        # set identity metadata on the vtkImageData for the volume node
-        # otherwise display properties are bugged, see:
-        # https://github.com/Slicer/Slicer/issues/6911
-        vtkImage.SetSpacing([1.0] * itkImage.ndim)
-        vtkImage.SetOrigin([0.0] * itkImage.ndim)
-        vtkImage.SetDirectionMatrix(np.eye(itkImage.ndim).flatten())
-        outputVolumeNode.SetAndObserveImageData(vtkImage)
-        outputVolumeNode.SetIJKToRASMatrix(ijkToRAS)
+        slicer.util.updateVolumeFromITKImage(outputVolumeNode, itkImage)
+
         slicer.util.setSliceViewerLayers(
             background=outputVolumeNode,
             fit=True,
