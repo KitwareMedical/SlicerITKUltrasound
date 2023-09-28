@@ -14,11 +14,7 @@ set(EXTENSION_SCREENSHOTURLS
   "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/f1f347fc6b9a1a56200ed1bbc2ff7f4e3d0836ef/Documentation/source/Modules/ScanConversion/ScanConvertCurvilinearArray.png"
   "https://github.com/KitwareMedical/SlicerITKUltrasound/raw/f1f347fc6b9a1a56200ed1bbc2ff7f4e3d0836ef/Documentation/source/Modules/ScanConversion/ScanConvertSliceSeries.png"
   )
-set(EXTENSION_BUILD_SUBDIRECTORY SlicerITKUltrasound-build)
 set(EXTENSION_STATUS Beta)
-
-set(SUPERBUILD_TOPLEVEL_PROJECT SlicerITKUltrasound)
-
 find_package(Git REQUIRED)
 
 #-----------------------------------------------------------------------------
@@ -30,13 +26,6 @@ mark_as_superbuild(PYTHON_EXECUTABLE)
 mark_as_superbuild(PYTHON_INCLUDE_DIR)
 mark_as_superbuild(PYTHON_LIBRARY)
 
-#-----------------------------------------------------------------------------
-option(${EXTENSION_NAME}_SUPERBUILD "Build ${EXTENSION_NAME} and the projects it depends on." ON)
-mark_as_advanced(${EXTENSION_NAME}_SUPERBUILD)
-if(${EXTENSION_NAME}_SUPERBUILD)
-  include("${CMAKE_CURRENT_SOURCE_DIR}/SuperBuild.cmake")
-  return()
-endif()
 
 #-----------------------------------------------------------------------------
 # Extension modules
