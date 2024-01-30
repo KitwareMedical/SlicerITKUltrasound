@@ -28,7 +28,7 @@ class ITKUltrasoundCommon(ScriptedLoadableModule):
         self.parent.contributors = ["Dženan Zukić (Kitware Inc.)"]
         self.parent.helpText = "This is a helper module, which contains commonly used ITKUltrasound functions."
         self.parent.acknowledgementText = """
-This file was originally developed by Dženan Zukić, Kitware Inc., 
+This file was originally developed by Dženan Zukić, Kitware Inc.,
 and was partially funded by NIH grant 5R44CA239830.
 """
         # Additional initialization step after application startup is complete
@@ -53,7 +53,6 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         ScriptedLoadableModuleLogic.__init__(self)
         self._itk = None
         self.FLIPXY_33 = np.diag([-1, -1, 1])  # Matrix used to switch between LPS and RAS
-       
 
     @property
     def itk(self):
@@ -71,15 +70,6 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         logging.info(f'ITK {itk.__version__} imported correctly')
         return itk
 
-
-    @contextmanager
-    def showWaitCursor(self, show=True):
-        if show:
-            qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
-        yield
-        if show:
-            qt.QApplication.restoreOverrideCursor()
-
     @staticmethod
     def installITK(confirm=True):
         if confirm and not slicer.app.commandOptions().testingEnabled:
@@ -94,6 +84,14 @@ class ITKUltrasoundCommonLogic(ScriptedLoadableModuleLogic):
         logging.info(f'ITK {itk.__version__} installed correctly')
         return itk
 
+
+    @contextmanager
+    def showWaitCursor(self, show=True):
+        if show:
+            qt.QApplication.setOverrideCursor(qt.Qt.WaitCursor)
+        yield
+        if show:
+            qt.QApplication.restoreOverrideCursor()
 
     # Adapted from TorchIO
     # https://github.com/fepegar/torchio/blob/4c1b3d83a7962699a15afe76ae6f39db1aae7a99/src/torchio/data/io.py#L278-L285
